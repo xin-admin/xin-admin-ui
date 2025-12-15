@@ -1,4 +1,11 @@
 export default {
+  // Composant XinForm
+  "xinForm.submit": "Soumettre",
+  "xinForm.reset": "Réinitialiser",
+  "xinForm.cancel": "Annuler",
+  "xinForm.formList.add": "Ajouter un élément",
+  "xinForm.upload.button": "Cliquer pour télécharger",
+
   // Composant UserSelector
   "xinForm.userSelector.placeholder": "Veuillez sélectionner un utilisateur",
   "xinForm.userSelector.modal.title": "Sélectionner un utilisateur",

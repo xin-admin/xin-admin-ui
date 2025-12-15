@@ -1,4 +1,11 @@
 export default {
+  // XinForm 组件
+  "xinForm.submit": "提交",
+  "xinForm.reset": "重置",
+  "xinForm.cancel": "取消",
+  "xinForm.formList.add": "添加一项",
+  "xinForm.upload.button": "点击上传",
+
   // UserSelector 组件
   "xinForm.userSelector.placeholder": "请选择用户",
   "xinForm.userSelector.modal.title": "选择用户",

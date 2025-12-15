@@ -1,4 +1,11 @@
 export default {
+  // XinForm Component
+  "xinForm.submit": "Submit",
+  "xinForm.reset": "Reset",
+  "xinForm.cancel": "Cancel",
+  "xinForm.formList.add": "Add Item",
+  "xinForm.upload.button": "Click to Upload",
+
   // UserSelector Component
   "xinForm.userSelector.placeholder": "Please select user",
   "xinForm.userSelector.modal.title": "Select User",

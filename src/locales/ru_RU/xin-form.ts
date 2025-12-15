@@ -1,4 +1,11 @@
 export default {
+  // Компонент XinForm
+  "xinForm.submit": "Отправить",
+  "xinForm.reset": "Сбросить",
+  "xinForm.cancel": "Отмена",
+  "xinForm.formList.add": "Добавить элемент",
+  "xinForm.upload.button": "Нажмите для загрузки",
+
   // Компонент UserSelector
   "xinForm.userSelector.placeholder": "Пожалуйста, выберите пользователя",
   "xinForm.userSelector.modal.title": "Выбрать пользователя",

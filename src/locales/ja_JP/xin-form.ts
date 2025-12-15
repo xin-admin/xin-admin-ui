@@ -1,4 +1,11 @@
 export default {
+  // XinForm コンポーネント
+  "xinForm.submit": "送信",
+  "xinForm.reset": "リセット",
+  "xinForm.cancel": "キャンセル",
+  "xinForm.formList.add": "項目を追加",
+  "xinForm.upload.button": "クリックしてアップロード",
+
   // UserSelector コンポーネント
   "xinForm.userSelector.placeholder": "ユーザーを選択してください",
   "xinForm.userSelector.modal.title": "ユーザー選択",
