@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import React, { useCallback, useImperativeHandle, useMemo, useState } from 'react';
 import {
   Form,
   Input,
@@ -10,51 +10,35 @@ import {
   DatePicker,
   TimePicker,
   TreeSelect,
-  Cascader,
   Rate,
   Slider,
-  Upload,
   Button,
   Space,
   Row,
   Col,
   Modal,
   Drawer,
-  Divider,
-  ColorPicker,
+  ColorPicker
 } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { IconSelector, ImageUploader, UserSelector } from '@/components/XinFormField';
-import { UploadOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import type { XinFormProps, XinFormColumn, XinFormRef } from './typings';
+import { useTranslation } from 'react-i18next'
+import type {XinFormProps, XinFormColumn, XinFormRef, SubmitterButton} from './typings';
 import type {
-  FormProps,
-  FormItemProps,
-  ColProps,
-  RowProps,
-  ModalProps,
-  DrawerProps,
-  StepProps,
   FormInstance,
   InputProps,
   InputNumberProps,
   SelectProps,
   TreeSelectProps,
-  CascaderProps,
   RadioGroupProps,
-  CheckboxGroupProps,
   SwitchProps,
   RateProps,
   SliderSingleProps,
   DatePickerProps,
   TimePickerProps,
-  RangePickerProps,
-  TimeRangePickerProps,
-  UploadProps,
   ColorPickerProps,
-  TextAreaProps,
-  PasswordProps
 } from 'antd';
+import type {PasswordProps, TextAreaProps} from "antd/es/input";
+import type {RangePickerProps} from "antd/es/date-picker";
+import type {CheckboxGroupProps} from 'antd/es/checkbox';
 
 
 const { TextArea, Password } = Input;
@@ -74,11 +58,13 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     modalProps,
     drawerProps,
     trigger,
+    submitter
   } = props;
 
   const { t } = useTranslation();
   const [form] = Form.useForm<T>();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // 暴露表单方法
   useImperativeHandle(formRef, (): XinFormRef => ({
@@ -91,9 +77,14 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
   // 表单提交处理
   const handleFinish = useCallback(async (values: T) => {
     if (!onFinish) return;
-    const result = await onFinish(values);
-    if (result !== false && (layoutType === 'ModalForm' || layoutType === 'DrawerForm')) {
-      setOpen(false);
+    try {
+      setLoading(true);
+      const result = await onFinish(values);
+      if (result !== false && (layoutType === 'ModalForm' || layoutType === 'DrawerForm')) {
+        setOpen(false);
+      }
+    } finally {
+      setLoading(false);
     }
   }, [onFinish, layoutType]);
 
@@ -111,7 +102,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     if(readonly) {
       const values: T = formInstance.getFieldsValue();
       return render ? render(values[key], values) : values[key];
-    };
+    }
 
     switch (valueType) {
 
@@ -132,9 +123,6 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
 
       case 'treeSelect':
         return <TreeSelect {...fieldProps as TreeSelectProps} />;
-
-      case 'cascader':
-        return <Cascader {...fieldProps as CascaderProps} />;
 
       case 'radio':
         return <Radio.Group options={[]} optionType="default" {...fieldProps as RadioGroupProps} />;
@@ -163,9 +151,6 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       case 'dateRange':
         return <RangePicker {...fieldProps as RangePickerProps} />;
 
-      case 'dateTimeRange':
-        return <RangePicker showTime {...fieldProps as DatePickerProps} />;
-
       case 'time':
         return <TimePicker {...fieldProps as TimePickerProps} />;
 
@@ -184,57 +169,8 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       case 'year':
         return <DatePicker picker="year" {...fieldProps as DatePickerProps} />;
 
-      case 'upload':
-        return (
-          <Upload
-            action={column.uploadProps?.action}
-            accept={column.uploadProps?.accept}
-            maxCount={column.uploadProps?.maxCount}
-            multiple={column.uploadProps?.multiple}
-            listType={column.uploadProps?.listType || 'text'}
-            {...commonProps}
-          >
-            <Button icon={<UploadOutlined />}>{t('xinForm.upload.button')}</Button>
-          </Upload>
-        );
-
-      case 'image':
-        return (
-          <ImageUploader
-            action={column.imageProps?.action || '/sys-file/upload'}
-            mode={column.imageProps?.mode}
-            maxCount={column.imageProps?.maxCount}
-            maxSize={column.imageProps?.maxSize}
-            maxWidth={column.imageProps?.maxWidth}
-            maxHeight={column.imageProps?.maxHeight}
-            croppable={column.imageProps?.croppable}
-            disabled={commonProps.disabled}
-          />
-        );
-
       case 'color':
         return <ColorPicker {...fieldProps as ColorPickerProps} />;
-
-      case 'icon':
-        return (
-          <IconSelector
-            placeholder={column.placeholder as string}
-            disabled={commonProps.disabled}
-            readonly={readonly}
-          />
-        );
-
-      case 'user':
-        return (
-          <UserSelector
-            mode={column.userProps?.mode}
-            showDept={column.userProps?.showDept}
-            maxTagCount={column.userProps?.maxTagCount}
-            placeholder={column.placeholder as string}
-            disabled={commonProps.disabled}
-            readonly={readonly}
-          />
-        );
 
       case 'text':
       default:
@@ -249,23 +185,13 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
 
     // 普通表单项
     const formItemContent = (
-      <Form.Item
-        key={key}
-        name={column.name}
-        label={column.label}
-        tooltip={column.tooltip}
-        extra={column.extra}
-        initialValue={column.initialValue}
-        rules={column.rules}
-        valuePropName={column.valueType === 'switch' ? 'checked' : 'value'}
-        {...column}
-      >
+      <Form.Item key={key} {...column}>
         {renderField(column, form)}
       </Form.Item>
     );
 
     return grid ? <Col {...colProps} key={key}>{formItemContent}</Col> : formItemContent;
-  }, [grid, rowProps, renderField, form, t]);
+  }, [grid, rowProps, renderField, form]);
 
   // 渲染提交按钮
   const renderSubmitter = useMemo(() => {
@@ -274,39 +200,70 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     const submitButton = (
       <Button
         type="primary"
-        htmlType="submit"
-        loading={submitting || loading}
+        loading={loading}
+        onClick={() => form.submit()}
         {...submitter?.submitButtonProps}
       >
         {submitter?.submitText || t('xinForm.submit')}
       </Button>
     );
 
+    const closeButton = (
+      <Button
+        loading={loading}
+        onClick={handleClose}
+        {...submitter?.closeButtonProps}
+      >
+        {submitter?.closeText || t('xinForm.cancel')}
+      </Button>
+    );
+
     const resetButton = (
-      <Button onClick={() => form.resetFields()} {...submitter?.resetButtonProps}>
+      <Button
+        loading={loading}
+        onClick={() => form.resetFields()}
+        {...submitter?.resetButtonProps}
+      >
         {submitter?.resetText || t('xinForm.reset')}
       </Button>
     );
 
-    const buttons = [resetButton, submitButton];
+    const buttons: SubmitterButton = {
+      submit: submitButton,
+      close: closeButton,
+      reset: resetButton,
+    };
 
     if (typeof submitter?.render === 'function') {
-      return submitter.render({ form, submitting }, buttons);
+      return submitter.render(buttons);
     }
 
-    return (
-      <Form.Item wrapperCol={wrapperCol ? { offset: wrapperCol.span ? Number(wrapperCol.span) : 0 } : undefined}>
-        <Space>{buttons}</Space>
-      </Form.Item>
-    );
-  }, [form, wrapperCol, t]);
+    if(layoutType === 'Form' || layoutType === 'StepsForm') {
+      return (
+        <Form.Item {...submitter?.formItemProps}>
+          <Space>
+            {buttons.reset}
+            {buttons.submit}
+          </Space>
+        </Form.Item>
+      );
+    }else {
+      return (
+        <Space>
+          {buttons.reset}
+          {buttons.submit}
+          {buttons.close}
+        </Space>
+      );
+    }
+  }, [loading, form, submitter, t]);
 
   // 表单内容
   const formContent = useMemo(() => (
     <Form
+      {...props}
       form={form}
       onFinish={handleFinish}
-      {...props}
     >
       {grid ? (
         <Row {...rowProps}>
@@ -315,32 +272,17 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       ) : (
         columns.map((column, index) => renderFormItem(column, index))
       )}
-      {layoutType === 'Form' && renderSubmitter}
+      {(layoutType === 'Form' || layoutType === 'StepsForm') && renderSubmitter}
     </Form>
   ), [ form, handleFinish, props, grid, rowProps, columns, renderFormItem, layoutType, renderSubmitter ]);
-
-  // 弹窗底部按钮
-  const modalFooter = useMemo(() => {
-    if (submitter?.render === false) return null;
-    return (
-      <Space>
-        <Button onClick={handleClose}>
-          {t('xinForm.cancel')}
-        </Button>
-        <Button type="primary" loading={submitting} onClick={() => form.submit()}>
-          {submitter?.submitText || t('xinForm.submit')}
-        </Button>
-      </Space>
-    );
-  }, [submitter, submitting, form, handleClose, t]);
 
   // 触发器
   const triggerElement = useMemo(() => {
     if (!trigger) return null;
     return React.cloneElement(trigger as React.ReactElement<{ onClick?: () => void }>, {
-      onClick: handleTriggerClick,
+      onClick: handleOpen,
     });
-  }, [trigger, handleTriggerClick]);
+  }, [trigger, handleOpen]);
 
   // 根据 layoutType 渲染
   if (layoutType === 'ModalForm') {
@@ -348,14 +290,10 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       <>
         {triggerElement}
         <Modal
-          title={modalProps?.title}
-          width={modalProps?.width}
           open={open}
           onCancel={handleClose}
-          destroyOnClose={modalProps?.destroyOnClose}
-          maskClosable={modalProps?.maskClosable}
-          forceRender={modalProps?.forceRender}
-          footer={modalFooter}
+          footer={renderSubmitter}
+          {...modalProps}
         >
           {formContent}
         </Modal>
@@ -368,14 +306,10 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       <>
         {triggerElement}
         <Drawer
-          title={drawerProps?.title}
-          width={drawerProps?.width || 400}
           open={open}
           onClose={handleClose}
-          destroyOnClose={drawerProps?.destroyOnClose}
-          maskClosable={drawerProps?.maskClosable}
-          placement={drawerProps?.placement}
-          footer={modalFooter}
+          footer={renderSubmitter}
+          {...drawerProps}
         >
           {formContent}
         </Drawer>
@@ -387,4 +321,5 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
 }
 
 export default XinForm;
-export type { XinFormProps, XinFormColumn, XinFormRef, XinFormOption, XinFormValueType };
+
+export type { XinFormProps, XinFormColumn, XinFormRef };

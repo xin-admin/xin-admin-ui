@@ -13,7 +13,6 @@ import type {
   TreeSelectProps,
   CascaderProps,
   RadioGroupProps,
-  CheckboxGroupProps,
   SwitchProps,
   RateProps,
   SliderSingleProps,
@@ -21,11 +20,12 @@ import type {
   TimePickerProps,
   TimeRangePickerProps,
   UploadProps,
-  ColorPickerProps,
+  ColorPickerProps, ButtonProps,
 } from 'antd';
 import type { TextAreaProps, PasswordProps } from 'antd/es/input';
 import type { RangePickerProps } from 'antd/es/date-picker';
-import type { ReactNode, RefObject } from 'react';
+import type { CheckboxGroupProps } from 'antd/es/checkbox';
+import {type ReactNode, type RefObject} from 'react';
 import type { IconSelectProps } from '@/components/XinFormField/IconSelector/typings';
 import type { ImageUploaderProps } from '@/components/XinFormField/ImageUploader/typings';
 import type { UserSelectorProps } from '@/components/XinFormField/UserSelector/typings';
@@ -51,7 +51,6 @@ export type XinFormValue =
     | 'date'          // 日期选择
     | 'dateTime'      // 日期时间选择
     | 'dateRange'     // 日期范围
-    | 'dateTimeRange' // 日期时间范围
     | 'time'          // 时间选择
     | 'timeRange'     // 时间范围
     | 'week'          // 周选择
@@ -86,7 +85,6 @@ export interface FieldPropsMap {
   date: DatePickerProps;
   dateTime: DatePickerProps;
   dateRange: RangePickerProps;
-  dateTimeRange: RangePickerProps;
   time: TimePickerProps;
   timeRange: TimeRangePickerProps;
   week: DatePickerProps;
@@ -131,10 +129,16 @@ type XinFormColumnMap<T> = {
  */
 export type XinFormColumn<T> = XinFormColumnMap<T>[XinFormValue]
 
+export type SubmitterButton = {
+  submit: ReactNode,
+  reset: ReactNode,
+  close: ReactNode,
+}
+
 /**
  * XinForm 组件属性
  */
-export type XinFormProps<T = any> = Omit<FormProps<T>, 'onFinish'> & {
+export type XinFormProps<T = any> = Omit<FormProps<T>, 'onFinish' | 'form'> & {
   /** 表单列配置 */
   columns: XinFormColumn<T>[];
   /** 表单布局类型 */
@@ -157,6 +161,18 @@ export type XinFormProps<T = any> = Omit<FormProps<T>, 'onFinish'> & {
   stepsProps?: StepProps;
   /** 触发器 */
   trigger?: ReactNode;
+  /** 渲染表单操作栏 */
+  submitter?: {
+    okText?: string;
+    render?: false | ((dom: SubmitterButton, form?: RefObject<XinFormRef | undefined>) => ReactNode);
+    submitText?: string | ReactNode;
+    resetText?: string | ReactNode;
+    closeText?: string | ReactNode;
+    submitButtonProps?: Omit<ButtonProps, 'loading' | 'onClick'>;
+    resetButtonProps?: Omit<ButtonProps, 'loading' | 'onClick'>;
+    closeButtonProps?: Omit<ButtonProps, 'loading' | 'onClick'>;
+    formItemProps?: Omit<FormItemProps, 'label'>;
+  }
 }
 
 /**
