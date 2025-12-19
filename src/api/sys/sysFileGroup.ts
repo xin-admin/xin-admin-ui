@@ -2,10 +2,11 @@ import type { ISysFileGroup } from "@/domain/iSysFileGroup";
 import createAxios from "@/utils/request";
 
 // 文件夹相关API
-export function getFileGroupList() {
+export function queryFileGroupList(params?: {keywordSearch: string}) {
   return createAxios<ISysFileGroup[]>({
     url: '/sys/file/group',
     method: 'get',
+    params
   });
 }
 

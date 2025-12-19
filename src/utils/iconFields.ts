@@ -37,7 +37,8 @@ const useIcons = [
   'icon-anzhuangzhiru',
   'icon-minglingyukongzhi',
   'icon-mubiaodacheng',
-  'icon-henjiqingli'
+  'icon-henjiqingli',
+  'icon-wenjianjia',
 ]
 
 const direction = [
