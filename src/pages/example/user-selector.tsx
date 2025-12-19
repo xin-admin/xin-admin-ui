@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Space, Divider, Typography, message } from 'antd';
 import { ProForm, ProFormField, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import UserSelector from '@/components/XinForm/UserSelector';
+import UserSelector from '@/components/XinFormField/UserSelector';
 
 const { Title, Paragraph, Text } = Typography;
 

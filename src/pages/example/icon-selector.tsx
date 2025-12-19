@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Space, Divider, Typography, message } from 'antd';
 import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import IconSelect from '@/components/XinForm/IconSelector';
+import IconSelect from '@/components/XinFormField/IconSelector';
 
 const { Title, Paragraph, Text } = Typography;
 

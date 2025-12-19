@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Button, Space, Typography } from 'antd';
-import ImageUploader from '@/components/XinForm/ImageUploader';
+import ImageUploader from '@/components/XinFormField/ImageUploader';
 import type { ISysFileInfo } from '@/domain/iSysFile';
 const { Title, Paragraph } = Typography;
 /**

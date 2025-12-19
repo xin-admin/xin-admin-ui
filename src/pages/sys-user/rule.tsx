@@ -5,7 +5,7 @@ import IconFont from "@/components/IconFont";
 import XinTable from "@/components/XinTable";
 import type {XinTableColumn, XinTableRef} from "@/components/XinTable/typings.ts";
 import {Button, message, Switch, Tag, Tooltip} from "antd";
-import IconSelector from "@/components/XinForm/IconSelector";
+import IconSelector from "@/components/XinFormField/IconSelector";
 import {PlusOutlined} from "@ant-design/icons";
 import {useRef} from "react";
 import type {ProFormInstance} from "@ant-design/pro-components";
