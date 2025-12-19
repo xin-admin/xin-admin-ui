@@ -1,45 +1,40 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
-  Card,
-  Col,
-  Row,
-  Menu,
   Button,
-  Space,
-  message,
-  Popconfirm,
+  Card,
+  Checkbox,
+  Col,
+  DatePicker,
+  Divider,
   Form,
   Input,
-  Select,
-  Switch,
   InputNumber,
-  DatePicker,
+  Menu,
+  message,
+  Popconfirm,
   Radio,
-  Checkbox,
-  Divider,
+  Row,
+  Select,
+  Space,
   Spin,
+  Switch,
   Typography,
 } from 'antd';
+import {DeleteOutlined, EditOutlined, PlusOutlined, SettingOutlined,} from '@ant-design/icons';
+import {BetaSchemaForm, type ProFormInstance} from '@ant-design/pro-components';
+import {useTranslation} from 'react-i18next';
+import type {ISettingGroup} from '@/domain/iSettingGroup';
+import type {ISetting} from '@/domain/iSetting';
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
-import { BetaSchemaForm, type ProFormInstance } from '@ant-design/pro-components';
-import { useTranslation } from 'react-i18next';
-import type { ISettingGroup } from '@/domain/iSettingGroup';
-import type { ISetting } from '@/domain/iSetting';
-import {
-  getSettingGroupList,
   createSettingGroup,
-  updateSettingGroup,
-  deleteSettingGroup,
-  getSettingItemList,
   createSettingItem,
-  updateSettingItem,
+  deleteSettingGroup,
   deleteSettingItem,
+  getSettingGroupList,
+  getSettingItemList,
   saveSettingItemValue,
+  updateSettingGroup,
+  updateSettingItem,
 } from '@/api/sys/sysSetting';
 
 const { TextArea } = Input;
@@ -116,8 +111,7 @@ const SettingManagement: React.FC = () => {
         if (item.values) {
           try {
             // 尝试解析JSON值
-            const parsedValue = JSON.parse(item.values);
-            initialValues[`item_${item.id}`] = parsedValue;
+            initialValues[`item_${item.id}`] = JSON.parse(item.values);
           } catch {
             // 如果不是JSON,直接使用字符串值
             initialValues[`item_${item.id}`] = item.values;
@@ -167,7 +161,7 @@ const SettingManagement: React.FC = () => {
       setGroupModalOpen(false);
       await loadSettingGroups();
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -215,7 +209,7 @@ const SettingManagement: React.FC = () => {
       setItemModalOpen(false);
       await loadSettingItems(selectedGroupId);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
@@ -244,7 +238,7 @@ const SettingManagement: React.FC = () => {
         const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
         await saveSettingItemValue(itemId, valueStr);
         message.success(t('setting.save.success'), 1);
-      } catch (error) {
+      } catch {
         message.error(t('setting.save.error'));
       }
     }, 500);
@@ -484,8 +478,12 @@ const SettingManagement: React.FC = () => {
   return (
     <Row gutter={[16, 16]}>
       {/* 左侧设置组菜单 */}
-      <Col xs={24} lg={6}>
+      <Col xs={24} lg={4}>
         <Card
+          styles={{
+            header: { paddingInline: 16, paddingBlock: 0, minHeight: 48 },
+            body: { padding: 16, minHeight: 52 },
+          }}
           title={(
             <Space>
               <SettingOutlined />
@@ -494,7 +492,7 @@ const SettingManagement: React.FC = () => {
           )}
           extra={
             <Button
-              type="primary"
+              type="link"
               size="small"
               icon={<PlusOutlined />}
               onClick={handleAddGroup}
@@ -553,13 +551,18 @@ const SettingManagement: React.FC = () => {
       </Col>
 
       {/* 右侧设置项 */}
-      <Col xs={24} lg={18}>
+      <Col xs={24} lg={20}>
         <Card
+          styles={{
+            header: { paddingInline: 16, paddingBlock: 0, minHeight: 48 },
+            body: { padding: 16, minHeight: 52 },
+          }}
           title={t('setting.item.title')}
           extra={
             selectedGroupId && (
               <Button
-                type="primary"
+                type="link"
+                size="small"
                 icon={<PlusOutlined />}
                 onClick={handleAddItem}
               >
