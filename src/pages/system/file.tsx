@@ -242,7 +242,7 @@ const FileManagement: React.FC = () => {
   const handleSaveGroup = async (values: ISysFileGroup) => {
     const isEdit = !!updateGroupData;
     await (isEdit ? updateFileGroup({...values, id: updateGroupData.id}) : createFileGroup(values));
-    message.success(t('sysFile.saveFolderSuccess', {action: isEdit ? '修改' : '新增'}));
+    message.success(isEdit ? t('sysFile.saveFolderSuccess', {action: t('sysFile.actionEdit')}) : t('sysFile.saveFolderSuccess', {action: t('sysFile.actionAdd')}));
     setGroupModalOpen(false);
     await loadFileGroups();
     return true;
@@ -252,7 +252,7 @@ const FileManagement: React.FC = () => {
   const handleDeleteGroup = async (id: number) => {
     window.$modal?.confirm({
       title: t('sysFile.confirmDeleteFolder'),
-      content: '删除文件夹前请删除文件夹下所有的文件',
+      content: t('sysFile.deleteFolderHint'),
       okText: t('sysFile.ok'),
       cancelText: t('sysFile.cancel'),
       onOk: async () => {
@@ -529,7 +529,7 @@ const FileManagement: React.FC = () => {
       title: t('sysFile.sort'),
       dataIndex: 'sort',
       valueType: 'digit',
-      formItemProps: {rules: [{required: true, message: '排序必须'}]},
+      formItemProps: {rules: [{required: true, message: t('sysFile.sortRequired')}]},
       initialValue: 0
     },
     {
@@ -768,11 +768,11 @@ const FileManagement: React.FC = () => {
           }}
         >
           <Input.Search
-            placeholder="输入文件夹名称搜索"
+            placeholder={t('sysFile.folderSearchPlaceholder')}
             style={{marginBottom: 16}}
             onSearch={(value) => setGroupSearchKeyword(value)}
           />
-          <Spin spinning={fileGroupLoading} tip="Loading..." size="small">
+          <Spin spinning={fileGroupLoading} tip={t('sysFile.loading')} size="small">
             <div style={{minHeight: 200}}>
               { fileGroups.length > 0 && (
                 <Tree
@@ -828,7 +828,7 @@ const FileManagement: React.FC = () => {
             <Tooltip title={t('sysFile.trash')}>
               <Button icon={<DeleteOutlined/>} onClick={() => openTrash()} children={t('sysFile.trash')}/>
             </Tooltip>
-            <Tooltip title="刷新">
+            <Tooltip title={t('sysFile.refresh')}>
               <Button icon={<ReloadOutlined/>} onClick={() => loadFiles()}/>
             </Tooltip>
           </Space>
@@ -844,7 +844,7 @@ const FileManagement: React.FC = () => {
               ...pagination,
               onChange: loadFiles,
               showSizeChanger: true,
-              showTotal: (total) => `共 ${total} 个文件`
+              showTotal: (total) => t('sysFile.totalFiles', { total })
             }}
             rowSelection={{
               selectedRowKeys,
@@ -905,7 +905,7 @@ const FileManagement: React.FC = () => {
             ...trashPagination,
             onChange: loadTrashFiles,
             showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 个文件`
+            showTotal: (total) => t('sysFile.totalFiles', { total })
           }}
           rowSelection={{
             selectedRowKeys,
@@ -946,8 +946,8 @@ const FileManagement: React.FC = () => {
               <p className="ant-upload-drag-icon">
                 <CloudUploadOutlined style={{fontSize: 48, color: '#1890ff'}} />
               </p>
-              <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
-              <p className="ant-upload-hint">支持单个或批量上传</p>
+              <p className="ant-upload-text">{t('sysFile.uploadDragText')}</p>
+              <p className="ant-upload-hint">{t('sysFile.uploadHint')}</p>
             </Upload.Dragger>
           </Form.Item>
           {uploading && <Form.Item label={t('sysFile.uploadProgress')}><Progress percent={uploadProgress} status="active"/></Form.Item>}
@@ -963,7 +963,7 @@ const FileManagement: React.FC = () => {
         onCancel={() => setRenameModalOpen(false)}
       >
         <div style={{ marginTop: 16, marginBottom: 16 }}>
-          {'你正在重命名文件，请选择输入新的文件名称！'}
+          {t('sysFile.renameDescription')}
         </div>
         <Input
           value={newFileName}
@@ -981,7 +981,7 @@ const FileManagement: React.FC = () => {
         onCancel={() => setTargetModelOpen(false)}
       >
         <div style={{ marginTop: 16, marginBottom: 16 }}>
-          { targetType === 'copy' ? '你正在复制文件，请选择复制到文件的文件夹！' : '你正在移动文件，请选择移动到的文件夹' }
+          { targetType === 'copy' ? t('sysFile.copyDescription') : t('sysFile.moveDescription') }
         </div>
         <TreeSelect
           value={targetGroupId}
@@ -994,7 +994,7 @@ const FileManagement: React.FC = () => {
 
       {/* 文件详情抽屉 */}
       <Drawer
-        title="文件详情"
+        title={t('sysFile.fileDetail')}
         placement="right"
         width={480}
         open={detailDrawerOpen}
@@ -1014,57 +1014,57 @@ const FileManagement: React.FC = () => {
 
             {/* 基本信息 */}
             <Descriptions
-              title="基本信息"
+              title={t('sysFile.basicInfo')}
               column={1}
               items={[
                 {
                   key: 'name',
-                  label: '文件名称',
+                  label: t('sysFile.fileName'),
                   children: currentDetailFile.file_name,
                 },
                 {
                   key: 'size',
-                  label: '文件大小',
-                  children: currentDetailFile.file_size,
+                  label: t('sysFile.fileSize'),
+                  children: formatFileSize(currentDetailFile.file_size),
                 },
                 {
                   key: 'type',
-                  label: '文件类型',
-                  children: currentDetailFile.file_type,
+                  label: t('sysFile.fileType'),
+                  children: fileTypeRender(currentDetailFile.file_type),
                 },
                 {
                   key: 'ext',
-                  label: '扩展名',
+                  label: t('sysFile.fileExt'),
                   children: currentDetailFile.file_ext,
                 },
                 {
                   key: 'disk',
-                  label: '存储方式',
+                  label: t('sysFile.storageMethod'),
                   children: currentDetailFile.disk,
                 },
                 {
                   key: 'path',
-                  label: '文件路径',
+                  label: t('sysFile.filePath'),
                   children: currentDetailFile.file_path,
                 },
                 {
                   key: 'group',
-                  label: '文件分组',
-                  children: fileGroupMap.get(currentDetailFile.group_id || 0)?.name || '未分组',
+                  label: t('sysFile.fileGroup'),
+                  children: fileGroupMap.get(currentDetailFile.group_id || 0)?.name || t('sysFile.ungrouped'),
                 },
                 {
                   key: 'created_at',
-                  label: '创建时间',
+                  label: t('sysFile.createdAt'),
                   children: currentDetailFile.created_at,
                 },
                 {
                   key: 'updated_at',
-                  label: '修改时间',
+                  label: t('sysFile.updatedAt'),
                   children: currentDetailFile.updated_at,
                 },
                 {
                   key: 'url',
-                  label: '访问链接',
+                  label: t('sysFile.accessUrl'),
                   children: (
                     <Typography.Link copyable>
                       {currentDetailFile.file_url}
