@@ -376,6 +376,18 @@ const defaultRoute: IMenus[] = [
         local: "menu.example.image-uploader",
         hidden: 1,
         link: 0 
+      },
+      {
+        type: "route",
+        key: "example.xin-form",
+        name: "XinForm 表单",
+        path: "/example/xin-form",
+        icon: "FormOutlined",
+        elementPath: "/example/xin-form",
+        order: 3,
+        local: "menu.example.xin-form",
+        hidden: 1,
+        link: 0 
       }
     ]
   },

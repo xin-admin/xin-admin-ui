@@ -20,7 +20,9 @@ import type {
   TimePickerProps,
   TimeRangePickerProps,
   UploadProps,
-  ColorPickerProps, ButtonProps,
+  ColorPickerProps, 
+  ButtonProps,
+  TooltipProps,
 } from 'antd';
 import type { TextAreaProps, PasswordProps } from 'antd/es/input';
 import type { RangePickerProps } from 'antd/es/date-picker';
@@ -100,6 +102,32 @@ export interface FieldPropsMap {
 }
 
 /**
+ * 字段依赖配置
+ */
+export interface FieldDependency<T = any> {
+  /** 依赖的字段名 */
+  dependencies: (keyof T)[];
+  /** 根据依赖值判断是否显示 */
+  visible?: (values: Partial<T>) => boolean;
+  /** 根据依赖值判断是否禁用 */
+  disabled?: (values: Partial<T>) => boolean;
+  /** 根据依赖值动态修改 fieldProps */
+  fieldProps?: (values: Partial<T>) => Record<string, any>;
+}
+
+/**
+ * 异步请求配置
+ */
+export interface RequestConfig<T = any> {
+  /** 请求函数 */
+  request: (params?: Record<string, any>) => Promise<T[]>;
+  /** 参数依赖的字段名 */
+  dependencies?: string[];
+  /** 参数转换函数 */
+  params?: (values: Record<string, any>) => Record<string, any>;
+}
+
+/**
  * 根据 valueType 映射 fieldProps 类型的表单列配置
  */
 type XinFormColumnMap<T> = {
@@ -110,16 +138,30 @@ type XinFormColumnMap<T> = {
     valueType?: K;
     /** 是否只读 */
     readonly?: boolean;
+    /** 是否隐藏 */
+    hidden?: boolean | ((values: T) => boolean);
     /** 自定义只读渲染 */
     render?: (text: any, values: T) => ReactNode;
-    /** 自定义字段渲染 */
-    renderField?: () => ReactNode;
+    /** 自定义字段渲染 (valueType = 'custom' 时生效) */
+    renderField?: (form: FormInstance<T>) => ReactNode;
     /** 参数变化时触发选项列表请求 */
     params?: Record<string, any>;
+    /** 异步请求配置 */
+    request?: RequestConfig;
+    /** 字段依赖配置 */
+    dependency?: FieldDependency<T>;
     /** Col 属性 表单开启 grid 时生效 */
     colProps?: ColProps;
     /** 字段组件的属性，根据 valueType 自动推断类型 */
     fieldProps?: FieldPropsMap[K];
+    /** 组件宽度 */
+    width?: number | string;
+    /** 提示信息 */
+    tooltip?: string | TooltipProps;
+    /** 额外信息 */
+    extra?: ReactNode;
+    /** 分组标题 (设置后该字段前会显示分割线和标题) */
+    group?: string;
   }
 }
 
