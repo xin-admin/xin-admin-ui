@@ -3,6 +3,7 @@ import {createJSONStorage, persist} from 'zustand/middleware'
 import type {AppListProps} from "@ant-design/pro-components";
 import type {LayoutType, ThemeProps} from "@/layout/typing";
 import {configTheme, defaultColorTheme} from "@/layout/theme";
+import {getWebInfo} from "@/api";
 
 type BreadcrumbType = {
   href?: string;
@@ -10,13 +11,6 @@ type BreadcrumbType = {
   icon?: string;
   local?: string;
 };
-
-type WebInfoProps = {
-  title: string;
-  subtitle: string; 
-  describe: string;
-   logo: string;
-}
 
 interface GlobalState {
   logo: string;
@@ -33,7 +27,7 @@ interface GlobalState {
   menuParentKey: string | null;
   isMobile: boolean;
   mobileMenuOpen: boolean;
-  setWebInfo: (info: WebInfoProps) => void;
+  initWebInfo: () => Promise<void>;
   setDocumentTitle: (documentTitle: string) => void;
   setCollapsed: (collapsed: boolean) => void;
   setThemeConfig: (themeConfig: ThemeProps) => void;
@@ -62,13 +56,9 @@ export const useGlobalStore = create<GlobalState>()(
       menuParentKey: null,
       isMobile: false,
       mobileMenuOpen: false,
-      setWebInfo: (info) => {
-        setState({
-          title: info.title, 
-          subtitle: info.subtitle, 
-          describe: info.describe,
-          logo: info.logo,
-        })
+      initWebInfo: async () => {
+        const response = await getWebInfo();
+        setState(response.data.data!);
       },
       setDocumentTitle: (documentTitle: string) => {
         setState({documentTitle})

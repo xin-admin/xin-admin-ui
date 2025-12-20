@@ -13,6 +13,37 @@ type BreadcrumbType = {
   local?: string;
 };
 
+type MenuIndexes = {
+  menuMap: { [key: string]: IMenus };
+  breadcrumbMap: { [key: string]: BreadcrumbType[] };
+};
+
+/**
+ * 构建菜单索引映射
+ */
+const buildMenuIndexes = (menus: IMenus[]): MenuIndexes => {
+  const menuMap: { [key: string]: IMenus } = {};
+  const breadcrumbMap: { [key: string]: BreadcrumbType[] } = {};
+
+  const traverse = (items: IMenus[], parentBreadcrumb: BreadcrumbType[] = []) => {
+    for (const menu of items) {
+      if (!menu.key) continue;
+      menuMap[menu.key] = menu;
+      const currentBreadcrumb: BreadcrumbType[] = [
+        ...parentBreadcrumb,
+        { href: menu.path, title: menu.name, icon: menu.icon, local: menu.local }
+      ];
+      breadcrumbMap[menu.key] = currentBreadcrumb;
+      if (menu.children?.length) {
+        traverse(menu.children, currentBreadcrumb);
+      }
+    }
+  };
+
+  traverse(menus);
+  return { menuMap, breadcrumbMap };
+};
+
 interface AuthState {
   user: ISysUser | null;
   access: string[];
@@ -20,8 +51,10 @@ interface AuthState {
   menuMap: {[key: string]: IMenus };
   localRoute: boolean;
   breadcrumbMap: {[key: string]: BreadcrumbType[] };
+  initialized: boolean;
   login: (credentials: LoginParams) => Promise<boolean>;
   getInfo: () => Promise<void>;
+  initApp: () => Promise<void>;
   logout: () => Promise<void>;
   setMenus: (rules: IMenus[]) => void;
   setAccess: (access: string[]) => void;
@@ -38,6 +71,7 @@ const useAuthStore = create<AuthState>()(
       menuMap: {},
       breadcrumbMap: {},
       localRoute: true,
+      initialized: false,
       login: async (params) => {
         try {
           const {data} = await login(params);
@@ -56,29 +90,8 @@ const useAuthStore = create<AuthState>()(
         try {
           const result = await info();
           const data: InfoResponse = result.data.data!;
-          const menuMap: {[key: string]: IMenus } = {};
-          const breadcrumbMap: {[key: string]: BreadcrumbType[] } = {};
-          const buildMenuIndexes = (menus: IMenus[], parentBreadcrumb: IMenus[] = []) => {
-            for (const menu of menus) {
-              if (!menu.key) continue;
-              menuMap[menu.key] = menu;
-              const currentBreadcrumb = [
-                ...parentBreadcrumb,
-                { href: menu.path, title: menu.name, icon: menu.icon, local: menu.local }
-              ];
-              breadcrumbMap[menu.key] = currentBreadcrumb;
-              if (menu.children?.length) {
-                buildMenuIndexes(menu.children, currentBreadcrumb);
-              }
-            }
-          };
-          let menus: IMenus[];
-          if (getState().localRoute) {
-            menus = defaultRoute;
-          }else {
-            menus = data.menus;
-          }
-          buildMenuIndexes(menus);
+          const menus = getState().localRoute ? defaultRoute : data.menus;
+          const { menuMap, breadcrumbMap } = buildMenuIndexes(menus);
           set({
             menus,
             menuMap,
@@ -88,9 +101,28 @@ const useAuthStore = create<AuthState>()(
           });
         } catch (error) {
           console.error('获取用户信息失败:', error);
-          // 清理状态
           set({ user: null, access: [], menus: [], menuMap: {}, breadcrumbMap: {} });
         }
+      },
+      // 统一的应用初始化方法，用于首次加载
+      initApp: async () => {
+        const state = getState();
+        if (state.initialized) return;
+        
+        const hasToken = !!localStorage.getItem('token');
+        
+        if (hasToken) {
+          await state.getInfo();
+        } else {
+          const { menuMap, breadcrumbMap } = buildMenuIndexes(defaultRoute);
+          set({
+            menus: defaultRoute,
+            menuMap,
+            breadcrumbMap,
+          });
+        }
+        
+        set({ initialized: true });
       },
       setMenus: (menus: IMenus[]) => {
         set({ menus });
