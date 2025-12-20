@@ -1,5 +1,4 @@
-import {Outlet} from 'react-router';
-import {useEffect} from 'react';
+import AnimatedOutlet from '@/components/AnimatedOutlet';
 import {useGlobalStore} from "@/stores";
 import {Button, Layout} from "antd";
 import HeaderRender from "@/layout/HeaderRender";
@@ -7,9 +6,7 @@ import FooterRender from "@/layout/FooterRender";
 import ColumnSiderRender from "@/layout/ColumnSiderRender";
 import MenuRender from "@/layout/MenuRender";
 import MobileDrawerMenu from "@/layout/MobileDrawerMenu";
-import {useMobile} from "@/hooks/useMobile";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import useAuthStore from '@/stores/user';
 import SettingDrawer from "@/layout/SettingDrawer";
 
 const {Content, Sider} = Layout;
@@ -21,8 +18,6 @@ const LayoutRender = () => {
   const isMobile = useGlobalStore(state => state.isMobile);
   const mobileMenuOpen = useGlobalStore(state => state.mobileMenuOpen);
   const setMobileMenuOpen = useGlobalStore(state => state.setMobileMenuOpen);
-
-
   return (
     <Layout
       className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed"
@@ -43,7 +38,7 @@ const LayoutRender = () => {
           <HeaderRender/>
           <Layout className={"relative"}>
             <Content style={{padding: themeConfig.bodyPadding}}>
-              <Outlet/>
+              <AnimatedOutlet/>
             </Content>
             <FooterRender/>
           </Layout>
@@ -66,7 +61,7 @@ const LayoutRender = () => {
               <Layout className={"relative"}>
                 <HeaderRender/>
                 <Content style={{padding: themeConfig.bodyPadding}}>
-                  <Outlet/>
+                  <AnimatedOutlet/>
                 </Content>
                 <FooterRender/>
               </Layout>
@@ -93,7 +88,7 @@ const LayoutRender = () => {
                 )}
                 <Layout className={"relative"}>
                   <Content style={{padding: themeConfig.bodyPadding}}>
-                    <Outlet/>
+                    <AnimatedOutlet/>
                   </Content>
                   <FooterRender/>
                 </Layout>

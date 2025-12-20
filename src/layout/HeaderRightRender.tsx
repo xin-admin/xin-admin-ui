@@ -130,7 +130,7 @@ const HeaderLeftRender = () => {
           <Dropdown menu={{items: userItems}}>
             <Button size={"large"} type={'text'}>
               <div>{userInfo.nickname || userInfo.username}</div>
-              <Avatar src={userInfo.avatar_url ? userInfo.avatar_url : ''} size={'small'}/>
+              <Avatar src={userInfo.avatar_url ? userInfo.avatar_url : null} size={'small'}/>
             </Button>
           </Dropdown>
           : null
