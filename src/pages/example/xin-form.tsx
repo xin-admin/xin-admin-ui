@@ -119,16 +119,21 @@ const fullColumns: XinFormColumn<any>[] = [
     name: 'digit',
     label: '数字输入',
     valueType: 'digit',
-    width: '100%',
     extra: '请输入0-100之间的数字',
-    fieldProps: { placeholder: '数字输入', min: 0, max: 100 },
+    fieldProps: {
+      placeholder: '数字输入',
+      min: 0,
+      max: 100,
+    },
   },
   {
     name: 'money',
     label: '金额输入',
     valueType: 'money',
-    width: '100%',
-    fieldProps: { placeholder: '金额输入' },
+    fieldProps: {
+      placeholder: '金额输入',
+      width: '100%',
+    },
   },
   {
     name: 'select',
@@ -269,7 +274,11 @@ const fullColumns: XinFormColumn<any>[] = [
 // 字段分组配置
 const groupColumns: XinFormColumn<any>[] = [
   {
-    group: '基本信息',
+    valueType: 'divider',
+    label: '基本信息',
+    colProps: {span: 24}
+  },
+  {
     name: 'name',
     label: '姓名',
     valueType: 'text',
@@ -284,7 +293,11 @@ const groupColumns: XinFormColumn<any>[] = [
     tooltip: '请输入11位手机号',
   },
   {
-    group: '工作信息',
+    valueType: 'divider',
+    label: '部门信息',
+    colProps: {span: 24}
+  },
+  {
     name: 'department',
     label: '部门',
     valueType: 'select',
@@ -304,7 +317,6 @@ const groupColumns: XinFormColumn<any>[] = [
     colProps: { span: 12 },
   },
   {
-    group: '其他信息',
     name: 'remark',
     label: '备注',
     valueType: 'textarea',
@@ -401,8 +413,8 @@ const customColumns: XinFormColumn<any>[] = [
   {
     name: 'tags',
     label: '标签',
-    valueType: 'custom',
-    renderField: (form) => (
+    valueType: 'text',
+    renderField: (_, form) => (
       <Space>
         <Input 
           placeholder="输入标签后按回车" 
@@ -431,7 +443,6 @@ const customColumns: XinFormColumn<any>[] = [
         </Space>
       </Space>
     ),
-    extra: '输入标签后按回车添加',
   },
   {
     name: 'hiddenField',
@@ -507,7 +518,7 @@ const XinFormExample: React.FC = () => {
 
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* 基础表单 */}
-        <Card title="基础表单" bordered>
+        <Card title="基础表单" variant={'borderless'}>
           <Paragraph type="secondary">
             最简单的表单用法，通过 columns 配置表单字段。
           </Paragraph>
@@ -519,7 +530,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* Grid 布局表单 */}
-        <Card title="Grid 布局表单" bordered>
+        <Card title="Grid 布局表单" variant={'borderless'}>
           <Paragraph type="secondary">
             使用 grid 属性开启栅格布局，通过 colProps 控制每列宽度。
           </Paragraph>
@@ -533,7 +544,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* 所有字段类型 */}
-        <Card title="所有字段类型" bordered>
+        <Card title="所有字段类型" variant={'borderless'}>
           <Paragraph type="secondary">
             展示 XinForm 支持的所有字段类型：text、password、digit、money、select、treeSelect、cascader、radio、checkbox、switch、rate、slider、date、time、color、icon、textarea 等。
             <br />
@@ -547,7 +558,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* 字段分组 */}
-        <Card title="字段分组" bordered>
+        <Card title="字段分组" variant={'borderless'}>
           <Paragraph type="secondary">
             使用 <Text code>group</Text> 属性对表单字段进行分组，自动显示分割线和标题。
           </Paragraph>
@@ -561,7 +572,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* 依赖联动 */}
-        <Card title="依赖联动" bordered>
+        <Card title="依赖联动" variant={'borderless'}>
           <Paragraph type="secondary">
             使用 <Text code>dependency</Text> 属性实现字段间的依赖联动：
             <br />
@@ -580,7 +591,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* 自定义渲染 */}
-        <Card title="自定义渲染" bordered>
+        <Card title="自定义渲染" variant={'borderless'}>
           <Paragraph type="secondary">
             使用 <Text code>valueType="custom"</Text> + <Text code>renderField</Text> 实现完全自定义的表单字段渲染。
             <br />
@@ -594,7 +605,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* ModalForm 弹窗表单 */}
-        <Card title="ModalForm 弹窗表单" bordered>
+        <Card title="ModalForm 弹窗表单" variant={'borderless'}>
           <Paragraph type="secondary">
             使用 layoutType="ModalForm" 实现弹窗表单，支持 trigger 触发器或 formRef 控制打开/关闭。
           </Paragraph>
@@ -622,7 +633,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* DrawerForm 抽屉表单 */}
-        <Card title="DrawerForm 抽屉表单" bordered>
+        <Card title="DrawerForm 抽屉表单" variant={'borderless'}>
           <Paragraph type="secondary">
             使用 layoutType="DrawerForm" 实现抽屉表单，适用于复杂表单或需要更大空间的场景。
           </Paragraph>
@@ -650,7 +661,7 @@ const XinFormExample: React.FC = () => {
         </Card>
 
         {/* 自定义提交按钮 */}
-        <Card title="自定义提交按钮" bordered>
+        <Card title="自定义提交按钮" variant={'borderless'}>
           <Paragraph type="secondary">
             通过 submitter 配置项自定义提交按钮文本、样式，或完全自定义渲染。
           </Paragraph>
