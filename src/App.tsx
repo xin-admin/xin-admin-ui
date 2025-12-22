@@ -1,52 +1,61 @@
 import createRouter from "@/router";
-import {RouterProvider} from "react-router";
+import {RouterProvider, type  RouterProviderProps} from "react-router";
 import useAuthStore from "@/stores/user";
 import AuthRoute from "@/components/AuthRoute"
 import PageTitle from "@/components/PageTitle";
 import AntdProvider from "@/components/AntdProvider";
 import { useGlobalStore } from "@/stores";
-import { useEffect, useMemo } from "react";
-import { getWebInfo } from "@/api";
+import {useEffect, useRef} from "react";
 import { useMobile } from "@/hooks/useMobile";
-
-const webInfo = {
-  title: "Xin Admin", 
-  subtitle: "基于 Ant Design 的后台管理框架", 
-  describe: "Xin Admin 是一个基于 Ant Design 的后台管理框架", 
-  logo: "https://file.xinadmin.cn/file/favicons.ico"
-};
+import Loading from "@/components/Loading";
 
 const App = () => {
-  const { menus } = useAuthStore();
-  const setWebInfo = useGlobalStore(state => state.setWebInfo);
-  const getInfo = useAuthStore(state => state.getInfo);
+  const menus = useAuthStore(state => state.menus);
+  const initialized = useAuthStore(state => state.initialized);
+  const initApp = useAuthStore(state => state.initApp);
+  const initWebInfo = useGlobalStore(state => state.initWebInfo);
   const setIsMobile = useGlobalStore(state => state.setIsMobile);
-  // 使用移动端检测Hook
+  
+  // 移动端检测
   const mobileDetected = useMobile();
-  // 使用 useMemo 缓存 router，避免每次渲染都重新创建
-  const router = useMemo(() => createRouter(menus), [menus]);
-  // 移动端状态
-  useEffect(() => { setIsMobile(mobileDetected) }, [mobileDetected, setIsMobile]);
-  // 初始化用户信息
-  useEffect(() => { localStorage.getItem("token") && getInfo() }, [getInfo]);
-  // 初始化网站信息
+  
+  // 使用 useRef 缓存路由
+  const routerRef = useRef<RouterProviderProps['router'] | null>(null);
+  
+  // 初始化
   useEffect(() => {
-    getWebInfo().then(({data}) => {
-      setWebInfo({...webInfo, ...data.data});
-    }).catch(() => {
-      setWebInfo(webInfo);
-    });
-  }, [])
+    Promise.all([
+      initApp(),
+      initWebInfo()
+    ]).then();
+  }, [initApp, initWebInfo]);
+  
+  // 移动端状态同步
+  useEffect(() => { setIsMobile(mobileDetected) }, [mobileDetected, setIsMobile]);
+  
+  // 初始化完成后创建路由器
+  if (initialized && !routerRef.current) {
+    routerRef.current = createRouter(menus);
+  }
+  
+  // 未初始化完成时显示 Loading
+  if (!initialized || !routerRef.current) {
+    return (
+      <AntdProvider>
+        <Loading />
+      </AntdProvider>
+    );
+  }
 
   return (
     <AntdProvider>
       <PageTitle>
         <AuthRoute>
-          <RouterProvider router={router} />
+          <RouterProvider router={routerRef.current} />
         </AuthRoute>
       </PageTitle>
     </AntdProvider>
-  )
-}
+  );
+};
 
-export default App
+export default App;

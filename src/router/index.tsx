@@ -1,33 +1,30 @@
-import {createBrowserRouter, type DataRouteObject, Navigate} from "react-router"
-import Layout from "@/layout"
-import Login from "@/pages/login"
-import { lazy, Suspense } from "react"
-import Loading from "@/components/Loading"
-import React from "react";
-import type {IMenus} from "@/domain/iSysRule.ts"
-import defaultRoute from "@/router/default.ts";
+import {createBrowserRouter, type DataRouteObject, Navigate} from "react-router";
+import Layout from "@/layout";
+import Login from "@/pages/login";
+import React, {lazy, Suspense} from "react";
+import type {IMenus} from "@/domain/iSysRule";
+import defaultRoute from "@/router/default";
 
 const modules = import.meta.glob('/src/pages/**/*')
 
-function lazyLoad(path: string) {
-  if(modules[path]) {
-    const Component = lazy(modules[path] as () => Promise<{ default: React.ComponentType }>)
+function lazyLoad(path: string): React.ReactNode {
+  if (modules[path]) {
+    const Component = lazy(modules[path] as () => Promise<{ default: React.ComponentType }>);
     return (
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={null}>
         <Component />
       </Suspense>
     )
   }
-  return <></>;
+  return null;
 }
 
-function generateReactRoutes(menuData: IMenus[]): DataRouteObject[] {
+function buildRoute(menuData: IMenus[]): DataRouteObject[] {
   const routes: DataRouteObject[] = [];
-
   function traverse(nodes: IMenus[]) {
     for (const node of nodes) {
       // 处理 route 类型
-      if (node.type === 'route' && node.link !== 1) {
+      if (node.type === 'route' && !node.link) {
         // 检查是否有 nested-route 子节点
         const nestedChildren = node.children?.filter(child => child.type === 'nested-route') || [];
         if (nestedChildren.length > 0) {
@@ -77,9 +74,9 @@ function generateReactRoutes(menuData: IMenus[]): DataRouteObject[] {
 export default function createRouter(rules?: IMenus[]) {
   let routes: DataRouteObject[];
   if(rules) {
-    routes = generateReactRoutes(rules);
+    routes = buildRoute(rules);
   } else {
-    routes = generateReactRoutes(defaultRoute);
+    routes = buildRoute(defaultRoute);
   }
   return createBrowserRouter([
     {
