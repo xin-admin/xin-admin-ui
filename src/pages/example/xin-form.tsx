@@ -1,12 +1,13 @@
 import React, { useRef } from 'react';
 import { Card, Space, Typography, message, Button, Divider, Input, Tag } from 'antd';
 import XinForm from '@/components/XinForm';
-import type { XinFormColumn, XinFormRef } from '@/components/XinForm';
+import type { XinFormRef } from '@/components/XinForm';
+import type { XinColumn } from '@/components/XinFormField/FieldRender';
 
 const { Title, Paragraph, Text } = Typography;
 
 // 基础表单字段配置
-const basicColumns: XinFormColumn<any>[] = [
+const basicColumns: XinColumn<any>[] = [
   {
     name: 'username',
     label: '用户名',
@@ -49,7 +50,7 @@ const basicColumns: XinFormColumn<any>[] = [
 ];
 
 // Grid 布局表单字段配置
-const gridColumns: XinFormColumn<any>[] = [
+const gridColumns: XinColumn<any>[] = [
   {
     name: 'name',
     label: '姓名',
@@ -101,7 +102,7 @@ const gridColumns: XinFormColumn<any>[] = [
 ];
 
 // 完整表单字段配置 - 展示所有字段类型
-const fullColumns: XinFormColumn<any>[] = [
+const fullColumns: XinColumn<any>[] = [
   {
     name: 'text',
     label: '文本输入',
@@ -272,7 +273,7 @@ const fullColumns: XinFormColumn<any>[] = [
 ];
 
 // 字段分组配置
-const groupColumns: XinFormColumn<any>[] = [
+const groupColumns: XinColumn<any>[] = [
   {
     valueType: 'divider',
     label: '基本信息',
@@ -332,7 +333,7 @@ interface DependencyFormData {
   subType: string;
 }
 
-const dependencyColumns: XinFormColumn<DependencyFormData>[] = [
+const dependencyColumns: XinColumn<DependencyFormData>[] = [
   {
     name: 'hasDiscount',
     label: '是否有折扣',
@@ -403,7 +404,7 @@ const dependencyColumns: XinFormColumn<DependencyFormData>[] = [
 ];
 
 // 自定义渲染配置
-const customColumns: XinFormColumn<any>[] = [
+const customColumns: XinColumn<any>[] = [
   {
     name: 'username',
     label: '用户名',
@@ -453,7 +454,7 @@ const customColumns: XinFormColumn<any>[] = [
 ];
 
 // Modal/Drawer 表单字段配置
-const modalColumns: XinFormColumn<any>[] = [
+const modalColumns: XinColumn<any>[] = [
   {
     name: 'title',
     label: '标题',
