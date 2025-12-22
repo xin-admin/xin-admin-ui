@@ -13,9 +13,11 @@ import dashboard from "./dashboard";
 import layout from "./layout";
 import login from "./login";
 import xinForm from "./xin-form";
+import xinCrud from "./xin-crud";
 
 export default {
   ...xinTable,
+  ...xinCrud,
   ...menu,
   ...userSetting,
   ...sysUserList,
@@ -30,4 +32,5 @@ export default {
   ...layout,
   ...login,
   ...xinForm,
+  ...xinCrud,
 };
