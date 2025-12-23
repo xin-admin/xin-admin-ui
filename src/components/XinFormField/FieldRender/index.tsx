@@ -44,15 +44,22 @@ const { RangePicker } = DatePicker;
 interface FieldsRenderProps<T> {
   column: XinColumn<T>;
   form: FormInstance<T>;
+  value?: any;
+  onChange?: any;
 }
 
 export default function FieldRender<T>(props: FieldsRenderProps<T>) {
   const { column, form } = props;
-  const { valueType = 'text', fieldProps = {}, renderField: customRenderField } = column;
+  const { valueType = 'text', renderField: customRenderField } = column;
+  const fieldProps: any = {
+    value: props.value,
+    onChange: props.onChange,
+    ...column.fieldProps,
+  };
   let dom: React.ReactNode;
   switch (valueType) {
     case 'password':
-      dom = <Password {...fieldProps as PasswordProps} />;
+      dom = <Password {...fieldProps as PasswordProps}/>;
       break;
     case 'textarea':
       dom =  <TextArea rows={4} {...fieldProps as TextAreaProps} />;

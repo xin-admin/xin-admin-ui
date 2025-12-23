@@ -29,11 +29,7 @@ export interface SubmitterProps {
   /** 重置按钮属性 */
   resetButtonProps?: Omit<ButtonProps, 'loading' | 'onClick'>;
   /** 折叠按钮属性 */
-  collapseButtonProps?: Omit<ButtonProps, 'loading' | 'onClick'>;
-  /** 展开状态下图标 */
-  expandIcon?: ReactNode;
-  /** 折叠状态下图标 */
-  collapseIcon?: ReactNode;
+  collapseRender?: (collapse: boolean) => ReactNode;
 }
 
 /**

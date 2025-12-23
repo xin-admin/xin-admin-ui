@@ -14,8 +14,7 @@ import type {
   DatePickerProps,
   TimePickerProps,
   TimeRangePickerProps,
-  ColorPickerProps,
-  DividerProps
+  ColorPickerProps
 } from 'antd';
 import type { TextAreaProps, PasswordProps } from 'antd/es/input';
 import type { RangePickerProps } from 'antd/es/date-picker';
@@ -56,7 +55,6 @@ export type XinValue =
     | 'color'         // 颜色选择
     | 'icon'          // 图标选择
     | 'user'          // 用户选择
-    | 'divider'
 
 /**
  * valueType 到组件 Props 的类型映射
@@ -89,7 +87,6 @@ export interface FieldPropsMap {
   color: ColorPickerProps;
   icon: IconSelectProps;
   user: UserSelectorProps;
-  divider: DividerProps;
 }
 
 /**
@@ -110,11 +107,13 @@ export interface FieldDependency<T = any> {
  * 根据 valueType 映射 fieldProps 类型的表单列配置
  */
 type XinColumnMap<T> = {
-  [K in XinValue]: FormItemProps & {
+  [K in XinValue]: FormItemProps<T> & {
     /** 唯一标识 */
     key?: string;
     /** 字段名 */
     dataIndex?: keyof T | string;
+    /** 字段标签 */
+    title?: string;
     /** 字段类型 */
     valueType?: K;
     /** 自定义字段渲染 */
