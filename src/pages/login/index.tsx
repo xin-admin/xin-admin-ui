@@ -24,7 +24,7 @@ import {useThemeTransition} from '@/hooks/useThemeTransition';
 
 // 样式定义函数，支持暗黑模式
 const getBodyStyle = (isDark: boolean): CSSProperties => ({
-  backgroundImage: isDark ? 'url(/public/static/bg-dark.jpg)' : 'url(/public/static/bg.png)',
+  backgroundImage: isDark ? 'url(/static/bg-dark.jpg)' : 'url(/static/bg.png)',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
