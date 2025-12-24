@@ -19,7 +19,7 @@ declare namespace API {
   }
 
   /** The response data format agreed upon with the back end */
-  interface ResponseStructure<T> {
+  interface ResponseStructure<T = any> {
     success: boolean
     msg: string
     data?: T

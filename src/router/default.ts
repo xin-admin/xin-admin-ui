@@ -388,6 +388,18 @@ const defaultRoute: IMenus[] = [
         local: "menu.example.xin-form",
         hidden: 1,
         link: 0 
+      },
+      {
+        type: "route",
+        key: "example.xin-table",
+        name: "XinTable 表格",
+        path: "/example/xin-table",
+        icon: "FormOutlined",
+        elementPath: "/example/xin-table",
+        order: 4,
+        local: "menu.example.xin-table",
+        hidden: 1,
+        link: 0 
       }
     ]
   },
