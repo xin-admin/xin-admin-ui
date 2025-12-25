@@ -117,7 +117,7 @@ type FormColumnMap<T> = {
     /** 字段类型 */
     valueType?: K;
     /** 自定义字段渲染 */
-    renderField?: (dom: ReactNode, form: FormInstance<T>) => ReactNode;
+    fieldRender?: (form: FormInstance<T>) => ReactNode;
     /** Col 属性 表单开启 grid 时生效 */
     colProps?: ColProps;
     /** 字段组件的属性，根据 valueType 自动推断类型 */

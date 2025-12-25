@@ -42,17 +42,11 @@ const { TextArea, Password } = Input;
 const { RangePicker } = DatePicker;
 
 interface FieldsRenderProps<T> extends Record<string, any> {
-  column: FormColumn<T>;
-  form: FormInstance<T>;
+  valueType: FormColumn<T>['valueType'];
 }
 
 export default function FieldRender<T>(props: FieldsRenderProps<T>) {
-  const { column, form } = props;
-  const { valueType = 'text', renderField: customRenderField } = column;
-  const fieldProps: any = {
-    ...props,
-    ...column.fieldProps,
-  };
+  const { valueType, ...fieldProps } = props;
   let dom: React.ReactNode;
   switch (valueType) {
     case 'password':
@@ -137,10 +131,6 @@ export default function FieldRender<T>(props: FieldsRenderProps<T>) {
     default:
       dom =  <Input {...fieldProps as InputProps} />;
       break;
-  }
-  // 自定义渲染
-  if (customRenderField) {
-    return customRenderField(dom, form);
   }
   return dom;
 }

@@ -1,10 +1,11 @@
-import {Button, Card, ConfigProvider, Space, Table} from "antd";
+import {Button, Card, ConfigProvider, Space, Table, Form, Flex} from "antd";
 import type { XinTableV2Props, XinTableV2Ref } from "./typings";
-import SearchForm, { type SearchFormProps, type SearchFormRef } from "./SearchForm";
-import FormModel, { type FormModalProps, type FormModalRef } from "./FormModal";
-import { useImperativeHandle, useMemo, useRef } from "react";
+import SearchForm, { type SearchFormProps } from "./SearchForm";
+import FormModel, { type FormModalRef } from "./FormModal";
+import { useImperativeHandle, useMemo, useRef, useState } from "react";
 import type { FormColumn } from "./FormField";
-import type { ColumnType, TableRef } from "antd/es/table";
+import type { ColumnType } from "antd/es/table";
+import { SearchOutlined } from "@ant-design/icons";
 
 export default function XinTableV2<T extends Record<string, any> = any>(props: XinTableV2Props<T>) {
   const {
@@ -26,7 +27,33 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   } = props;
 
   const formRef = useRef<FormModalRef<T>>(null);
-  const searchRef = useRef<SearchFormRef<T>>(null);
+  const [searchRef] = Form.useForm();
+  const [collapse, setCollapse] = useState<boolean>(false);
+  const [dataSource, setDataSource] = useState<T[]>([]);
+
+  // 暴露表单方法
+  useImperativeHandle(tableRef, (): XinTableV2Ref => ({
+    /** 刷新表格（保持当前页） */
+    reload: () => {},
+    /** 重置表格（回到第一页） */
+    reset: () => {},
+    /** 获取当前数据源 */
+    getDataSource: () => dataSource,
+    /** 获取选中行的 keys */
+    getSelectedRowKeys: () => [],
+    /** 获取选中行数据 */
+    getSelectedRows: () => [] as T[],
+    /** 清空选中 */
+    clearSelected: () => {},
+    openFormModal: formRef.current?.open,
+    closeFormModal: formRef.current?.close,
+    isOpenFormModal: formRef.current?.isOpen,
+    setFormModalLoading: formRef.current?.setLoading,
+    setFormMode: formRef.current?.setFormMode,
+    formMode: formRef.current?.formMode,
+    form: () => formRef.current,
+    searchForm: () => searchRef,
+  }));
 
   /* 搜索列 */
   const searchColumn: FormColumn<T>[] = useMemo(() => {
@@ -40,74 +67,52 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     return columns.filter((column) => column.hideInForm !== true);
   }, [columns, form]);
 
-  // 暴露表单方法
-  useImperativeHandle(tableRef, (): XinTableV2Ref => ({
-    /** 刷新表格（保持当前页） */
-    reload: () => {},
-    /** 重置表格（回到第一页） */
-    reset: () => {},
-    /** 获取当前数据源 */
-    getDataSource: () => [],
-    /** 获取选中行的 keys */
-    getSelectedRowKeys: () => [],
-    /** 获取选中行数据 */
-    getSelectedRows: () => [] as T[],
-    /** 清空选中 */
-    clearSelected: () => {},
-    openFormModal: formRef.current?.open!,
-    closeFormModal: formRef.current?.close!,
-    isOpenFormModal: formRef.current?.isOpen!,
-    setFormModalLoading: formRef.current?.setLoading!,
-    setFormMode: formRef.current?.setFormMode!,
-    formMode: formRef.current?.formMode!,
-    collapseSearch: searchRef.current?.collapse!,
-    isCollapseSearch: searchRef.current?.isCollapse!,
-    setSearchLoading: searchRef.current?.setLoading!,
-    form: () => formRef.current!,
-    searchForm: () => searchRef.current!,
-  }));
-
   /**
    * 处理搜索
    */
-  const handleSearch: SearchFormProps<T>['onSearch'] = async (values: T) => {
+  const handleSearch: SearchFormProps<T>['handleSearch'] = async (values: T) => {
     console.log(values);
   };
 
   return (
     <div>
-      {/* 搜索表单 */}
-      <Card {...cardProps} styles={{body: { padding: 0 }}}>
+      <Card {...cardProps}>
         <Space direction="vertical" size={16}>
-          <div style={{padding: '0 16px', paddingTop: '16px'}}>
-            <SearchForm<T>
-              columns={searchColumn}
-              onSearch={handleSearch}
-              {...search}
-            />
+          <div>
+            {/* 搜索表单 */}
+            { collapse && (
+              <SearchForm<T>
+                columns={searchColumn}
+                handleSearch={handleSearch}
+                {...search}
+              />
+            )}
+            {/* 操作栏 */}
+            <Flex justify={'space-between'}>
+              <Space>
+                {addShow && <Button type="primary">新增</Button>}
+                {deleteShow && <Button color="danger">批量删除</Button>}
+                {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
+              </Space>
+              <Space>
+                <Button 
+                  onClick={() => setCollapse(!collapse)}
+                  type={collapse ? 'default' : 'primary'}
+                  icon={<SearchOutlined />}
+                  children={collapse ? '收起' : '展开'}
+                />
+              </Space>
+            </Flex>
           </div>
-
-          <Space style={{padding: '0 16px'}}>
-            {addShow && <Button type="primary">新增</Button>}
-            {deleteShow && <Button color="danger">批量删除</Button>}
-            {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
-          </Space>
-          <ConfigProvider
-              theme={{
-                components: {
-                  Table: {
-                    /* 这里是你的组件 token */
-                    headerBorderRadius: 0
-                  },
-                },
-              }}
-          >
-            <Table
-                {...props} columns={columns as ColumnType<T>[]} rowKey={rowKey} pagination={{
+          <Table
+            {...props}
+            dataSource={dataSource}
+            columns={columns as ColumnType<T>[]} 
+            rowKey={rowKey} 
+            pagination={{
               total: 300
-            }} />
-          </ConfigProvider>
-
+            }} 
+          />
         </Space>
       </Card>
 

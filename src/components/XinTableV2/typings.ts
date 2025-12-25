@@ -2,11 +2,12 @@ import type {
   TableProps,
   TableColumnType,
   CardProps,
+  FormInstance,
 } from 'antd';
 import type { Key, RefObject } from 'react';
 import type { TableRef } from 'antd/es/table';
 import type { FormColumn } from './FormField';
-import type { SearchFormProps, SearchFormRef } from './SearchForm';
+import type { SearchFormProps } from './SearchForm';
 import type { FormModalProps, FormModalRef } from './FormModal';
 import type { FormMode } from './FormModal/typings';
 
@@ -37,27 +38,21 @@ export interface XinTableV2Ref<T = any> {
   /** 清空选中 */
   clearSelected: () => void;
   /** 打开表单弹窗 */
-  openFormModal: () => void;
+  openFormModal?: () => void;
   /** 关闭表单弹窗 */
-  closeFormModal: () => void;
+  closeFormModal?: () => void;
   /** 获取表单弹窗的打开状态 */
-  isOpenFormModal: () => boolean;
+  isOpenFormModal?: () => boolean;
   /** 设置表单加载状态 */
-  setFormModalLoading: (loading: boolean) => void;
+  setFormModalLoading?: (loading: boolean) => void;
   /** 设置表单类型 */
-  setFormMode: (mode: FormMode, values?: T, key?: string) => void;
+  setFormMode?: (mode: FormMode, values?: T, key?: string) => void;
   /** 获取表单类型 */
-  formMode: () => FormMode;
-  /** 折叠、展开搜索栏 */
-  collapseSearch: () => void;
-  /** 获取搜索栏的折叠状态 */
-  isCollapseSearch: () => boolean;
-  /** 设置搜索 Loading */
-  setSearchLoading: (loading: boolean) => void;
+  formMode?: () => FormMode;
   /** 获取表单实例 */
-  form: () => FormModalRef<T>;
+  form?: () => FormModalRef<T> | null;
   /** 获取搜索表单实例 */
-  searchForm: () => SearchFormRef<T>;
+  searchForm?: () => FormInstance<T> | undefined;
 }
 
 /**

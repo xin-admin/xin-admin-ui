@@ -13,6 +13,7 @@ import type { FormItemProps } from 'antd';
 import type { FormColumn } from '../FormField';
 import FieldRender from '../FormField';
 import { Create, Update } from '@/api/common/table';
+import { pick } from 'lodash';
 
 /**
  * XinForm - JSON 配置动态表单组件
@@ -27,7 +28,8 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
     onFinish,
     formRef,
     modalProps,
-    submitter
+    submitter,
+    ...formProps
   } = props;
 
   const { t } = useTranslation();
@@ -92,8 +94,30 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
 
   // 渲染表单项
   const renderFormItem = useCallback((column: FormColumn<T>, index: number): React.ReactNode => {
-    const key = String(column.dataIndex) || String(column.name) || `form-item-${index}`;
-    const dependency = column.dependency;
+
+    const {
+      dataIndex, 
+      valueType,
+      title = '', 
+      fieldProps = {},
+      dependency,
+      fieldRender
+    } = column;
+
+    // Form.Item 允许的属性列表
+    const formItemPropKeys = [
+      'colon', 'extra', 'getValueFromEvent', 'help', 'hidden', 'htmlFor',
+      'initialValue',   'name', 'normalize',
+      'noStyle', 'preserve', 'tooltip', 'trigger', 
+      // 验证相关
+      'required', 'rules', 'validateFirst', 'validateDebounce', 'validateStatus', 'hasFeedback',
+      'validateTrigger', 'valuePropName', 'messageVariables',
+      // 布局
+      'wrapperCol', 'layout', 'label', 'labelAlign', 'labelCol'
+    ];
+    const formItemProps = pick(column, formItemPropKeys);
+
+    const key = String(dataIndex) || `form-item-${index}`;
 
     let formItemContent;
     if (dependency) {
@@ -115,38 +139,51 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
             // 动态 fieldProps
             const dynamicFieldProps = dependency.fieldProps ? dependency.fieldProps(values) : {};
 
-            const mergedColumn = {
-              ...column,
-              fieldProps: {
-                ...(column.fieldProps || {}),
-                ...dynamicFieldProps,
-                disabled: isDisabled || (column.fieldProps as any)?.disabled,
-              },
-            } as FormColumn<T>;
+            const mergedFieldProps = {
+              ...fieldProps,
+              ...dynamicFieldProps,
+              disabled: isDisabled || fieldProps?.disabled,
+            }
+
+            const defaultFieldRender = (
+              <FieldRender 
+                valueType={valueType}
+                placeholder={title}
+                {...mergedFieldProps}
+              />
+            );
 
             return (
               <Form.Item 
                 key={key} 
                 name={key} 
                 label={column.title || column.label} 
-                {...column as FormItemProps}
+                {...formItemProps as FormItemProps}
               >
-                <FieldRender column={mergedColumn} form={form} />
+                {fieldRender ? fieldRender(form) : defaultFieldRender}
               </Form.Item>
             );
           }}
         </Form.Item>
       );
     } else {
+
+      const defaultFieldRender = (
+        <FieldRender 
+          valueType={valueType}
+          placeholder={title}
+          {...fieldProps}
+        />
+      );
       // 普通表单项
       formItemContent = (
         <Form.Item 
           key={key} 
           name={key} 
           label={column.title || column.label} 
-          {...column as FormItemProps}
+          {...formItemProps as FormItemProps}
         >
-          <FieldRender column={column} form={form} />
+          {fieldRender ? fieldRender(form) : defaultFieldRender}
         </Form.Item>
       );
     }
@@ -211,7 +248,7 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
   // 表单内容
   const formContent = useMemo(() => (
     <Form
-      {...props}
+      {...formProps}
       form={form}
       onFinish={handleFinish}
     >
