@@ -391,13 +391,13 @@ const defaultRoute: IMenus[] = [
       },
       {
         type: "route",
-        key: "example.xin-crud",
-        name: "XinCrud 表格",
-        path: "/example/xin-crud",
-        icon: "TableOutlined",
-        elementPath: "/example/xin-crud",
+        key: "example.xin-table",
+        name: "XinTable 表格",
+        path: "/example/xin-table",
+        icon: "FormOutlined",
+        elementPath: "/example/xin-table",
         order: 4,
-        local: "menu.example.xin-crud",
+        local: "menu.example.xin-table",
         hidden: 1,
         link: 0 
       }

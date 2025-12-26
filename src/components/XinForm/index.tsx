@@ -6,15 +6,11 @@ import {
   Row,
   Col,
   Modal,
-  Drawer,
-  Divider
+  Drawer
 } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { XinFormProps, XinFormRef, SubmitterButton } from './typings';
-import type {
-  FormItemProps,
-  DividerProps
-} from 'antd';
+import type { FormItemProps } from 'antd';
 import type { XinColumn } from '../XinFormField/FieldRender/typings';
 import FieldRender from '../XinFormField/FieldRender';
 
@@ -75,9 +71,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     const dependency = column.dependency;
 
     let formItemContent;
-    if (column.valueType === 'divider' ) {
-      formItemContent = <Divider {...column.fieldProps as DividerProps}>{ column.label || '' }</Divider>
-    } else if (dependency) {
+    if (dependency) {
       // 有依赖时使用 Form.Item 的 shouldUpdate
       formItemContent = (
         <Form.Item noStyle shouldUpdate={(prevValues, curValues) => {
@@ -106,7 +100,12 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
             } as XinColumn<T>;
 
             return (
-              <Form.Item key={key} name={column.dataIndex} {...column} >
+              <Form.Item 
+                key={key} 
+                name={key} 
+                label={column.title || column.label} 
+                {...column as FormItemProps}
+              >
                 <FieldRender column={mergedColumn} form={form} />
               </Form.Item>
             );
@@ -116,7 +115,12 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     } else {
       // 普通表单项
       formItemContent = (
-        <Form.Item key={key} name={column.dataIndex} {...column as FormItemProps}>
+        <Form.Item 
+          key={key} 
+          name={key} 
+          label={column.title || column.label} 
+          {...column as FormItemProps}
+        >
           <FieldRender column={column} form={form} />
         </Form.Item>
       );

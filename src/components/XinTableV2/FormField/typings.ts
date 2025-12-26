@@ -27,7 +27,7 @@ import type { UserSelectorProps } from '@/components/XinFormField/UserSelector/t
 /**
  * 表单字段类型
  */
-export type XinValue =
+export type FieldValue =
     | 'text'          // 文本输入
     | 'password'      // 密码输入
     | 'textarea'      // 多行文本
@@ -106,8 +106,8 @@ export interface FieldDependency<T = any> {
 /**
  * 根据 valueType 映射 fieldProps 类型的表单列配置
  */
-type XinColumnMap<T> = {
-  [K in XinValue]: FormItemProps<T> & {
+type FormColumnMap<T> = {
+  [K in FieldValue]: FormItemProps<T> & {
     /** 唯一标识 */
     key?: string;
     /** 字段名 */
@@ -117,7 +117,7 @@ type XinColumnMap<T> = {
     /** 字段类型 */
     valueType?: K;
     /** 自定义字段渲染 */
-    renderField?: (dom: ReactNode, form: FormInstance<T>) => ReactNode;
+    fieldRender?: (form: FormInstance<T>) => ReactNode;
     /** Col 属性 表单开启 grid 时生效 */
     colProps?: ColProps;
     /** 字段组件的属性，根据 valueType 自动推断类型 */
@@ -131,4 +131,4 @@ type XinColumnMap<T> = {
  * 表单列配置
  * fieldProps 类型会根据 valueType 自动推断
  */
-export type XinColumn<T> = XinColumnMap<T>[XinValue]
+export type FormColumn<T> = FormColumnMap<T>[FieldValue]

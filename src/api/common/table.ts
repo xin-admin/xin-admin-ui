@@ -51,9 +51,9 @@ export function List<T,>(
  * @param data
  * @param options
  */
-export function Create<T,>(
+export function Create<T = API.ResponseStructure, Values = any>(
     url: string,
-    data?: { [key: string]: unknown },
+    data?: Values,
     options?: AxiosRequestConfig | undefined
 ){
   return createAxios<T>({
@@ -70,9 +70,9 @@ export function Create<T,>(
  * @param data
  * @param options
  */
-export function Update<T,>(
+export function Update<T = API.ResponseStructure, Values = any>(
     url: string,
-    data?: { [key: string]: unknown },
+    data?: Values,
     options?: AxiosRequestConfig | undefined
 ){
   return createAxios<T>({

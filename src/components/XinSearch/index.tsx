@@ -11,7 +11,7 @@ import type { XinSearchProps, XinSearchRef, SubmitterButton } from './typings';
 import type { FormItemProps } from 'antd';
 import type { XinColumn } from '../XinFormField/FieldRender/typings';
 import FieldRender from '../XinFormField/FieldRender';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 
 /**
  * XinForm - JSON 配置动态表单组件
@@ -20,7 +20,10 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
   const {
     columns,
     grid = true,
-    rowProps,
+    rowProps = {
+      gutter: [16, 16], 
+      wrap: true
+    },
     onSearch,
     formRef,
     submitter
@@ -30,6 +33,13 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
   const [form] = Form.useForm<T>();
   const [collapse, setCollapse] = useState(false);
   const [loading, setLoading] = useState(false);
+  const defaultColProps = {
+    xs: 24,
+    sm: 12,
+    md: 8,
+    lg: 8,
+    xl: 6,
+  }
 
   // 打开弹窗/抽屉
   const onCollapse = () => setCollapse(!collapse);
@@ -56,59 +66,28 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
 
   // 渲染表单项
   const renderFormItem = useCallback((column: XinColumn<T>, index: number): React.ReactNode => {
+    if (collapse && index >= 3) return null;
     const key = String(column.dataIndex) || String(column.name) || `form-item-${index}`;
-    const colProps = column.colProps;
-    const dependency = column.dependency;
-
-    let formItemContent;
-    if (column.valueType === 'divider' ) {
-      return;
-    } else if (dependency) {
-      // 有依赖时使用 Form.Item 的 shouldUpdate
-      formItemContent = (
-        <Form.Item noStyle shouldUpdate={(prevValues, curValues) => {
-          return dependency.dependencies.some(
-              (dep) => prevValues[dep as string] !== curValues[dep as string]
-          );
-        }}>
-          {({getFieldsValue}) => {
-            const values = getFieldsValue() as T;
-            // 判断是否隐藏
-            const isHidden = dependency.visible ? !dependency.visible(values) : false;
-            if (isHidden) return null;
-
-            // 判断是否禁用
-            const isDisabled = dependency.disabled ? dependency.disabled(values) : false;
-            // 动态 fieldProps
-            const dynamicFieldProps = dependency.fieldProps ? dependency.fieldProps(values) : {};
-
-            const mergedColumn = {
-              ...column,
-              fieldProps: {
-                ...(column.fieldProps || {}),
-                ...dynamicFieldProps,
-                disabled: isDisabled || (column.fieldProps as any)?.disabled,
-              },
-            } as XinColumn<T>;
-
-            return (
-                <Form.Item key={key} name={column.dataIndex} {...column} >
-                  <FieldRender column={mergedColumn} form={form} />
-                </Form.Item>
-            );
-          }}
-        </Form.Item>
-      );
-    } else {
-      // 普通表单项
-      formItemContent = (
-        <Form.Item key={key} name={column.dataIndex} {...column as FormItemProps}>
-          <FieldRender column={column} form={form} />
-        </Form.Item>
-      );
+    const colProps = {
+      ...defaultColProps,
+      ...column.colProps,
     }
+    
+    const formItemContent = (
+      <Form.Item
+        style={{marginBottom: 0}}
+        key={key} 
+        name={key} 
+        label={column.title || column.label} 
+        {...column as FormItemProps}
+        required={false}
+      >
+        <FieldRender column={column} form={form} />
+      </Form.Item>
+    );
+    
     return grid ? <Col {...colProps} key={key}>{formItemContent}</Col> : formItemContent;
-  }, [grid, form]);
+  }, [grid, form, collapse]);
 
   // 渲染提交按钮
   const renderSubmitter = useMemo(() => {
@@ -121,7 +100,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
         onClick={() => form.submit()}
         {...submitter?.submitButtonProps}
       >
-        {submitter?.submitText || t('xinForm.submit')}
+        {submitter?.submitText || '搜索'}
       </Button>
     );
 
@@ -131,23 +110,32 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
         onClick={() => form.resetFields()}
         {...submitter?.resetButtonProps}
       >
-        {submitter?.resetText || t('xinForm.reset')}
+        {submitter?.resetText || '重置'}
       </Button>
     );
 
+    const collapseButtonRender = (collapsed: boolean) => {
+      if (collapsed) {
+        return (
+          <Space>
+            { '展开' }
+            <CaretDownOutlined />
+          </Space>
+        )
+      } else {
+        return (
+          <Space>
+            { '收起' }
+            <CaretUpOutlined />
+          </Space>
+        )
+      }
+    };
+
     const collapseButton = (
-      <Button
-        loading={loading}
-        onClick={onCollapse}
-        icon={ 
-          collapse
-          ? 
-          (submitter?.expandIcon || <UpOutlined />) 
-          : 
-          (submitter?.collapseIcon || <DownOutlined />)
-        }
-        {...submitter?.collapseButtonProps}
-      />
+      <a onClick={onCollapse}>
+        { submitter?.collapseRender ? submitter.collapseRender(collapse) : collapseButtonRender(collapse) }
+      </a>
     );
 
     const buttons: SubmitterButton = {
@@ -161,19 +149,21 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
     }
 
     return (
-      <Form.Item>
-        <Space>
+      <Form.Item style={{marginBottom: 0}}>
+        <Space size={12}>
           {buttons.reset}
           {buttons.search}
           {buttons.collapse}
         </Space>
       </Form.Item>
     );
-  }, [loading, form, submitter, t]);
+  }, [loading, form, submitter, t, onCollapse]);
 
   // 表单内容
   return (
     <Form
+      name="xin-search"
+      variant={props.variant || 'filled'}
       {...props}
       form={form}
       onFinish={handleFinish}
@@ -181,11 +171,15 @@ function XinForm<T extends Record<string, any> = any>(props: XinSearchProps<T>) 
       {grid ? (
         <Row {...rowProps}>
           {columns.map((column, index) => renderFormItem(column, index))}
+          <Col {...defaultColProps}>{renderSubmitter}</Col>
         </Row>
       ) : (
-        columns.map((column, index) => renderFormItem(column, index))
+        <>
+          {columns.map((column, index) => renderFormItem(column, index))}
+          {renderSubmitter}
+        </>
       )}
-      {renderSubmitter}
+      
     </Form>
   )
 }
