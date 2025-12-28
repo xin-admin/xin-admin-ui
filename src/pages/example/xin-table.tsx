@@ -78,6 +78,10 @@ const XinTableExample: React.FC = () => {
         const item = enumMap[value];
         return item ? <Tag color={item.color}>{item.text}</Tag> : '-';
       },
+      filters: [
+        { text: '启用', value: 1 },
+        { text: '禁用', value: 0 },
+      ],
     },
     {
       dataIndex: 'role',
@@ -179,7 +183,7 @@ const XinTableExample: React.FC = () => {
       columns={columns}
       rowKey="id"
       accessName='system.user.list'
-      api='/api/user/list'
+      api={'/sys-user/list'}
       toolBarRender={customToolbar}
     />
   );

@@ -15,7 +15,6 @@ import {
   ColorPicker
 } from 'antd';
 import type {
-  FormInstance,
   InputProps,
   InputNumberProps,
   SelectProps,

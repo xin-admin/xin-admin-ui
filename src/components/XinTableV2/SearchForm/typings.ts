@@ -10,6 +10,8 @@ export type SubmitterButton = {
   search: ReactNode;
   /** 重置按钮 */
   reset: ReactNode;
+  /** 折叠按钮 */
+  collapse?: ReactNode;
 }
 
 /**
@@ -42,4 +44,10 @@ export type SearchFormProps<T = any> = Omit<FormProps<T>, 'onFinish' | 'form'> &
   handleSearch?: (values: T) => Promise<boolean | void>;
   /** 渲染表单操作栏 */
   submitter?: SubmitterProps;
+  /** 是否使用 Grid 布局 */
+  grid?: boolean;
+  /** 开启 grid 模式时传递给 Row */
+  rowProps?: RowProps;
+  /** 传递给表单项的 Col */
+  colProps?: ColProps;
 }

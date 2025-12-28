@@ -4,8 +4,7 @@ import type {
   CardProps,
   FormInstance,
 } from 'antd';
-import type { Key, RefObject } from 'react';
-import type { TableRef } from 'antd/es/table';
+import {type Key, type ReactNode, type RefObject} from 'react';
 import type { FormColumn } from './FormField';
 import type { SearchFormProps } from './SearchForm';
 import type { FormModalProps, FormModalRef } from './FormModal';
@@ -81,12 +80,14 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   deleteShow?: boolean | ((record: T) => boolean);
   /** 表格操作列显示 */
   operateShow?: boolean;
+  /** 标题渲染 */
+  titleRender?: ReactNode;
   /** 操作栏之后渲染 */
-  beforeOperateRender?: (record: T) => React.ReactNode;
+  beforeOperateRender?: (record: T) => ReactNode;
   /** 操作栏之后渲染 */
-  afterOperateRender?: (record: T) => React.ReactNode;
+  afterOperateRender?: (record: T) => ReactNode;
   /** 工具栏渲染 */
-  toolBarRender?: React.ReactNode[];
+  toolBarRender?: ReactNode[];
   /**
    * 表单提交
    * @param formData 表单数据
@@ -112,4 +113,8 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
     delete?: string;
   };
   cardProps?: Pick<CardProps, 'variant' | 'hoverable' | 'size' | 'classNames' | 'styles'>;
+  /** 自定义请求 */
+  handleRequest?: (params: Record<any, any>) => Promise<{ data: T[]; total: number }>;
+  /** 请求参数处理 */
+  requestParams?: (params: Record<any, any>) => Record<any, any>;
 }
