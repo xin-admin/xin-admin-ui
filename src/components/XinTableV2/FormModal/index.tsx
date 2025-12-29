@@ -50,9 +50,11 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
     formMode: () => formMode,
     setFormMode: (mode: FormMode, defaultValues?: T, key?: string) => {
       setFormMode(mode);
-      if(defaultValues) {
+      if(mode === 'create') {
+        form.resetFields();
+      } else {
         setDefaultValues(defaultValues);
-        form.setFieldsValue(defaultValues);
+        form.setFieldsValue(defaultValues || {});
         setKey(key || 'id');
       }
     },
@@ -64,7 +66,7 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
       const ok = await onFinish(values, formMode, formRef, defaultValues);
       if (ok) setOpen(false);
       return;
-    };
+    }
     try {
       setLoading(true);
       const values = form.getFieldsValue();
@@ -211,7 +213,7 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
         onClick={handleClose}
         {...submitter?.closeButtonProps}
       >
-        {submitter?.closeText || t('xinForm.cancel')}
+        {submitter?.closeText || '关闭'}
       </Button>
     );
 
@@ -237,9 +239,9 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
 
     return (
       <Space>
+        {buttons.close}
         {buttons.reset}
         {buttons.submit}
-        {buttons.close}
       </Space>
     );
     
@@ -267,6 +269,8 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
     <>
       <Modal
         open={open}
+        title={formMode === 'update' ? '编辑' : '新增'}
+        styles={{ header: { marginBottom: 16 } }}
         onCancel={handleClose}
         footer={renderSubmitter}
         {...modalProps}

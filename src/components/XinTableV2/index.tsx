@@ -1,17 +1,40 @@
 import {
-  Button, Card, ConfigProvider, Space, Table, Form, Flex, type PaginationProps, type TableProps,
-  type TablePaginationConfig, type GetProp,
-  Typography
+  Button,
+  Card,
+  Flex,
+  Form,
+  Input,
+  Space,
+  Table,
+  Tooltip,
+  Typography,
+  type TableProps,
+  type TableColumnType,
 } from "antd";
-import type { XinTableV2Props, XinTableV2Ref } from "./typings";
+import type {XinTableV2Props, XinTableV2Ref} from "./typings";
 import SearchForm from "./SearchForm";
-import FormModel, { type FormModalRef } from "./FormModal";
-import {useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
-import type { FormColumn } from "./FormField";
-import type { ColumnType } from "antd/es/table";
-import { SearchOutlined } from "@ant-design/icons";
-import {List} from "@/api/common/table.ts";
-import {isArray, isEmpty, isObject} from "lodash";
+import FormModel, {type FormModalRef} from "./FormModal";
+import {useImperativeHandle, useMemo, useRef, useState} from "react";
+import type {FormColumn} from "./FormField";
+import {Delete, List} from "@/api/common/table.ts";
+import {isArray, isEmpty, omit} from "lodash";
+import type {SearchProps} from "antd/es/input";
+import {DeleteOutlined, EditOutlined} from "@ant-design/icons";
+import {useTranslation} from "react-i18next";
+
+interface SorterParams {
+  field: string;
+  order: 'asc' | 'desc';
+}
+
+/** 请求参数类型 */
+interface RequestParams extends Record<string, any> {
+  page?: number;
+  pageSize?: number;
+  filter?: Record<string, any>;
+  sorter?: SorterParams;
+  keywordSearch?: string;
+}
 
 export default function XinTableV2<T extends Record<string, any> = any>(props: XinTableV2Props<T>) {
   const {
@@ -19,8 +42,9 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     accessName,
     rowKey,
     columns,
-    search,
-    form,
+    searchProps,
+    formProps,
+    cardProps,
     tableRef,
     addShow = true,
     editShow = true,
@@ -28,28 +52,22 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     operateShow = true,
     titleRender,
     toolBarRender = [],
+    operateProps,
     beforeOperateRender,
     afterOperateRender,
+    pagination: customPagination = {},
     handleRequest: customHandleRequest,
     requestParams: customRequestParams,
-    cardProps
+
   } = props;
 
+  const {t} = useTranslation();
   const formRef = useRef<FormModalRef<T>>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchRef] = Form.useForm<T>();
   const [dataSource, setDataSource] = useState<T[]>([]);
-  const [keywordSearch, setKeywordSearch] = useState();
-  // 分页
-  const [pagination, setPagination] = useState({
-    total: 0,
-    pageSize: 10,
-    current: 1
-  });
-  // 排序
-  const [sorter, setSorter] = useState<{ field: string; order: 'asc' | 'desc'; }>();
-  // 筛选
-  const [filters, setFilters] = useState<Record<string, any>>();
+  const [total, setTotal] = useState<number>(0);
+  const [requestParams, setRequestParams] = useState<RequestParams>({});
 
   // 暴露表单方法
   useImperativeHandle(tableRef, (): XinTableV2Ref => ({
@@ -75,97 +93,199 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     searchForm: () => searchRef,
   }));
 
-  /** 搜索列 */
-  const searchColumn: FormColumn<T>[] = useMemo(() => {
-    if (search && search.columns) return search.columns;
-    return columns.filter((column) => column.hideInForm !== true);
-  }, [columns, search]);
-
-  /** 表单列 */
-  const formColumn: FormColumn<T>[] = useMemo(() => {
-    if (form && form.columns) return form.columns;
-    return columns.filter((column) => column.hideInForm !== true);
-  }, [columns, form]);
-
   /** 表格请求 */
-  const handleRequest = async (page, pageSize, searchParams,  filters, sorter, keywordSearch) => {
+  const handleRequest = async (params: RequestParams) => {
     try {
       setLoading(true);
-      const searchValues = searchRef.getFieldsValue();
-      // 合并查询参数
-      let params: any = {
-        keywordSearch,
-        ...searchValues,
-        filter: filters,
-        sorter: sorter,
-        page: pagination.current,
-        pageSize: pagination.pageSize
-      };
-      // 去除未定义的参数
-      Object.keys(params).forEach((key) => {
-        if (isObject(params[key]) && isEmpty(params[key])) delete params[key];
-        if (params[key] === undefined) delete params[key];
-        if (params[key] === '') delete params[key];
-      });
-      params = customRequestParams ? customRequestParams(params) : params;
-      let listData: { data: T[], total: number };
-      if(customHandleRequest) {
-        listData = await customHandleRequest(params);
+      // 自定义参数处理
+      const requestParams: RequestParams = customRequestParams ? customRequestParams(params) : params;
+      // 自定义请求
+      let listData: { data: T[]; total: number };
+      if (customHandleRequest) {
+        listData = await customHandleRequest(requestParams);
       } else {
-        const { data } = await List<T>(api, params);
+        const { data } = await List<T>(api, requestParams);
         listData = data.data!;
       }
       setDataSource(listData.data);
-      setPagination({
-        ...pagination,
-        total: listData.total,
-      });
+      setTotal(listData.total);
     } finally {
       setLoading(false);
     }
-  }
-
-  /** 初始请求 */
-  useEffect(() => { handleRequest(); }, []);
-
-  /** 处理表格变化 */
-  const handleTableChange: TableProps<T>['onChange'] = (newPagination , filters, sorter) => {
-    if (!isEmpty(filters)) {
-      setFilters(filters);
-    } else {
-      setFilters(undefined);
-    }
-    if (!isArray(sorter) && !isEmpty(sorter.field)) {
-      setSorter({
-        field: String(sorter.field),
-        order: sorter.order === 'ascend' ? 'asc' : 'desc'
-      });
-    } else {
-      setSorter(undefined);
-    }
-    if (
-      pagination.current !== newPagination.current
-      || pagination.pageSize !== newPagination.pageSize
-    ) {
-      setPagination({
-        total: pagination.total,
-        pageSize: newPagination.pageSize || pagination.pageSize,
-        current: newPagination.current || pagination.current
-      })
-    }
-    handleRequest();
   };
 
-  const createClick = () => {
+  /** 初始请求 */
+  useState(async () => { await handleRequest(requestParams) });
+
+  /** 处理表格变化 */
+  const handleTableChange: TableProps<T>['onChange'] = async (newPagination, newFilters, newSorter) => {
+    console.log(newPagination, newFilters, newSorter)
+    const params: RequestParams = {
+      ...requestParams,
+      page: newPagination.current ?? requestParams.current,
+      pageSize: newPagination.pageSize ?? requestParams.pageSize,
+    };
+    // 处理筛选
+    if (!isEmpty(newFilters)) {
+      params.filterValues = newFilters;
+    }
+    // 处理排序
+    if (newSorter && !isArray(newSorter) && !isEmpty(newSorter) && !newSorter.field) {
+      params.sorterValue = {
+        field: String(newSorter.field),
+        order: newSorter.order === 'ascend' ? 'asc' : 'desc',
+      };
+    }
+    setRequestParams(params);
+    await handleRequest(params);
+  };
+
+  /** 快速搜索 */
+  const handleKeywordSearch: SearchProps['onSearch'] = async (value: string) => {
+    if( !value ) {
+      window.$message?.warning('请输入搜索内容');
+      return;
+    }
+    const params: RequestParams = {
+      ...requestParams,
+      page: 1,
+      keywordSearch: value,
+    }
+    setRequestParams(params);
+    await handleRequest(params);
+  };
+
+  /** 快速搜索 Change */
+  const keywordSearchChange: SearchProps['onChange'] = (e) => {
+    if( !e.target.value ) {
+      const { keywordSearch, ...params } = requestParams;
+      setRequestParams(params);
+      console.log('keywordSearch: ' + keywordSearch);
+    } else {
+      setRequestParams({
+        ...requestParams,
+        keywordSearch: e.target.value,
+      });
+    }
+  };
+
+  /** 搜索表单提交 */
+  const handleSearch = async () => {
+    const searchValues: T = searchRef.getFieldsValue();
+    // 移除 空值
+    Object.keys(searchValues).forEach((key) => {
+      if (searchValues[key] === '' || searchValues[key] === undefined) {
+        delete searchValues[key];
+      }
+    });
+    await handleRequest({
+      page: 1,
+      ...requestParams,
+      ...searchValues,
+    });
+  };
+
+  /** 搜索列 */
+  const searchColumn: FormColumn<T>[] = useMemo(() => {
+    return columns.filter((column) => column.hideInForm !== true);
+  }, [columns]);
+
+  /** 表单列 */
+  const formColumn: FormColumn<T>[] = useMemo(() => {
+    return columns.filter((column) => column.hideInForm !== true);
+  }, [columns]);
+
+  /** 表格操作列 */
+  const operate = useMemo((): TableColumnType<T>[] => {
+    if (!operateShow) return [];
+    return [
+      {
+        title: '操作栏',
+        key: 'operate',
+        align: 'center',
+        ...operateProps,
+        render: (_, record) => (
+          <Space>
+            {beforeOperateRender?.(record)}
+            {(typeof editShow === 'function' ? editShow(record) : editShow) &&
+              <Tooltip title={'编辑'}>
+                <Button
+                  type="primary"
+                  icon={<EditOutlined />}
+                  size={'small'}
+                  onClick={() => handleUpdate(record)}
+                />
+              </Tooltip>
+            }
+            {(typeof deleteShow === 'function' ? deleteShow(record) : deleteShow) !== false &&
+              <Tooltip title={'删除'}>
+                <Button
+                  danger
+                  type="primary"
+                  icon={<DeleteOutlined />}
+                  size={'small'}
+                  onClick={() => handleDelete(record)}
+                />
+              </Tooltip>
+            }
+            {afterOperateRender?.(record)}
+          </Space>
+        ),
+      },
+    ];
+  }, [columns, operateShow]);
+
+  /** 表格列 */
+  const tableColumns: TableColumnType<T>[] = useMemo(() => {
+    const columnsList: TableColumnType<T>[] = columns.filter((column) => column.hideInTable !== true).map(column => {
+      return omit(column, ['hideInTable', 'hideInForm', 'hideInSearch', 'search']);
+    });
+    return [
+      ...columnsList,
+      ...operate
+    ]
+  }, [columns]);
+
+  /** 新增按钮点击 */
+  const handleCreate = () => {
     formRef.current?.open();
-    formRef.current?.setFieldsValue({});
     formRef.current?.setFormMode('create');
   }
-  const editClick = (record: T) => {
+
+  /** 修改按钮点击 */
+  const handleUpdate = (record: T) => {
     formRef.current?.open();
-    formRef.current?.setFieldsValue(record);
-    formRef.current?.setFormMode('update');
+    formRef.current?.setFormMode('update', record, rowKey);
   }
+
+  /** 删除记录 */
+  const handleDelete = async (record: T) => {
+    window.$modal?.confirm({
+      title: `你是否要删除 ${record[rowKey]} 记录？`,
+      okText: '确认删除',
+      cancelText: '取消删除',
+      onOk: async () => {
+        await Delete(api + `/${record[rowKey]}`);
+        window.$message?.success('删除成功');
+        await handleRequest(requestParams);
+      }
+    })
+  };
+
+  /** 批量删除 */
+  // const handleBatchDelete = async () => {
+  //   if (!selectedRowKeys.length) return message.warning(t('sysFile.noSelected'));
+  //   window.$modal?.confirm({
+  //     title: t('sysFile.confirmBatchDelete', { count: selectedRowKeys.length }),
+  //     okText: t('sysFile.ok'),
+  //     cancelText: t('sysFile.cancel'),
+  //     onOk: async () => {
+  //       await batchDeleteFiles(selectedRowKeys as number[]);
+  //       message.success(t('sysFile.batchDeleteSuccess'));
+  //       await loadFiles();
+  //     }
+  //   });
+  // };
 
   return (
     <div>
@@ -174,8 +294,8 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         <SearchForm<T>
           form={searchRef}
           columns={searchColumn}
-          handleSearch={handleRequest}
-          {...search}
+          handleSearch={handleSearch}
+          {...searchProps}
         />
       </Card>
       <Card {...cardProps}>
@@ -187,9 +307,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
                 {titleRender || <Typography.Title level={5}>查询表格</Typography.Title>}
               </Flex>
               <Space>
+                {/* 快速搜索 */}
+                <Input.Search
+                  onChange={keywordSearchChange}
+                  placeholder="请输入关键字"
+                  style={{ width: 200 }}
+                  value={requestParams.keywordSearch}
+                  onSearch={handleKeywordSearch}
+                />
                 {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
                 {deleteShow && <Button color="danger">批量删除</Button>}
-                {addShow && <Button type="primary" onClick={createClick}>新增</Button>}
+                {addShow && <Button type="primary" onClick={handleCreate}>新增</Button>}
               </Space>
             </Flex>
           </div>
@@ -197,11 +325,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
             {...props}
             loading={loading}
             dataSource={dataSource}
-            columns={columns as ColumnType<T>[]} 
+            columns={tableColumns}
             rowKey={rowKey}
             onChange={handleTableChange}
             pagination={{
-              ...pagination
+              showQuickJumper: true,
+              showSizeChanger: true,
+              showTotal: (total) => `Total ${total} items`,
+              ...customPagination,
+              pageSize: requestParams.pageSize,
+              current: requestParams.page,
+              total,
             }}
           />
         </Space>
@@ -212,7 +346,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         api={api}
         columns={formColumn}
         formRef={formRef}
-        {...form} 
+        {...formProps}
       />
     </div>
   );

@@ -19,7 +19,7 @@ import type {
 import type { TextAreaProps, PasswordProps } from 'antd/es/input';
 import type { RangePickerProps } from 'antd/es/date-picker';
 import type { CheckboxGroupProps } from 'antd/es/checkbox';
-import {type ReactNode} from 'react';
+import {type Key, type ReactNode} from 'react';
 import type { IconSelectProps } from '@/components/XinFormField/IconSelector/typings';
 import type { ImageUploaderProps } from '@/components/XinFormField/ImageUploader/typings';
 import type { UserSelectorProps } from '@/components/XinFormField/UserSelector/typings';
@@ -109,9 +109,9 @@ export interface FieldDependency<T = any> {
 type FormColumnMap<T> = {
   [K in FieldValue]: FormItemProps<T> & {
     /** 唯一标识 */
-    key?: string;
+    key?: Key;
     /** 字段名 */
-    dataIndex?: keyof T | string;
+    dataIndex?: string;
     /** 字段标签 */
     title?: string;
     /** 字段类型 */

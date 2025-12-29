@@ -2,7 +2,7 @@ import type {
   TableProps,
   TableColumnType,
   CardProps,
-  FormInstance,
+  FormInstance, PaginationProps,
 } from 'antd';
 import {type Key, type ReactNode, type RefObject} from 'react';
 import type { FormColumn } from './FormField';
@@ -63,15 +63,13 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 权限名称前缀 */
   accessName: string;
   /** 主键 */
-  rowKey: keyof T | string;
+  rowKey: string;
   /** 列配置 */
   columns: XinTableColumn<T>[];
+
   /** 表格实例引用 */
   tableRef?: RefObject<XinTableV2Ref<T>>;
-  /** 搜索栏配置 */
-  search?: SearchFormProps<T> | false;
-  /** 表单配置 */
-  form?: FormModalProps<T> | false;
+
   /** 新增按钮显示 */
   addShow?: boolean
   /** 编辑按钮显示 */
@@ -80,29 +78,27 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   deleteShow?: boolean | ((record: T) => boolean);
   /** 表格操作列显示 */
   operateShow?: boolean;
+
+  /** 表单属性  */
+  formProps?: FormModalProps<T> | false;
+  /** 搜索栏属性  */
+  searchProps?: SearchFormProps<T> | false;
+  /** 操作栏属性 */
+  operateProps?: TableColumnType<T>;
+  /** 卡片属性 */
+  cardProps?: Pick<CardProps, 'variant' | 'hoverable' | 'size' | 'classNames' | 'styles'>;
+  /** 分页配置 */
+  pagination: Omit<PaginationProps, 'total' | 'onChange' | 'size' | 'current'>;
+
   /** 标题渲染 */
   titleRender?: ReactNode;
+  /** 工具栏渲染 */
+  toolBarRender?: ReactNode[];
   /** 操作栏之后渲染 */
   beforeOperateRender?: (record: T) => ReactNode;
   /** 操作栏之后渲染 */
   afterOperateRender?: (record: T) => ReactNode;
-  /** 工具栏渲染 */
-  toolBarRender?: ReactNode[];
-  /**
-   * 表单提交
-   * @param formData 表单数据
-   * @param mode 表单模式 'create' | 'edit'
-   * @param editingRecord 编辑时的原始数据，新增时为 null
-   */
-  onFinish?: (formData: T, mode: FormMode, editingRecord?: T) => Promise<boolean>;
-  /** 删除前钩子，返回 false 可取消删除 */
-  onDelete?: (record: T) => Promise<boolean> | boolean;
-  /** 搜索前钩子，返回的数据会作为最终搜索的 Params */
-  onSearch?: (record: T) => T;
-  /** 请求后钩子 */
-  requestSuccess?: (data?: API.ListResponse<T>) => void;
-  /** 刷新方式: reset-重置到第一页, reload-保持当前页 */
-  reloadType?: 'reset' | 'reload';
+
   /** 成功提示文本配置 */
   successMessage?: {
     /** 新增成功提示文本 */
@@ -112,7 +108,7 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
     /** 删除成功提示文本 */
     delete?: string;
   };
-  cardProps?: Pick<CardProps, 'variant' | 'hoverable' | 'size' | 'classNames' | 'styles'>;
+
   /** 自定义请求 */
   handleRequest?: (params: Record<any, any>) => Promise<{ data: T[]; total: number }>;
   /** 请求参数处理 */
