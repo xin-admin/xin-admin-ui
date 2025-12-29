@@ -92,8 +92,12 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
 
   /** 标题渲染 */
   titleRender?: ReactNode;
-  /** 工具栏渲染 */
+  /** 工具栏配置，传入 false 隐藏整个工具栏 */
+  toolBarOptions?: ToolBarOptions | false;
+  /** 工具栏自定义渲染 */
   toolBarRender?: ReactNode[];
+  /** 工具栏左侧渲染 */
+  toolBarLeft?: ReactNode;
   /** 操作栏之后渲染 */
   beforeOperateRender?: (record: T) => ReactNode;
   /** 操作栏之后渲染 */
@@ -114,3 +118,5 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 请求参数处理 */
   requestParams?: (params: Record<any, any>) => Record<any, any>;
 }
+
+export type { ToolBarOptions, ColumnSettingItem, TableDensity };
