@@ -210,7 +210,9 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
       .map(column => {
         return omit(column, ['hideInTable', 'hideInForm', 'hideInSearch', 'search']);
       });
-    setColumnsChecked(list.map(item => item.dataIndex!));
+    const dataIndexList = list.map(item => item.dataIndex!);
+    setColumnsChecked(dataIndexList);
+    setColumnSorted(dataIndexList);
     return list;
   }, [columns]);
 
@@ -256,12 +258,21 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   /** 最终表格列，计算排序以及显示状态 */
   const tableColumns: TableColumnType<T>[] = useMemo(() => {
-    // 需要新增根据 columnSorted 的顺序排序
-    return [
-      ...defaultTableColumns.filter(column => columnsChecked.includes(column.dataIndex as any)),
-      ...operate
-    ];
-  }, [defaultTableColumns, columnsChecked, columnSorted]);
+    // 过滤出选中的列
+    const filteredColumns = defaultTableColumns.filter(column => 
+      columnsChecked.includes(column.dataIndex as any)
+    );
+    // 根据 columnSorted 的顺序排序
+    const sortedColumns = filteredColumns.sort((a, b) => {
+      const indexA = columnSorted.indexOf(a.dataIndex as any);
+      const indexB = columnSorted.indexOf(b.dataIndex as any);
+      // 如果不在排序列表中，放到最后
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+    return [...sortedColumns, ...operate];
+  }, [defaultTableColumns, columnsChecked, columnSorted, operate]);
 
   /** 新增按钮点击 */
   const handleCreate = () => {
@@ -328,17 +339,54 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   // 处理拖拽排序
   const handleDrop: TreeProps['onDrop'] = useCallback((info: any) => {
-    // 需要新增根据 变化处理 columnSorted
-    console.log(info)
+    const { dragNode, node, dropPosition } = info;
+    const dragKey = dragNode.key;
+    const dropKey = node.key;
+
+    setColumnSorted((prevSorted) => {
+      const newSorted = [...prevSorted];
+      const dragIndex = newSorted.indexOf(dragKey);
+      const dropIndex = newSorted.indexOf(dropKey);
+
+      if (dragIndex === -1 || dropIndex === -1) return prevSorted;
+
+      // 移除拖拽的元素
+      newSorted.splice(dragIndex, 1);
+
+      // 计算插入位置
+      let insertIndex = newSorted.indexOf(dropKey);
+      if (dropPosition === -1) {
+        // 放在目标节点前面
+        insertIndex = insertIndex;
+      } else {
+        // 放在目标节点后面
+        insertIndex = insertIndex + 1;
+      }
+
+      // 插入到新位置
+      newSorted.splice(insertIndex, 0, dragKey);
+
+      return newSorted;
+    });
   }, []);
 
-  /** 列设置树数据 */
+  /** 列设置树数据  */
   const columnTreeData: DataNode[] = useMemo(() => {
-    return columns.filter(item => item.hideInTable !== false && item.dataIndex).map((item) => ({
-      key: item.dataIndex!,
-      title: item.title,
-    }));
-  }, [columns]);
+    const filteredColumns = columns.filter(item => item.hideInTable !== true && item.dataIndex);
+    // 根据 columnSorted 排序
+    return filteredColumns
+      .sort((a, b) => {
+        const indexA = columnSorted.indexOf(a.dataIndex as any);
+        const indexB = columnSorted.indexOf(b.dataIndex as any);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      })
+      .map((item) => ({
+        key: item.dataIndex!,
+        title: item.title,
+      }));
+  }, [columns, columnSorted]);
 
   /** 列设置选中改变 */
   const columnSettingCheck: TreeProps['onCheck'] = (keys) => {
