@@ -41,10 +41,24 @@ export interface XinTableV2Ref<T = any> {
   searchForm?: () => FormInstance<T> | undefined;
 }
 
+export interface SorterParams {
+  field: string;
+  order: 'asc' | 'desc';
+}
+
+/** 请求参数类型 */
+export interface RequestParams extends Record<string, any> {
+  page?: number;
+  pageSize?: number;
+  filter?: Record<string, any>;
+  sorter?: SorterParams;
+  keywordSearch?: string;
+}
+
 /**
  * XinTableV2 组件属性
  */
-export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' | 'rowKey'> {
+export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' | 'rowKey' | 'onChange' | 'pagination'> {
   /** API 地址 */
   api: string;
   /** 权限名称前缀 */
@@ -97,7 +111,7 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   };
 
   /** 自定义请求 */
-  handleRequest?: (params: Record<any, any>) => Promise<{ data: T[]; total: number }>;
+  handleRequest?: (params: RequestParams) => Promise<{ data: T[]; total: number }>;
   /** 请求参数处理 */
-  requestParams?: (params: Record<any, any>) => Record<any, any>;
+  requestParams?: (params: RequestParams) => RequestParams;
 }

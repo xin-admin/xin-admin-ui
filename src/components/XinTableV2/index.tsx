@@ -1,5 +1,6 @@
 import {
   Button,
+  Tree,
   Card,
   Flex,
   Form,
@@ -7,14 +8,17 @@ import {
   Space,
   Table,
   Tooltip,
+  Popover,
+  Dropdown,
   Typography,
   type TableProps,
-  type TableColumnType, Dropdown,
+  type TableColumnType,
+  type TreeProps,
 } from "antd";
-import type {XinTableV2Props, XinTableV2Ref} from "./typings";
+import type {XinTableV2Props, XinTableV2Ref, RequestParams} from "./typings";
 import SearchForm from "./SearchForm";
 import FormModel, {type FormModalRef} from "./FormModal";
-import {useImperativeHandle, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
 import type {FormColumn} from "./FormField";
 import {Delete, List} from "@/api/common/table.ts";
 import {isArray, isEmpty, omit} from "lodash";
@@ -25,24 +29,15 @@ import {
   ColumnHeightOutlined,
   DeleteOutlined,
   EditOutlined,
-  ReloadOutlined
+  ReloadOutlined, SettingOutlined
 } from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
-import ToolBar from "@/components/XinTableV2/ToolBar";
+import type {DataNode} from "antd/es/tree";
 
-interface SorterParams {
-  field: string;
-  order: 'asc' | 'desc';
-}
-
-/** 请求参数类型 */
-interface RequestParams extends Record<string, any> {
-  page?: number;
-  pageSize?: number;
-  filter?: Record<string, any>;
-  sorter?: SorterParams;
-  keywordSearch?: string;
-}
+// 默认分页大小
+const DEFAULT_PAGE_SIZE: number = 10;
+// 默认页数
+const DEFAULT_PAGE: number = 1;
 
 export default function XinTableV2<T extends Record<string, any> = any>(props: XinTableV2Props<T>) {
   const {
@@ -74,9 +69,14 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   const [searchRef] = Form.useForm<T>();
   const [dataSource, setDataSource] = useState<T[]>([]);
   const [total, setTotal] = useState<number>(0);
-  const [requestParams, setRequestParams] = useState<RequestParams>({});
+  const [requestParams, setRequestParams] = useState<RequestParams>({
+    page: DEFAULT_PAGE,
+    pageSize: DEFAULT_PAGE_SIZE,
+  });
   const [density, setDensity] = useState<TableProps['size']>();
   const [bordered, setBordered] = useState<boolean>();
+  const [columnsChecked, setColumnsChecked] = useState<any[]>([]);
+  const [columnSorted, setColumnSorted] = useState<any[]>([]);
 
   // 暴露表单方法
   useImperativeHandle(tableRef, (): XinTableV2Ref => ({
@@ -98,11 +98,15 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   }));
 
   /** 表格请求 */
-  const handleRequest = async (params: RequestParams) => {
+  const handleRequest = async (params?: RequestParams) => {
     try {
       setLoading(true);
+      const defaultParams: RequestParams = Object.assign({
+        page: DEFAULT_PAGE,
+        pageSize: DEFAULT_PAGE_SIZE,
+      }, params)
       // 自定义参数处理
-      const requestParams: RequestParams = customRequestParams ? customRequestParams(params) : params;
+      const requestParams: RequestParams = customRequestParams ? customRequestParams(defaultParams) : defaultParams;
       // 自定义请求
       let listData: { data: T[]; total: number };
       if (customHandleRequest) {
@@ -118,8 +122,8 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     }
   };
 
-  /** 初始请求 */
-  useState(async () => { await handleRequest(requestParams) });
+  /** 初始化 */
+  useEffect(() => { handleRequest() }, []);
 
   /** 处理表格变化 */
   const handleTableChange: TableProps<T>['onChange'] = async (newPagination, newFilters, newSorter) => {
@@ -199,6 +203,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     return columns.filter((column) => column.hideInForm !== true);
   }, [columns]);
 
+  /** 默认表格列 */
+  const defaultTableColumns: TableColumnType[] = useMemo(() => {
+    const list: TableColumnType[] = columns
+      .filter((column) => column.hideInTable !== true && column.dataIndex)
+      .map(column => {
+        return omit(column, ['hideInTable', 'hideInForm', 'hideInSearch', 'search']);
+      });
+    setColumnsChecked(list.map(item => item.dataIndex!));
+    return list;
+  }, [columns]);
+
   /** 表格操作列 */
   const operate = useMemo((): TableColumnType<T>[] => {
     if (!operateShow) return [];
@@ -239,16 +254,14 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     ];
   }, [columns, operateShow]);
 
-  /** 表格列 */
+  /** 最终表格列，计算排序以及显示状态 */
   const tableColumns: TableColumnType<T>[] = useMemo(() => {
-    const columnsList: TableColumnType<T>[] = columns.filter((column) => column.hideInTable !== true).map(column => {
-      return omit(column, ['hideInTable', 'hideInForm', 'hideInSearch', 'search']);
-    });
+    // 需要新增根据 columnSorted 的顺序排序
     return [
-      ...columnsList,
+      ...defaultTableColumns.filter(column => columnsChecked.includes(column.dataIndex as any)),
       ...operate
-    ]
-  }, [columns]);
+    ];
+  }, [defaultTableColumns, columnsChecked, columnSorted]);
 
   /** 新增按钮点击 */
   const handleCreate = () => {
@@ -291,6 +304,49 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   //   });
   // };
 
+  /** 密度设置菜单 */
+  const densityMenu = {
+    items: [
+      {
+        key: 'large',
+        label: '默认',
+        onClick: () => setDensity('large'),
+      },
+      {
+        key: 'middle',
+        label: '适中',
+        onClick: () => setDensity('middle'),
+      },
+      {
+        key: 'small',
+        label: '紧凑',
+        onClick: () => setDensity('small'),
+      },
+    ],
+    selectedKeys: [density || 'large'],
+  };
+
+  // 处理拖拽排序
+  const handleDrop: TreeProps['onDrop'] = useCallback((info: any) => {
+    // 需要新增根据 变化处理 columnSorted
+    console.log(info)
+  }, []);
+
+  /** 列设置树数据 */
+  const columnTreeData: DataNode[] = useMemo(() => {
+    return columns.filter(item => item.hideInTable !== false && item.dataIndex).map((item) => ({
+      key: item.dataIndex!,
+      title: item.title,
+    }));
+  }, [columns]);
+
+  /** 列设置选中改变 */
+  const columnSettingCheck: TreeProps['onCheck'] = (keys) => {
+    if(isArray( keys)) {
+      setColumnsChecked(keys);
+    }
+  }
+
   return (
     <div>
       <Card style={{marginBottom: 20}}>
@@ -303,55 +359,90 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         />
       </Card>
       <Card {...cardProps}>
-        <Space direction="vertical" size={20}>
-          <div>
-            {/* 操作栏 */}
-            <Flex justify={'space-between'}>
-              <Flex align={'center'}>
-                {titleRender || <Typography.Title level={5}>查询表格</Typography.Title>}
-              </Flex>
-              <Space>
-                {/* 快速搜索 */}
-                <Input.Search
-                  onChange={keywordSearchChange}
-                  placeholder="请输入关键字"
-                  style={{ width: 200 }}
-                  value={requestParams.keywordSearch}
-                  onSearch={handleKeywordSearch}
-                />
-                {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
-                {deleteShow && <Button color="danger">批量删除</Button>}
-                {addShow && <Button type="primary" onClick={handleCreate}>新增</Button>}
-                <ToolBar
-                  handleRequest={handleRequest}
-                  density={density}
-                  setDensity={setDensity}
-                  bordered={bordered}
-                  setBordered={setBordered}
-                />
-              </Space>
+        <div style={{ marginBottom: 20 }}>
+          {/* 操作栏 */}
+          <Flex justify={'space-between'}>
+            <Flex align={'center'}>
+              {titleRender || <Typography.Title level={5}>查询表格</Typography.Title>}
             </Flex>
-          </div>
-          <Table
-            {...props}
-            loading={loading}
-            dataSource={dataSource}
-            columns={tableColumns}
-            rowKey={rowKey}
-            size={density}
-            bordered={bordered}
-            onChange={handleTableChange}
-            pagination={{
-              showQuickJumper: true,
-              showSizeChanger: true,
-              showTotal: (total) => `Total ${total} items`,
-              ...customPagination,
-              pageSize: requestParams.pageSize,
-              current: requestParams.page,
-              total,
-            }}
-          />
-        </Space>
+            <Space>
+              {/* 快速搜索 */}
+              <Input.Search
+                onChange={keywordSearchChange}
+                placeholder="请输入关键字"
+                style={{ width: 200 }}
+                value={requestParams.keywordSearch}
+                onSearch={handleKeywordSearch}
+              />
+              {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
+              {deleteShow && <Button color="danger">批量删除</Button>}
+              {addShow && <Button type="primary" onClick={handleCreate}>新增</Button>}
+              <Space size={1}>
+                {/* 刷新表格 */}
+                <Tooltip title="刷新">
+                  <Button
+                    type="text"
+                    icon={<ReloadOutlined />}
+                    onClick={() => handleRequest()}
+                  />
+                </Tooltip>
+                {/* 密度设置 */}
+                <Dropdown menu={densityMenu} trigger={['click']}>
+                  <Button type="text" icon={<ColumnHeightOutlined />} />
+                </Dropdown>
+                {/* 边框设置 */}
+                <Tooltip title={bordered ? '隐藏边框' : '显示边框'}>
+                  <Button
+                    type="text"
+                    icon={bordered ? <BorderOutlined /> : <BorderlessTableOutlined />}
+                    onClick={() => setBordered(!bordered)}
+                  />
+                </Tooltip>
+                {/* 列设置 */}
+                <Popover
+                  content={(
+                    <Tree
+                      draggable
+                      blockNode
+                      checkable={true}
+                      treeData={columnTreeData}
+                      selectable={false}
+                      onDrop={handleDrop}
+                      checkedKeys={columnsChecked}
+                      onCheck={columnSettingCheck}
+                    />
+                  )}
+                  trigger="click"
+                  placement="bottomRight"
+                  title="列设置"
+                >
+                  <Tooltip title="列设置">
+                    <Button type="text" icon={<SettingOutlined />} />
+                  </Tooltip>
+                </Popover>
+              </Space>
+            </Space>
+          </Flex>
+        </div>
+        <Table
+          loading={loading}
+          dataSource={dataSource}
+          size={density}
+          bordered={bordered}
+          {...props}
+          columns={tableColumns}
+          rowKey={rowKey}
+          onChange={handleTableChange}
+          pagination={{
+            showQuickJumper: true,
+            showSizeChanger: true,
+            showTotal: (total) => `Total ${total} items`,
+            ...customPagination,
+            pageSize: requestParams.pageSize,
+            current: requestParams.page,
+            total,
+          }}
+        />
       </Card>
 
       {/* 新增编辑表单 */}
