@@ -130,7 +130,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     console.log(newPagination, newFilters, newSorter)
     const params: RequestParams = {
       ...requestParams,
-      page: newPagination.current ?? requestParams.current,
+      page: newPagination.current ?? requestParams.page,
       pageSize: newPagination.pageSize ?? requestParams.pageSize,
     };
     // 处理筛选
@@ -138,11 +138,13 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
       params.filterValues = newFilters;
     }
     // 处理排序
-    if (newSorter && !isArray(newSorter) && !isEmpty(newSorter) && !newSorter.field) {
+    if (newSorter && !isArray(newSorter) && !isEmpty(newSorter) && newSorter.field) {
       params.sorterValue = {
         field: String(newSorter.field),
         order: newSorter.order === 'ascend' ? 'asc' : 'desc',
       };
+    } else {
+      delete params.sorterValue;
     }
     setRequestParams(params);
     await handleRequest(params);
@@ -195,7 +197,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   /** 搜索列 */
   const searchColumn: FormColumn<T>[] = useMemo(() => {
-    return columns.filter((column) => column.hideInForm !== true);
+    return columns.filter((column) => column.hideInSearch !== true);
   }, [columns]);
 
   /** 表单列 */
@@ -204,17 +206,18 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   }, [columns]);
 
   /** 默认表格列 */
-  const defaultTableColumns: TableColumnType[] = useMemo(() => {
-    const list: TableColumnType[] = columns
+  const defaultTableColumns = useMemo(() => {
+    return columns
       .filter((column) => column.hideInTable !== true && column.dataIndex)
-      .map(column => {
-        return omit(column, ['hideInTable', 'hideInForm', 'hideInSearch', 'search']);
-      });
-    const dataIndexList = list.map(item => item.dataIndex!);
+      .map(column => omit(column, ['hideInTable', 'hideInForm', 'hideInSearch', 'search']));
+  }, [columns]);
+
+  /** 初始化列设置树数据 */
+  useEffect(() => {
+    const dataIndexList = defaultTableColumns.map(item => item.dataIndex!);
     setColumnsChecked(dataIndexList);
     setColumnSorted(dataIndexList);
-    return list;
-  }, [columns]);
+  }, [defaultTableColumns]);
 
   /** 表格操作列 */
   const operate = useMemo((): TableColumnType<T>[] => {
@@ -254,7 +257,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         ),
       },
     ];
-  }, [columns, operateShow]);
+  }, [columns, operateShow, editShow, deleteShow]);
 
   /** 最终表格列，计算排序以及显示状态 */
   const tableColumns: TableColumnType<T>[] = useMemo(() => {
