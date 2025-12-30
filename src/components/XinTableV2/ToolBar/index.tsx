@@ -185,25 +185,7 @@ export default function ToolBar(props: ToolBarProps) {
   );
 
   return (
-    <Flex justify="space-between" align="center" style={{ width: '100%' }}>
-      {/* 左侧区域 */}
-      <Flex align="center">
-        {renderLeft || <Typography.Title level={5} style={{ margin: 0 }}>查询表格</Typography.Title>}
-      </Flex>
-
-      {/* 右侧区域 */}
       <Space size={4}>
-        {/* 自定义右侧渲染 */}
-        {renderRight}
-
-        {/* 额外操作按钮 */}
-        {extraRender.length > 0 && extraRender.map((item, index) => (
-          <span key={index}>{item}</span>
-        ))}
-
-        {/* 功能按钮分隔 */}
-        {(renderRight || extraRender.length > 0) && hasAnyOption && <Divider type="vertical" />}
-
         {/* 刷新按钮 */}
         {toolBarOptions.reload && (
           <Tooltip title="刷新">
@@ -272,6 +254,5 @@ export default function ToolBar(props: ToolBarProps) {
           </Tooltip>
         )}
       </Space>
-    </Flex>
   );
 }

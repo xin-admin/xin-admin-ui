@@ -8,7 +8,6 @@ import {type Key, type ReactNode, type RefObject} from 'react';
 import type { FormColumn } from './FormField';
 import type { SearchFormProps } from './SearchForm';
 import type { FormModalProps, FormModalRef } from './FormModal';
-import type { FormMode } from './FormModal/typings';
 
 /**
  * 表格列配置
@@ -36,18 +35,6 @@ export interface XinTableV2Ref<T = any> {
   getSelectedRows: () => T[];
   /** 清空选中 */
   clearSelected: () => void;
-  /** 打开表单弹窗 */
-  openFormModal?: () => void;
-  /** 关闭表单弹窗 */
-  closeFormModal?: () => void;
-  /** 获取表单弹窗的打开状态 */
-  isOpenFormModal?: () => boolean;
-  /** 设置表单加载状态 */
-  setFormModalLoading?: (loading: boolean) => void;
-  /** 设置表单类型 */
-  setFormMode?: (mode: FormMode, values?: T, key?: string) => void;
-  /** 获取表单类型 */
-  formMode?: () => FormMode;
   /** 获取表单实例 */
   form?: () => FormModalRef<T> | null;
   /** 获取搜索表单实例 */
@@ -80,9 +67,9 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   operateShow?: boolean;
 
   /** 表单属性  */
-  formProps?: FormModalProps<T> | false;
+  formProps?: Omit<FormModalProps<T>, 'formRef'> | false;
   /** 搜索栏属性  */
-  searchProps?: SearchFormProps<T> | false;
+  searchProps?: Omit<SearchFormProps<T>, 'form'> | false;
   /** 操作栏属性 */
   operateProps?: TableColumnType<T>;
   /** 卡片属性 */
@@ -92,12 +79,8 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
 
   /** 标题渲染 */
   titleRender?: ReactNode;
-  /** 工具栏配置，传入 false 隐藏整个工具栏 */
-  toolBarOptions?: ToolBarOptions | false;
-  /** 工具栏自定义渲染 */
+  /** 工具栏渲染 */
   toolBarRender?: ReactNode[];
-  /** 工具栏左侧渲染 */
-  toolBarLeft?: ReactNode;
   /** 操作栏之后渲染 */
   beforeOperateRender?: (record: T) => ReactNode;
   /** 操作栏之后渲染 */
@@ -118,5 +101,3 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 请求参数处理 */
   requestParams?: (params: Record<any, any>) => Record<any, any>;
 }
-
-export type { ToolBarOptions, ColumnSettingItem, TableDensity };
