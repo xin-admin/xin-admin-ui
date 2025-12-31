@@ -72,15 +72,15 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
       const values = form.getFieldsValue();
       if (formMode === 'create') {
         await Create(api, values);
-        window.$message?.success('创建成功！');
+        window.$message?.success(t('xinTableV2.form.createSuccess'));
         setOpen(false);
       } else {
         if (defaultValues && key) {
           await Update(api + `/${(defaultValues as Record<string, any>)[key]}`, values);
-          window.$message?.success('更新成功！');
+          window.$message?.success(t('xinTableV2.form.updateSuccess'));
           setOpen(false);
         } else {
-          window.$message?.error('更新的主键未定义！');
+          window.$message?.error(t('xinTableV2.form.updateKeyUndefined'));
         }
       }
     } finally {
@@ -213,7 +213,7 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
         onClick={handleClose}
         {...submitter?.closeButtonProps}
       >
-        {submitter?.closeText || '关闭'}
+        {submitter?.closeText || t('xinTableV2.form.close')}
       </Button>
     );
 
@@ -269,7 +269,7 @@ function XinForm<T = Record<string, any>>(props: FormModalProps<T>) {
     <>
       <Modal
         open={open}
-        title={formMode === 'update' ? '编辑' : '新增'}
+        title={formMode === 'update' ? t('xinTableV2.form.editTitle') : t('xinTableV2.form.createTitle')}
         styles={{ header: { marginBottom: 16 } }}
         onCancel={handleClose}
         footer={renderSubmitter}

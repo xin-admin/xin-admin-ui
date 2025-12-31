@@ -1,0 +1,35 @@
+export default {
+  // Компонент XinTableV2
+  'xinTableV2.queryTable': 'Таблица запросов',
+  'xinTableV2.keywordPlaceholder': 'Введите ключевое слово',
+  'xinTableV2.keywordEmpty': 'Пожалуйста, введите содержимое для поиска',
+  'xinTableV2.add': 'Добавить',
+  'xinTableV2.refresh': 'Обновить',
+  'xinTableV2.columnSettings': 'Настройки колонок',
+  'xinTableV2.showBorder': 'Показать границу',
+  'xinTableV2.hideBorder': 'Скрыть границу',
+  'xinTableV2.density.default': 'По умолчанию',
+  'xinTableV2.density.middle': 'Средний',
+  'xinTableV2.density.compact': 'Компактный',
+  'xinTableV2.total': 'Всего {{total}} элементов',
+  // Колонка действий
+  'xinTableV2.operate': 'Действия',
+  'xinTableV2.edit': 'Редактировать',
+  'xinTableV2.delete': 'Удалить',
+  'xinTableV2.deleteConfirm': 'Вы уверены, что хотите удалить запись {{id}}?',
+  'xinTableV2.deleteOk': 'Подтвердить удаление',
+  'xinTableV2.deleteCancel': 'Отмена',
+  'xinTableV2.deleteSuccess': 'Успешно удалено',
+  // FormModal
+  'xinTableV2.form.createTitle': 'Создать',
+  'xinTableV2.form.editTitle': 'Редактировать',
+  'xinTableV2.form.close': 'Закрыть',
+  'xinTableV2.form.createSuccess': 'Успешно создано!',
+  'xinTableV2.form.updateSuccess': 'Успешно обновлено!',
+  'xinTableV2.form.updateKeyUndefined': 'Первичный ключ для обновления не определён!',
+  // SearchForm
+  'xinTableV2.search.search': 'Поиск',
+  'xinTableV2.search.reset': 'Сбросить',
+  'xinTableV2.search.expand': 'Развернуть',
+  'xinTableV2.search.collapse': 'Свернуть',
+};

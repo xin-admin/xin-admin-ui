@@ -94,16 +94,6 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 操作栏之后渲染 */
   afterOperateRender?: (record: T) => ReactNode;
 
-  /** 成功提示文本配置 */
-  successMessage?: {
-    /** 新增成功提示文本 */
-    create?: string;
-    /** 编辑成功提示文本 */
-    update?: string;
-    /** 删除成功提示文本 */
-    delete?: string;
-  };
-
   /** 自定义请求 */
   handleRequest?: (params: RequestParams) => Promise<{ data: T[]; total: number }>;
   /** 请求参数处理 */

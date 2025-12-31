@@ -1,0 +1,35 @@
+export default {
+  // Composant XinTableV2
+  'xinTableV2.queryTable': 'Tableau de requête',
+  'xinTableV2.keywordPlaceholder': 'Entrez un mot-clé',
+  'xinTableV2.keywordEmpty': 'Veuillez entrer le contenu de recherche',
+  'xinTableV2.add': 'Ajouter',
+  'xinTableV2.refresh': 'Actualiser',
+  'xinTableV2.columnSettings': 'Paramètres des colonnes',
+  'xinTableV2.showBorder': 'Afficher la bordure',
+  'xinTableV2.hideBorder': 'Masquer la bordure',
+  'xinTableV2.density.default': 'Par défaut',
+  'xinTableV2.density.middle': 'Moyen',
+  'xinTableV2.density.compact': 'Compact',
+  'xinTableV2.total': 'Total {{total}} éléments',
+  // Colonne d'actions
+  'xinTableV2.operate': 'Actions',
+  'xinTableV2.edit': 'Modifier',
+  'xinTableV2.delete': 'Supprimer',
+  'xinTableV2.deleteConfirm': 'Êtes-vous sûr de vouloir supprimer l\'enregistrement {{id}} ?',
+  'xinTableV2.deleteOk': 'Confirmer la suppression',
+  'xinTableV2.deleteCancel': 'Annuler',
+  'xinTableV2.deleteSuccess': 'Supprimé avec succès',
+  // FormModal
+  'xinTableV2.form.createTitle': 'Créer',
+  'xinTableV2.form.editTitle': 'Modifier',
+  'xinTableV2.form.close': 'Fermer',
+  'xinTableV2.form.createSuccess': 'Créé avec succès !',
+  'xinTableV2.form.updateSuccess': 'Mis à jour avec succès !',
+  'xinTableV2.form.updateKeyUndefined': 'La clé primaire pour la mise à jour n\'est pas définie !',
+  // SearchForm
+  'xinTableV2.search.search': 'Rechercher',
+  'xinTableV2.search.reset': 'Réinitialiser',
+  'xinTableV2.search.expand': 'Développer',
+  'xinTableV2.search.collapse': 'Réduire',
+};

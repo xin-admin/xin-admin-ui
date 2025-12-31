@@ -96,7 +96,7 @@ function SearchForm<T extends Record<string, any> = any>(props: SearchFormProps<
         onClick={() => form.submit()}
         {...submitter?.submitButtonProps}
       >
-        {submitter?.submitText || '搜索'}
+        {submitter?.submitText || t('xinTableV2.search.search')}
       </Button>
     );
 
@@ -105,7 +105,7 @@ function SearchForm<T extends Record<string, any> = any>(props: SearchFormProps<
         onClick={() => form.resetFields()}
         {...submitter?.resetButtonProps}
       >
-        {submitter?.resetText || '重置'}
+        {submitter?.resetText || t('xinTableV2.search.reset')}
       </Button>
     );
 
@@ -113,14 +113,14 @@ function SearchForm<T extends Record<string, any> = any>(props: SearchFormProps<
       if (collapsed) {
         return (
           <Space>
-            { '收起' }
+            { t('xinTableV2.search.collapse') }
             <CaretUpOutlined />
           </Space>
         )
       } else {
         return (
           <Space>
-            { '展开' }
+            { t('xinTableV2.search.expand') }
             <CaretDownOutlined />
           </Space>
         )

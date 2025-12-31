@@ -1,0 +1,35 @@
+export default {
+  // XinTableV2 コンポーネント
+  'xinTableV2.queryTable': 'クエリテーブル',
+  'xinTableV2.keywordPlaceholder': 'キーワードを入力',
+  'xinTableV2.keywordEmpty': '検索内容を入力してください',
+  'xinTableV2.add': '追加',
+  'xinTableV2.refresh': '更新',
+  'xinTableV2.columnSettings': '列設定',
+  'xinTableV2.showBorder': '枠線を表示',
+  'xinTableV2.hideBorder': '枠線を非表示',
+  'xinTableV2.density.default': 'デフォルト',
+  'xinTableV2.density.middle': '中',
+  'xinTableV2.density.compact': 'コンパクト',
+  'xinTableV2.total': '合計 {{total}} 件',
+  // 操作列
+  'xinTableV2.operate': '操作',
+  'xinTableV2.edit': '編集',
+  'xinTableV2.delete': '削除',
+  'xinTableV2.deleteConfirm': 'レコード {{id}} を削除してもよろしいですか？',
+  'xinTableV2.deleteOk': '削除確認',
+  'xinTableV2.deleteCancel': 'キャンセル',
+  'xinTableV2.deleteSuccess': '削除に成功しました',
+  // FormModal
+  'xinTableV2.form.createTitle': '追加',
+  'xinTableV2.form.editTitle': '編集',
+  'xinTableV2.form.close': '閉じる',
+  'xinTableV2.form.createSuccess': '作成に成功しました！',
+  'xinTableV2.form.updateSuccess': '更新に成功しました！',
+  'xinTableV2.form.updateKeyUndefined': '更新用の主キーが未定義です！',
+  // SearchForm
+  'xinTableV2.search.search': '検索',
+  'xinTableV2.search.reset': 'リセット',
+  'xinTableV2.search.expand': '展開',
+  'xinTableV2.search.collapse': '折りたたむ',
+};

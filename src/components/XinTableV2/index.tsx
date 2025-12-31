@@ -150,7 +150,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   /** 快速搜索 */
   const handleKeywordSearch: SearchProps['onSearch'] = async (value: string) => {
     if( !value ) {
-      window.$message?.warning('请输入搜索内容');
+      window.$message?.warning(t('xinTableV2.keywordEmpty'));
       return;
     }
     const params: RequestParams = {
@@ -221,7 +221,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     if (!operateShow) return [];
     return [
       {
-        title: '操作栏',
+        title: t('xinTableV2.operate'),
         key: 'operate',
         align: 'center',
         ...operateProps,
@@ -230,7 +230,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
             {beforeOperateRender?.(record)}
             {(typeof editShow === 'function' ? editShow(record) : editShow) && (
               <AuthButton auth={props.accessName + '.update'} key={'update'}>
-                <Tooltip title={'编辑'}>
+                <Tooltip title={t('xinTableV2.edit')}>
                   <Button
                     type="primary"
                     icon={<EditOutlined />}
@@ -242,7 +242,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
             )}
             {(typeof deleteShow === 'function' ? deleteShow(record) : deleteShow) !== false && (
               <AuthButton auth={props.accessName + '.update'} key={'update'}>
-                <Tooltip title={'删除'}>
+                <Tooltip title={t('xinTableV2.delete')}>
                   <Button
                     danger
                     type="primary"
@@ -258,7 +258,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         ),
       },
     ];
-  }, [columns, operateShow, editShow, deleteShow]);
+  }, [columns, operateShow, editShow, deleteShow, t]);
 
   /** 最终表格列，计算排序以及显示状态 */
   const tableColumns: TableColumnType<T>[] = useMemo(() => {
@@ -293,12 +293,12 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   /** 删除记录 */
   const handleDelete = async (record: T) => {
     window.$modal?.confirm({
-      title: `你是否要删除 ${record[rowKey]} 记录？`,
-      okText: '确认删除',
-      cancelText: '取消删除',
+      title: t('xinTableV2.deleteConfirm', { id: record[rowKey] }),
+      okText: t('xinTableV2.deleteOk'),
+      cancelText: t('xinTableV2.deleteCancel'),
       onOk: async () => {
         await Delete(api + `/${record[rowKey]}`);
-        window.$message?.success('删除成功');
+        window.$message?.success(t('xinTableV2.deleteSuccess'));
         await handleRequest(requestParams);
       }
     })
@@ -309,17 +309,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     items: [
       {
         key: 'large',
-        label: '默认',
+        label: t('xinTableV2.density.default'),
         onClick: () => setDensity('large'),
       },
       {
         key: 'middle',
-        label: '适中',
+        label: t('xinTableV2.density.middle'),
         onClick: () => setDensity('middle'),
       },
       {
         key: 'small',
-        label: '紧凑',
+        label: t('xinTableV2.density.compact'),
         onClick: () => setDensity('small'),
       },
     ],
@@ -400,14 +400,14 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
           {/* 操作栏 */}
           <Flex justify={'space-between'}>
             <Flex align={'center'}>
-              {titleRender || <Typography.Title level={5}>查询表格</Typography.Title>}
+              {titleRender || <Typography.Title level={5}>{t('xinTableV2.queryTable')}</Typography.Title>}
             </Flex>
             <Space>
               {/* 快速搜索 */}
               {keywordSearchShow && (
                 <Input.Search
                   onChange={keywordSearchChange}
-                  placeholder="请输入关键字"
+                  placeholder={t('xinTableV2.keywordPlaceholder')}
                   style={{ width: 200 }}
                   value={requestParams.keywordSearch}
                   onSearch={handleKeywordSearch}
@@ -416,12 +416,12 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
               {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
               {addShow && (
                 <AuthButton auth={accessName + '.create'} key={'create'}>
-                  <Button type="primary" onClick={handleCreate}>新增</Button>
+                  <Button type="primary" onClick={handleCreate}>{t('xinTableV2.add')}</Button>
                 </AuthButton>
               )}
               <Space size={1}>
                 {/* 刷新表格 */}
-                <Tooltip title="刷新">
+                <Tooltip title={t('xinTableV2.refresh')}>
                   <Button
                     type="text"
                     size={'small'}
@@ -434,7 +434,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
                   <Button type="text" size={'small'} icon={<ColumnHeightOutlined />} />
                 </Dropdown>
                 {/* 边框设置 */}
-                <Tooltip title={bordered ? '隐藏边框' : '显示边框'}>
+                <Tooltip title={bordered ? t('xinTableV2.hideBorder') : t('xinTableV2.showBorder')}>
                   <Button
                     type="text"
                     size={'small'}
@@ -458,9 +458,9 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
                   )}
                   trigger="click"
                   placement="bottomRight"
-                  title="列设置"
+                  title={t('xinTableV2.columnSettings')}
                 >
-                  <Tooltip title="列设置">
+                  <Tooltip title={t('xinTableV2.columnSettings')}>
                     <Button type="text" size={'small'} icon={<SettingOutlined />} />
                   </Tooltip>
                 </Popover>
@@ -481,7 +481,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
           pagination={{
             showQuickJumper: true,
             showSizeChanger: true,
-            showTotal: (total) => `Total ${total} items`,
+            showTotal: (total) => t('xinTableV2.total', { total }),
             ...customPagination,
             pageSize: requestParams.pageSize,
             current: requestParams.page,
