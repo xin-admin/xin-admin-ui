@@ -1,4 +1,4 @@
-import type { XinColumn } from "./typings";
+import type { FormColumn } from "./typings";
 import {
   Input,
   InputNumber,
@@ -15,7 +15,6 @@ import {
   ColorPicker
 } from 'antd';
 import type {
-  FormInstance,
   InputProps,
   InputNumberProps,
   SelectProps,
@@ -37,26 +36,18 @@ import UserSelector from '@/components/XinFormField/UserSelector';
 import type { IconSelectProps } from '@/components/XinFormField/IconSelector/typings';
 import type { ImageUploaderProps } from '@/components/XinFormField/ImageUploader/typings';
 import type { UserSelectorProps } from '@/components/XinFormField/UserSelector/typings';
+import type {ReactNode} from "react";
 
 const { TextArea, Password } = Input;
 const { RangePicker } = DatePicker;
 
-interface FieldsRenderProps<T> {
-  column: XinColumn<T>;
-  form: FormInstance<T>;
-  value?: any;
-  onChange?: any;
+interface FieldsRenderProps<T> extends Record<string, any> {
+  valueType: FormColumn<T>['valueType'];
 }
 
 export default function FieldRender<T>(props: FieldsRenderProps<T>) {
-  const { column, form } = props;
-  const { valueType = 'text', renderField: customRenderField } = column;
-  const fieldProps: any = {
-    value: props.value,
-    onChange: props.onChange,
-    ...column.fieldProps,
-  };
-  let dom: React.ReactNode;
+  const { valueType, ...fieldProps } = props;
+  let dom: ReactNode;
   switch (valueType) {
     case 'password':
       dom = <Password {...fieldProps as PasswordProps}/>;
@@ -141,11 +132,7 @@ export default function FieldRender<T>(props: FieldsRenderProps<T>) {
       dom =  <Input {...fieldProps as InputProps} />;
       break;
   }
-  // 自定义渲染
-  if (customRenderField) {
-    return customRenderField(dom, form);
-  }
   return dom;
 }
 
-export type { FieldsRenderProps, XinColumn };
+export type { FieldsRenderProps, FormColumn };

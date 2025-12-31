@@ -11,8 +11,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import type { XinFormProps, XinFormRef, SubmitterButton } from './typings';
 import type { FormItemProps } from 'antd';
-import type { XinColumn } from '../XinFormField/FieldRender/typings';
-import FieldRender from '../XinFormField/FieldRender';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
+import FieldRender from '@/components/XinFormField/FieldRender';
+import {pick} from "lodash";
 
 /**
  * XinForm - JSON 配置动态表单组件
@@ -23,12 +24,14 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     layoutType = 'Form',
     grid = false,
     rowProps,
+    colProps = { span: 12 },
     onFinish,
     formRef,
     modalProps,
     drawerProps,
     trigger,
-    submitter
+    submitter,
+    ...formProps
   } = props;
 
   const { t } = useTranslation();
@@ -42,6 +45,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
     open: handleOpen,
     close: handleClose,
     isOpen: () => open,
+    setLoading: (loading: boolean) => setLoading(loading),
   }));
 
   // 表单提交处理
@@ -65,10 +69,31 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
   const handleClose = () => setOpen(false);
 
   // 渲染表单项
-  const renderFormItem = useCallback((column: XinColumn<T>, index: number): React.ReactNode => {
-    const key = String(column.dataIndex) || String(column.name) || `form-item-${index}`;
-    const colProps = column.colProps;
-    const dependency = column.dependency;
+  const renderFormItem = useCallback((column: FormColumn<T>, index: number): React.ReactNode => {
+    const {
+      dataIndex,
+      valueType,
+      title = '',
+      fieldProps = {},
+      dependency,
+      fieldRender
+    } = column;
+
+    // Form.Item 允许的属性列表
+    const formItemPropKeys = [
+      'colon', 'extra', 'getValueFromEvent', 'help', 'hidden', 'htmlFor',
+      'initialValue',   'name', 'normalize',
+      'noStyle', 'preserve', 'tooltip', 'trigger',
+      // 验证相关
+      'required', 'rules', 'validateFirst', 'validateDebounce', 'validateStatus', 'hasFeedback',
+      'validateTrigger', 'valuePropName', 'messageVariables',
+      // 布局
+      'wrapperCol', 'layout', 'label', 'labelAlign', 'labelCol'
+    ];
+
+    const formItemProps = pick(column, formItemPropKeys);
+
+    const key = String(dataIndex) || `form-item-${index}`;
 
     let formItemContent;
     if (dependency) {
@@ -76,7 +101,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       formItemContent = (
         <Form.Item noStyle shouldUpdate={(prevValues, curValues) => {
           return dependency.dependencies.some(
-              (dep) => prevValues[dep as string] !== curValues[dep as string]
+            (dep) => prevValues[dep as string] !== curValues[dep as string]
           );
         }}>
           {({getFieldsValue}) => {
@@ -90,42 +115,55 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
             // 动态 fieldProps
             const dynamicFieldProps = dependency.fieldProps ? dependency.fieldProps(values) : {};
 
-            const mergedColumn = {
-              ...column,
-              fieldProps: {
-                ...(column.fieldProps || {}),
-                ...dynamicFieldProps,
-                disabled: isDisabled || (column.fieldProps as any)?.disabled,
-              },
-            } as XinColumn<T>;
+            const mergedFieldProps = {
+              ...fieldProps,
+              ...dynamicFieldProps,
+              disabled: isDisabled || fieldProps?.disabled,
+            }
+
+            const defaultFieldRender = (
+              <FieldRender
+                valueType={valueType}
+                placeholder={title}
+                {...mergedFieldProps}
+              />
+            );
 
             return (
-              <Form.Item 
-                key={key} 
-                name={key} 
-                label={column.title || column.label} 
-                {...column as FormItemProps}
+              <Form.Item
+                key={key}
+                name={key}
+                label={column.title || column.label}
+                {...formItemProps as FormItemProps}
               >
-                <FieldRender column={mergedColumn} form={form} />
+                {fieldRender ? fieldRender(form) : defaultFieldRender}
               </Form.Item>
             );
           }}
         </Form.Item>
       );
     } else {
+
+      const defaultFieldRender = (
+        <FieldRender
+          valueType={valueType}
+          placeholder={title}
+          {...fieldProps}
+        />
+      );
       // 普通表单项
       formItemContent = (
-        <Form.Item 
-          key={key} 
-          name={key} 
-          label={column.title || column.label} 
-          {...column as FormItemProps}
+        <Form.Item
+          key={key}
+          name={key}
+          label={column.title || column.label}
+          {...formItemProps as FormItemProps}
         >
-          <FieldRender column={column} form={form} />
+          {fieldRender ? fieldRender(form) : defaultFieldRender}
         </Form.Item>
       );
     }
-    return grid ? <Col {...colProps} key={key}>{formItemContent}</Col> : formItemContent;
+    return grid ? <Col {...Object.assign(colProps, column.colProps)} key={key}>{formItemContent}</Col> : formItemContent;
   }, [grid, form]);
 
   // 渲染提交按钮
@@ -196,7 +234,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
   // 表单内容
   const formContent = useMemo(() => (
     <Form
-      {...props}
+      {...formProps}
       form={form}
       onFinish={handleFinish}
     >

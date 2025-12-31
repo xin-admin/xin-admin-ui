@@ -7,7 +7,7 @@ import type {
   ColProps, 
 } from 'antd';
 import {type ReactNode, type RefObject} from 'react';
-import type { FormColumn } from '../FormField';
+import type { FormColumn } from '@/components/XinFormField/FieldRender';
 
 /**
  * 表单操作栏按钮

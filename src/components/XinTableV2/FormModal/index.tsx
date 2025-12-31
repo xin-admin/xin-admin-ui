@@ -10,8 +10,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import type { FormMode, FormModalProps, FormModalRef, SubmitterButton } from './typings';
 import type { FormItemProps } from 'antd';
-import type { FormColumn } from '../FormField';
-import FieldRender from '../FormField';
+import type { FormColumn } from '@/components/XinFormField/FieldRender';
+import FieldRender from '@/components/XinFormField/FieldRender';
 import { Create, Update } from '@/api/common/table';
 import { pick } from 'lodash';
 

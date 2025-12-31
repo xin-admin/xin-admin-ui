@@ -3,12 +3,12 @@ import type {
   RowProps,
   ModalProps,
   DrawerProps,
-  StepProps,
   FormInstance,
-  ButtonProps, 
+  ButtonProps,
+  ColProps,
 } from 'antd';
 import {type ReactNode, type RefObject} from 'react';
-import type { XinColumn } from '../XinFormField/FieldRender/typings';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 
 /**
  * 表单操作栏按钮
@@ -52,6 +52,8 @@ export interface XinFormRef<T = any> extends FormInstance<T> {
   close: () => void;
   /** 获取弹窗/抽屉的打开状态 */
   isOpen: () => boolean;
+  /** 设置加载状态 */
+  setLoading: (loading: boolean) => void;
 }
 
 /**
@@ -59,15 +61,15 @@ export interface XinFormRef<T = any> extends FormInstance<T> {
  */
 export type XinFormProps<T = any> = Omit<FormProps<T>, 'onFinish' | 'form'> & {
   /** 表单列配置 */
-  columns: XinColumn<T>[];
+  columns: FormColumn<T>[];
   /** 表单布局类型 */
   layoutType?: 'Form' | 'ModalForm' | 'DrawerForm';
-  /** 表单布局 */
-  layout?: 'horizontal' | 'vertical' | 'inline';
   /** 是否使用 Grid 布局 */
   grid?: boolean;
   /** 开启 grid 模式时传递给 Row */
   rowProps?: RowProps;
+  /** 传递给表单项的 Col */
+  colProps?: ColProps;
   /** 表单提交 */
   onFinish?: (values: T) => Promise<boolean | void>;
   /** 表单实例引用 */
@@ -76,8 +78,6 @@ export type XinFormProps<T = any> = Omit<FormProps<T>, 'onFinish' | 'form'> & {
   modalProps?: Omit<ModalProps, 'open'>;
   /** DrawerForm 抽屉配置 */
   drawerProps?: Omit<DrawerProps, 'open'>;
-  /** StepsForm 步骤配置 */
-  stepsProps?: StepProps;
   /** 触发器 */
   trigger?: ReactNode;
   /** 渲染表单操作栏 */
