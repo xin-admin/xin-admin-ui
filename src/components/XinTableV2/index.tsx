@@ -313,24 +313,24 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   };
 
   /** 表单提交处理 */
-  const handleFinish = async (values: T): Promise<boolean> => {
-    // 如果有自定义 onFinish，优先调用
-    if (formProps && formProps.onFinish) {
-      const result = await formProps.onFinish(values, formMode, formRef, formDefaultValues);
-      if (result) {
-        await handleRequest(requestParams);
-      }
-      return result;
-    }
-    
+  const handleFinish = async (values: T) => {
     try {
       formRef.current?.setLoading(true);
+      // 如果有自定义 onFinish，优先调用
+      if (formProps && formProps.onFinish) {
+        const result = await formProps.onFinish(values, formMode, formRef, formDefaultValues);
+        if (result) {
+          await handleRequest(requestParams);
+          formRef.current?.close();
+        }
+        return;
+      }
       if (formMode === 'create') {
         await Create(api, values);
         window.$message?.success(t('xinTableV2.form.createSuccess'));
       } else {
         if (formDefaultValues && rowKey) {
-          await Update(api + `/${(formDefaultValues as Record<string, any>)[rowKey]}`, values);
+          await Update(api + `/${formDefaultValues[rowKey]}`, values);
           window.$message?.success(t('xinTableV2.form.updateSuccess'));
         } else {
           window.$message?.error(t('xinTableV2.form.updateKeyUndefined'));
@@ -338,9 +338,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         }
       }
       await handleRequest(requestParams);
-      return true;
-    } catch (error) {
-      return false;
+      formRef.current?.close();
     } finally {
       formRef.current?.setLoading(false);
     }
