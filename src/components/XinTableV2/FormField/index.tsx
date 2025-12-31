@@ -36,6 +36,7 @@ import UserSelector from '@/components/XinFormField/UserSelector';
 import type { IconSelectProps } from '@/components/XinFormField/IconSelector/typings';
 import type { ImageUploaderProps } from '@/components/XinFormField/ImageUploader/typings';
 import type { UserSelectorProps } from '@/components/XinFormField/UserSelector/typings';
+import type {ReactNode} from "react";
 
 const { TextArea, Password } = Input;
 const { RangePicker } = DatePicker;
@@ -46,7 +47,7 @@ interface FieldsRenderProps<T> extends Record<string, any> {
 
 export default function FieldRender<T>(props: FieldsRenderProps<T>) {
   const { valueType, ...fieldProps } = props;
-  let dom: React.ReactNode;
+  let dom: ReactNode;
   switch (valueType) {
     case 'password':
       dom = <Password {...fieldProps as PasswordProps}/>;
