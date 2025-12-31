@@ -33,6 +33,7 @@ import {
 } from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
 import type {DataNode} from "antd/es/tree";
+import AuthButton from "@/components/AuthButton";
 
 // 默认分页大小
 const DEFAULT_PAGE_SIZE: number = 10;
@@ -48,14 +49,16 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     searchProps,
     formProps,
     cardProps,
+    operateProps,
     tableRef,
     addShow = true,
     editShow = true,
     deleteShow = true,
     operateShow = true,
+    keywordSearchShow = true,
     titleRender,
     toolBarRender = [],
-    operateProps,
+
     beforeOperateRender,
     afterOperateRender,
     pagination: customPagination = {},
@@ -73,6 +76,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     page: DEFAULT_PAGE,
     pageSize: DEFAULT_PAGE_SIZE,
   });
+  // 操作栏状态
   const [density, setDensity] = useState<TableProps['size']>();
   const [bordered, setBordered] = useState<boolean>();
   const [columnsChecked, setColumnsChecked] = useState<any[]>([]);
@@ -81,19 +85,12 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   // 暴露表单方法
   useImperativeHandle(tableRef, (): XinTableV2Ref => ({
     /** 刷新表格（保持当前页） */
-    reload: () => {},
-    /** 重置表格（回到第一页） */
-    reset: () => {},
+    reload: () => { handleRequest() },
     /** 获取当前数据源 */
     getDataSource: () => dataSource,
-    /** 获取选中行的 keys */
-    getSelectedRowKeys: () => [],
-    /** 获取选中行数据 */
-    getSelectedRows: () => [] as T[],
-    /** 清空选中 */
-    clearSelected: () => {},
-
+    /** 表单 ref */
     form: () => formRef.current!,
+    /** 搜索表单 ref */
     searchForm: () => searchRef,
   }));
 
@@ -231,27 +228,31 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         render: (_, record) => (
           <Space>
             {beforeOperateRender?.(record)}
-            {(typeof editShow === 'function' ? editShow(record) : editShow) &&
-              <Tooltip title={'编辑'}>
-                <Button
-                  type="primary"
-                  icon={<EditOutlined />}
-                  size={'small'}
-                  onClick={() => handleUpdate(record)}
-                />
-              </Tooltip>
-            }
-            {(typeof deleteShow === 'function' ? deleteShow(record) : deleteShow) !== false &&
-              <Tooltip title={'删除'}>
-                <Button
-                  danger
-                  type="primary"
-                  icon={<DeleteOutlined />}
-                  size={'small'}
-                  onClick={() => handleDelete(record)}
-                />
-              </Tooltip>
-            }
+            {(typeof editShow === 'function' ? editShow(record) : editShow) && (
+              <AuthButton auth={props.accessName + '.update'} key={'update'}>
+                <Tooltip title={'编辑'}>
+                  <Button
+                    type="primary"
+                    icon={<EditOutlined />}
+                    size={'small'}
+                    onClick={() => handleUpdate(record)}
+                  />
+                </Tooltip>
+              </AuthButton>
+            )}
+            {(typeof deleteShow === 'function' ? deleteShow(record) : deleteShow) !== false && (
+              <AuthButton auth={props.accessName + '.update'} key={'update'}>
+                <Tooltip title={'删除'}>
+                  <Button
+                    danger
+                    type="primary"
+                    icon={<DeleteOutlined />}
+                    size={'small'}
+                    onClick={() => handleDelete(record)}
+                  />
+                </Tooltip>
+              </AuthButton>
+            )}
             {afterOperateRender?.(record)}
           </Space>
         ),
@@ -303,21 +304,6 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     })
   };
 
-  /** 批量删除 */
-  // const handleBatchDelete = async () => {
-  //   if (!selectedRowKeys.length) return message.warning(t('sysFile.noSelected'));
-  //   window.$modal?.confirm({
-  //     title: t('sysFile.confirmBatchDelete', { count: selectedRowKeys.length }),
-  //     okText: t('sysFile.ok'),
-  //     cancelText: t('sysFile.cancel'),
-  //     onOk: async () => {
-  //       await batchDeleteFiles(selectedRowKeys as number[]);
-  //       message.success(t('sysFile.batchDeleteSuccess'));
-  //       await loadFiles();
-  //     }
-  //   });
-  // };
-
   /** 密度设置菜单 */
   const densityMenu = {
     items: [
@@ -360,7 +346,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
       let insertIndex = newSorted.indexOf(dropKey);
       if (dropPosition === -1) {
         // 放在目标节点前面
-        insertIndex = insertIndex;
+        insertIndex = insertIndex - 1;
       } else {
         // 放在目标节点后面
         insertIndex = insertIndex + 1;
@@ -418,33 +404,40 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
             </Flex>
             <Space>
               {/* 快速搜索 */}
-              <Input.Search
-                onChange={keywordSearchChange}
-                placeholder="请输入关键字"
-                style={{ width: 200 }}
-                value={requestParams.keywordSearch}
-                onSearch={handleKeywordSearch}
-              />
+              {keywordSearchShow && (
+                <Input.Search
+                  onChange={keywordSearchChange}
+                  placeholder="请输入关键字"
+                  style={{ width: 200 }}
+                  value={requestParams.keywordSearch}
+                  onSearch={handleKeywordSearch}
+                />
+              )}
               {toolBarRender.length > 0 && toolBarRender.map((item) => item)}
-              {deleteShow && <Button color="danger">批量删除</Button>}
-              {addShow && <Button type="primary" onClick={handleCreate}>新增</Button>}
+              {addShow && (
+                <AuthButton auth={accessName + '.create'} key={'create'}>
+                  <Button type="primary" onClick={handleCreate}>新增</Button>
+                </AuthButton>
+              )}
               <Space size={1}>
                 {/* 刷新表格 */}
                 <Tooltip title="刷新">
                   <Button
                     type="text"
+                    size={'small'}
                     icon={<ReloadOutlined />}
                     onClick={() => handleRequest()}
                   />
                 </Tooltip>
                 {/* 密度设置 */}
                 <Dropdown menu={densityMenu} trigger={['click']}>
-                  <Button type="text" icon={<ColumnHeightOutlined />} />
+                  <Button type="text" size={'small'} icon={<ColumnHeightOutlined />} />
                 </Dropdown>
                 {/* 边框设置 */}
                 <Tooltip title={bordered ? '隐藏边框' : '显示边框'}>
                   <Button
                     type="text"
+                    size={'small'}
                     icon={bordered ? <BorderOutlined /> : <BorderlessTableOutlined />}
                     onClick={() => setBordered(!bordered)}
                   />
@@ -468,13 +461,14 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
                   title="列设置"
                 >
                   <Tooltip title="列设置">
-                    <Button type="text" icon={<SettingOutlined />} />
+                    <Button type="text" size={'small'} icon={<SettingOutlined />} />
                   </Tooltip>
                 </Popover>
               </Space>
             </Space>
           </Flex>
         </div>
+
         <Table
           loading={loading}
           dataSource={dataSource}

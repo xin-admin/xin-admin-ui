@@ -25,16 +25,8 @@ export type XinTableColumn<T = any> = Omit<TableColumnType<T>, 'dataIndex'> & {
 export interface XinTableV2Ref<T = any> {
   /** 刷新表格（保持当前页） */
   reload: () => void;
-  /** 重置表格（回到第一页） */
-  reset: () => void;
   /** 获取当前数据源 */
   getDataSource: () => T[];
-  /** 获取选中行的 keys */
-  getSelectedRowKeys: () => Key[];
-  /** 获取选中行数据 */
-  getSelectedRows: () => T[];
-  /** 清空选中 */
-  clearSelected: () => void;
   /** 获取表单实例 */
   form?: () => FormModalRef<T> | null;
   /** 获取搜索表单实例 */
@@ -72,13 +64,15 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   tableRef?: RefObject<XinTableV2Ref<T>>;
 
   /** 新增按钮显示 */
-  addShow?: boolean
+  addShow?: boolean;
   /** 编辑按钮显示 */
   editShow?: boolean | ((record: T) => boolean);
   /** 删除按钮显示 */
   deleteShow?: boolean | ((record: T) => boolean);
   /** 表格操作列显示 */
   operateShow?: boolean;
+  /** 快速搜索显示 */
+  keywordSearchShow?: boolean;
 
   /** 表单属性  */
   formProps?: Omit<FormModalProps<T>, 'formRef'> | false;
@@ -114,4 +108,9 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   handleRequest?: (params: RequestParams) => Promise<{ data: T[]; total: number }>;
   /** 请求参数处理 */
   requestParams?: (params: RequestParams) => RequestParams;
+
+  /** 开启批量操作 */
+  batchOperation?: boolean;
+  /** */
+  selectionProps?: TableProps['rowSelection'];
 }

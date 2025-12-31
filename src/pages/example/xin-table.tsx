@@ -182,6 +182,7 @@ const XinTableExample: React.FC = () => {
     <XinTableV2 
       columns={columns}
       rowKey="id"
+      selectionType={'radio'}
       accessName='system.user.list'
       api={'/sys-user/list'}
       toolBarRender={customToolbar}
