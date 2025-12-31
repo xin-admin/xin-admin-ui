@@ -1,6 +1,6 @@
 import type { ButtonProps, ColProps, FormInstance, FormProps, RowProps } from "antd";
 import type { ReactNode } from "react";
-import type { FormColumn } from "../FormField";
+import type { FormColumn } from "@/components/XinFormField/FieldRender";
 
 /**
  * 操作栏按钮

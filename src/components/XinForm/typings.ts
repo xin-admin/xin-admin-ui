@@ -81,5 +81,5 @@ export type XinFormProps<T = any> = Omit<FormProps<T>, 'onFinish' | 'form'> & {
   /** 触发器 */
   trigger?: ReactNode;
   /** 渲染表单操作栏 */
-  submitter?: SubmitterProps
+  submitter?: SubmitterProps;
 }

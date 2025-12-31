@@ -5,9 +5,14 @@ import type {
   FormInstance, PaginationProps,
 } from 'antd';
 import {type ReactNode, type RefObject} from 'react';
-import type { FormColumn } from './FormField';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 import type { SearchFormProps } from './SearchForm';
-import type { FormModalProps, FormModalRef } from './FormModal';
+import type { XinFormRef } from '@/components/XinForm/typings';
+
+/**
+ * 表单模式
+ */
+export type FormMode = 'create' | 'update';
 
 /**
  * 表格列配置
@@ -28,7 +33,7 @@ export interface XinTableV2Ref<T = any> {
   /** 获取当前数据源 */
   getDataSource: () => T[];
   /** 获取表单实例 */
-  form?: () => FormModalRef<T> | null;
+  form?: () => XinFormRef<T> | null;
   /** 获取搜索表单实例 */
   searchForm?: () => FormInstance<T> | undefined;
 }
@@ -36,6 +41,16 @@ export interface XinTableV2Ref<T = any> {
 export interface SorterParams {
   field: string;
   order: 'asc' | 'desc';
+}
+
+/**
+ * 表单属性接口
+ */
+export interface FormProps<T = any> {
+  /** 表单提交 */
+  onFinish?: (values: T, mode?: FormMode, formRef?: RefObject<XinFormRef<T> | undefined>, defaultValues?: T) => Promise<boolean>;
+  /** 其他属性可以通过 XinForm 的属性扩展 */
+  [key: string]: any;
 }
 
 /** 请求参数类型 */
@@ -75,7 +90,7 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   keywordSearchShow?: boolean;
 
   /** 表单属性  */
-  formProps?: Omit<FormModalProps<T>, 'formRef'> | false;
+  formProps?: FormProps<T> | false;
   /** 搜索栏属性  */
   searchProps?: Omit<SearchFormProps<T>, 'form'> | false;
   /** 操作栏属性 */

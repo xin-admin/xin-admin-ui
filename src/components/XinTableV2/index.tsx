@@ -15,12 +15,12 @@ import {
   type TableColumnType,
   type TreeProps,
 } from "antd";
-import type {XinTableV2Props, XinTableV2Ref, RequestParams} from "./typings";
+import type {XinTableV2Props, XinTableV2Ref, RequestParams, FormMode} from "./typings";
 import SearchForm from "./SearchForm";
-import FormModel, {type FormModalRef} from "./FormModal";
+import XinForm, {type XinFormRef} from "@/components/XinForm";
 import {useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
-import type {FormColumn} from "./FormField";
-import {Delete, List} from "@/api/common/table.ts";
+import type {FormColumn} from "@/components/XinFormField/FieldRender/typings";
+import {Delete, List, Create, Update} from "@/api/common/table.ts";
 import {isArray, isEmpty, omit} from "lodash";
 import type {SearchProps} from "antd/es/input";
 import {
@@ -67,7 +67,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   } = props;
 
   const {t} = useTranslation();
-  const formRef = useRef<FormModalRef<T>>(undefined);
+  const formRef = useRef<XinFormRef<T>>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchRef] = Form.useForm<T>();
   const [dataSource, setDataSource] = useState<T[]>([]);
@@ -81,6 +81,10 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
   const [bordered, setBordered] = useState<boolean>();
   const [columnsChecked, setColumnsChecked] = useState<any[]>([]);
   const [columnSorted, setColumnSorted] = useState<any[]>([]);
+  
+  // 表单模式状态
+  const [formMode, setFormMode] = useState<FormMode>('create');
+  const [formDefaultValues, setFormDefaultValues] = useState<T | undefined>(undefined);
 
   // 暴露表单方法
   useImperativeHandle(tableRef, (): XinTableV2Ref => ({
@@ -280,14 +284,18 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   /** 新增按钮点击 */
   const handleCreate = () => {
+    setFormMode('create');
+    setFormDefaultValues(undefined);
+    formRef.current?.resetFields();
     formRef.current?.open();
-    formRef.current?.setFormMode('create');
   }
 
   /** 修改按钮点击 */
   const handleUpdate = (record: T) => {
+    setFormMode('update');
+    setFormDefaultValues(record);
+    formRef.current?.setFieldsValue(record);
     formRef.current?.open();
-    formRef.current?.setFormMode('update', record, rowKey);
   }
 
   /** 删除记录 */
@@ -302,6 +310,40 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
         await handleRequest(requestParams);
       }
     })
+  };
+
+  /** 表单提交处理 */
+  const handleFinish = async (values: T): Promise<boolean> => {
+    // 如果有自定义 onFinish，优先调用
+    if (formProps && formProps.onFinish) {
+      const result = await formProps.onFinish(values, formMode, formRef, formDefaultValues);
+      if (result) {
+        await handleRequest(requestParams);
+      }
+      return result;
+    }
+    
+    try {
+      formRef.current?.setLoading(true);
+      if (formMode === 'create') {
+        await Create(api, values);
+        window.$message?.success(t('xinTableV2.form.createSuccess'));
+      } else {
+        if (formDefaultValues && rowKey) {
+          await Update(api + `/${(formDefaultValues as Record<string, any>)[rowKey]}`, values);
+          window.$message?.success(t('xinTableV2.form.updateSuccess'));
+        } else {
+          window.$message?.error(t('xinTableV2.form.updateKeyUndefined'));
+          return false;
+        }
+      }
+      await handleRequest(requestParams);
+      return true;
+    } catch (error) {
+      return false;
+    } finally {
+      formRef.current?.setLoading(false);
+    }
   };
 
   /** 密度设置菜单 */
@@ -491,10 +533,16 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
       </Card>
 
       {/* 新增编辑表单 */}
-      <FormModel 
-        api={api}
+      <XinForm 
         columns={formColumn}
         formRef={formRef}
+        layoutType="ModalForm"
+        modalProps={{
+          title: formMode === 'update' ? t('xinTableV2.form.editTitle') : t('xinTableV2.form.createTitle'),
+          styles: { header: { marginBottom: 16 } },
+          ...(formProps && typeof formProps === 'object' ? formProps.modalProps : {}),
+        }}
+        onFinish={handleFinish}
         {...formProps}
       />
     </div>

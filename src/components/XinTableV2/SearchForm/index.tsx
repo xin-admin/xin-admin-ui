@@ -7,7 +7,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import type { SearchFormProps, SubmitterButton } from './typings';
 import type { FormItemProps } from 'antd';
-import type { FormColumn } from '../FormField';
+import type { FormColumn } from "@/components/XinFormField/FieldRender";
 import FieldRender from '@/components/XinFormField/FieldRender';
 import { pick } from 'lodash';
 import {CaretDownOutlined, CaretUpOutlined} from "@ant-design/icons";
