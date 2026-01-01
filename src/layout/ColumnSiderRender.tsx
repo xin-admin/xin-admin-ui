@@ -1,7 +1,7 @@
 import {ConfigProvider, Layout, theme} from "antd";
-import {useGlobalStore} from "@/stores";
+import { useGlobalStore, useAuthStore } from "@/stores";
 import React from "react";
-import useAuthStore from "@/stores/user.ts";
+
 import IconFont from "@/components/IconFont";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";

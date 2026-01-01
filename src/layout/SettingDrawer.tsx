@@ -1,10 +1,10 @@
 import React from 'react';
 import {debounce} from 'lodash';
 import {Button, Col, ColorPicker, Divider, Drawer, InputNumber, Row, Select, Switch, theme, Tooltip} from 'antd';
-import {useGlobalStore} from "@/stores";
+import { useGlobalStore, useAuthStore } from "@/stores";
 import {configTheme, darkColorTheme, defaultColorTheme, greenColorTheme, pinkColorTheme} from "@/layout/theme.ts";
 import {algorithmOptions} from "@/layout/algorithm.ts";
-import useAuthStore from "@/stores/user.ts";
+
 import {useTranslation} from 'react-i18next';
 import {useThemeTransition} from '@/hooks/useThemeTransition';
 

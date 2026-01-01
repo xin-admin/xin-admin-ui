@@ -2,7 +2,7 @@ import {useLocation, useOutlet} from "react-router";
 import {useMemo, useRef} from "react";
 import {SwitchTransition, CSSTransition} from "react-transition-group";
 import './transition.css';
-import useAuthStore from "@/stores/user";
+import { useAuthStore } from "@/stores";
 
 /**
  * 带动画的 Outlet 组件
