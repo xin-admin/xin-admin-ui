@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, Space, Divider, Typography, message } from 'antd';
-import { ProForm, ProFormField, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import XinForm, { type XinFormRef } from '@/components/XinForm';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 import UserSelector from '@/components/XinFormField/UserSelector';
 
 const { Title, Paragraph, Text } = Typography;
@@ -11,13 +12,57 @@ const { Title, Paragraph, Text } = Typography;
 const UserSelectorExample: React.FC = () => {
   const [singleUser, setSingleUser] = useState<number | null>(null);
   const [multipleUsers, setMultipleUsers] = useState<number[]>([]);
+  const formRef = useRef<XinFormRef>(undefined);
+
+  // 表单列配置
+  const columns: FormColumn<any>[] = [
+    {
+      dataIndex: 'taskName',
+      title: '任务名称',
+      valueType: 'text',
+      rules: [{ required: true, message: '请输入任务名称' }],
+      fieldProps: {
+        placeholder: '请输入任务名称',
+      },
+    },
+    {
+      dataIndex: 'owner_id',
+      title: '任务负责人',
+      rules: [{ required: true, message: '请选择负责人' }],
+      fieldRender: () => <UserSelector placeholder="请选择负责人" />,
+    },
+    {
+      dataIndex: 'participant_ids',
+      title: '参与人员',
+      rules: [
+        { required: true, message: '请至少选择一个参与人员' },
+        {
+          validator: (_: any, value: number[]) => {
+            if (value && value.length > 10) {
+              return Promise.reject('最多选择10个参与人员');
+            }
+            return Promise.resolve();
+          },
+        },
+      ],
+      fieldRender: () => <UserSelector mode="multiple" maxTagCount={3} placeholder="请选择参与人员" />,
+    },
+    {
+      dataIndex: 'description',
+      title: '任务描述',
+      valueType: 'textarea',
+      fieldProps: {
+        placeholder: '请输入任务描述',
+      },
+    },
+  ];
 
   return (
     <div>
       <Typography style={{ margin: '12px 0 24px 0' }}>
         <Title level={2}>用户选择器组件示例</Title>
         <Paragraph>
-          基于 AntDesign ProComponents 封装的用户选择器表单组件，支持单选和多选模式。
+          基于 AntDesign 封装的用户选择器表单组件，支持单选和多选模式。
         </Paragraph>
       </Typography>
 
@@ -59,8 +104,10 @@ const UserSelectorExample: React.FC = () => {
           </Text>
         </Card>
 
-        <Card title="在 ProForm 中使用" bordered>
-          <ProForm
+        <Card title="在 XinForm 中使用" bordered>
+          <XinForm
+            formRef={formRef}
+            columns={columns}
             onFinish={async (values) => {
               console.log('表单提交:', values);
               message.success('提交成功！');
@@ -68,53 +115,10 @@ const UserSelectorExample: React.FC = () => {
               return true;
             }}
             submitter={{
-              searchConfig: {
-                submitText: '提交表单',
-              },
-              resetButtonProps: {
-                style: { display: 'none' },
-              },
+              submitText: '提交表单',
+              render: (dom) => dom.submit,
             }}
-          >
-            <ProFormText
-              name="taskName"
-              label="任务名称"
-              placeholder="请输入任务名称"
-              rules={[{ required: true, message: '请输入任务名称' }]}
-            />
-
-            <ProFormField 
-              name="owner_id" 
-              label="任务负责人" 
-              rules={[{ required: true, message: '请选择负责人' }]}
-            >
-              <UserSelector placeholder="请选择负责人"/>
-            </ProFormField>
-
-            <ProFormField 
-              name="participant_ids" 
-              label="参与人员"
-              rules={[
-                { required: true, message: '请至少选择一个参与人员' },
-                {
-                  validator: (_, value) => {
-                    if (value && value.length > 10) {
-                      return Promise.reject('最多选择10个参与人员');
-                    }
-                    return Promise.resolve();
-                  },
-                },
-              ]}
-            >
-              <UserSelector mode="multiple" maxTagCount={3} placeholder="请选择参与人员"/>
-            </ProFormField>
-
-            <ProFormTextArea
-              name="description"
-              label="任务描述"
-              placeholder="请输入任务描述"
-            />
-          </ProForm>
+          />
         </Card>
       </Space>
     </div>

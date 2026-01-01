@@ -1,5 +1,4 @@
-import {Alert, Card, Space, Tag} from "antd";
-import {CheckCard} from "@ant-design/pro-components"
+import {Alert, Card, Space, Tag, Radio} from "antd";
 import { useAuthStore } from "@/stores";
 import defaultRoute from "@/router/default.ts";
 
@@ -30,8 +29,9 @@ const PageAuth = () => {
           className={"mb-5"}
         />
 
-        <CheckCard.Group
-          onChange={(value) => {
+        <Radio.Group
+          onChange={(e) => {
+            const value = e.target.value;
             if (value === "A") {
               setRules(defaultRoute)
             }
@@ -43,11 +43,21 @@ const PageAuth = () => {
             }
           }}
           defaultValue="A"
+          style={{ display: 'flex', gap: 16 }}
         >
-          <CheckCard title="管理员" description="管理员拥有所有的权限" value="A"/>
-          <CheckCard title="运营人员" description="运营人员看不到 `页面布局` 菜单" value="B"/>
-          <CheckCard title="测试人员" description="测试人员看不到 `多级菜单` 菜单" value="C"/>
-        </CheckCard.Group>
+          <Radio.Button value="A" style={{ height: 'auto', padding: '16px 24px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: 8 }}>管理员</div>
+            <div style={{ color: 'rgba(0,0,0,0.45)', whiteSpace: 'normal' }}>管理员拥有所有的权限</div>
+          </Radio.Button>
+          <Radio.Button value="B" style={{ height: 'auto', padding: '16px 24px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: 8 }}>运营人员</div>
+            <div style={{ color: 'rgba(0,0,0,0.45)', whiteSpace: 'normal' }}>运营人员看不到 `页面布局` 菜单</div>
+          </Radio.Button>
+          <Radio.Button value="C" style={{ height: 'auto', padding: '16px 24px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: 8 }}>测试人员</div>
+            <div style={{ color: 'rgba(0,0,0,0.45)', whiteSpace: 'normal' }}>测试人员看不到 `多级菜单` 菜单</div>
+          </Radio.Button>
+        </Radio.Group>
 
         <div className={"mb-2.5"}>当前拥有的权限:</div>
         <Space className={"mb-5"} wrap={true}>

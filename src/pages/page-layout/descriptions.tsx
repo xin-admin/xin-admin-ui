@@ -1,16 +1,11 @@
-import {PageContainer, ProCard} from '@ant-design/pro-components';
-import { Descriptions } from 'antd';
+import { Descriptions, Card, Row, Col } from 'antd';
 
 const Layout = () => {
   return (
-    <PageContainer
-      ghost
-      header={{
-        title: '页面标题',
-        breadcrumb: {},
-      }}
-      content={
-        <Descriptions column={2} style={{ marginBlockEnd: -16 }}>
+    <div>
+      <Card style={{ marginBottom: 16 }}>
+        <h2 style={{ marginBottom: 16 }}>页面标题</h2>
+        <Descriptions column={2}>
           <Descriptions.Item label="创建人">曲丽丽</Descriptions.Item>
           <Descriptions.Item label="关联表单">
             <a>421421</a>
@@ -20,16 +15,19 @@ const Layout = () => {
             浙江省杭州市西湖区工专路
           </Descriptions.Item>
         </Descriptions>
-      }
-    >
-      <ProCard direction="column" ghost gutter={[0, 16]}>
-        <ProCard style={{ height: 200 }} />
-        <ProCard gutter={16} ghost style={{ height: 200 }}>
-          <ProCard colSpan={16} />
-          <ProCard colSpan={8} />
-        </ProCard>
-      </ProCard>
-    </PageContainer>
+      </Card>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card style={{height: 200}} />
+        </Col>
+        <Col span={16}>
+          <Card style={{height: 200}} />
+        </Col>
+        <Col span={8}>
+          <Card style={{height: 200}} />
+        </Col>
+      </Row>
+    </div>
   );
 };
 

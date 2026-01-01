@@ -69,8 +69,9 @@ import {
   cleanTrashed,
   getTrashedFileList, batchRestoreFiles
 } from '@/api/sys/sysFile';
-import type {ProFormColumnsType, ProFormInstance} from '@ant-design/pro-components';
-import {BetaSchemaForm} from '@ant-design/pro-components';
+import XinForm from '@/components/XinForm';
+import type { XinFormRef } from '@/components/XinForm/typings';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 import type {ColumnsType} from 'antd/es/table';
 import dayjs from 'dayjs';
 import IconFont from '@/components/IconFont';
@@ -90,9 +91,8 @@ const FileManagement: React.FC = () => {
   const [fileGroups, setFileGroups] = useState<ISysFileGroup[]>([]);
   const [fileGroupMap, setFileGroupMap] = useState<Map<React.Key, ISysFileGroup>>(new Map());
   const [selectedGroupId, setSelectedGroupId] = useState<React.Key>(0);
-  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [updateGroupData, setUpdateGroupData] = useState<ISysFileGroup | null>(null);
-  const groupFormRef = useRef<ProFormInstance>(null);
+  const groupFormRef = useRef<XinFormRef | undefined>(undefined);
   const [groupSearchKeyword, setGroupSearchKeyword] = useState<string>();
   const [fileGroupLoading, setFileGroupLoading] = useState<boolean>(true);
 
@@ -228,14 +228,14 @@ const FileManagement: React.FC = () => {
     setUpdateGroupData(null);
     groupFormRef.current?.resetFields();
     groupFormRef.current?.setFieldsValue({parent_id: parentId});
-    setGroupModalOpen(true);
+    groupFormRef.current?.open();
   };
 
   /** 编辑文件夹 */
   const handleEditGroup = (group: ISysFileGroup) => {
     setUpdateGroupData(group);
     groupFormRef.current?.setFieldsValue(group);
-    setGroupModalOpen(true);
+    groupFormRef.current?.open();
   };
 
   /** 保存文件夹 */
@@ -243,7 +243,7 @@ const FileManagement: React.FC = () => {
     const isEdit = !!updateGroupData;
     await (isEdit ? updateFileGroup({...values, id: updateGroupData.id}) : createFileGroup(values));
     message.success(isEdit ? t('sysFile.saveFolderSuccess', {action: t('sysFile.actionEdit')}) : t('sysFile.saveFolderSuccess', {action: t('sysFile.actionAdd')}));
-    setGroupModalOpen(false);
+    groupFormRef.current?.close();
     await loadFileGroups();
     return true;
   };
@@ -508,19 +508,19 @@ const FileManagement: React.FC = () => {
   };
 
   /** 文件组表单列 */
-  const groupFormColumns: ProFormColumnsType<ISysFileGroup, "text">[] = [
+  const groupFormColumns: FormColumn<ISysFileGroup>[] = [
     {
       title: t('sysFile.folderName'),
       dataIndex: 'name',
       valueType: 'text',
-      formItemProps: {rules: [{required: true, message: t('sysFile.folderNameRequired')}]}
+      rules: [{required: true, message: t('sysFile.folderNameRequired')}]
     },
     {
       title: t('sysFile.parentFolder'),
       dataIndex: 'parent_id',
       valueType: 'treeSelect',
       fieldProps: {
-        options: buildTreeData,
+        treeData: buildTreeData,
         fieldNames: {label: 'title', value: 'key'},
         disabled: true
       }
@@ -529,7 +529,7 @@ const FileManagement: React.FC = () => {
       title: t('sysFile.sort'),
       dataIndex: 'sort',
       valueType: 'digit',
-      formItemProps: {rules: [{required: true, message: t('sysFile.sortRequired')}]},
+      rules: [{required: true, message: t('sysFile.sortRequired')}],
       initialValue: 0
     },
     {
@@ -856,14 +856,16 @@ const FileManagement: React.FC = () => {
       </Col>
 
       {/* 文件分组表单 */}
-      <BetaSchemaForm<ISysFileGroup>
-        title={updateGroupData ? t('sysFile.editFolderTitle') : t('sysFile.addFolderTitle')}
-        open={groupModalOpen}
+      <XinForm<ISysFileGroup>
+        formRef={groupFormRef}
         layoutType="ModalForm"
         columns={groupFormColumns}
-        formRef={groupFormRef}
         onFinish={handleSaveGroup}
-        modalProps={{onCancel: () => setGroupModalOpen(false)}}
+        modalProps={{
+          title: updateGroupData ? t('sysFile.editFolderTitle') : t('sysFile.addFolderTitle'),
+          onCancel: () => groupFormRef.current?.close()
+        }}
+        trigger={<span style={{display: 'none'}} />}
       />
 
       {/* 回收站抽屉 */}
@@ -1030,7 +1032,7 @@ const FileManagement: React.FC = () => {
                 {
                   key: 'type',
                   label: t('sysFile.fileType'),
-                  children: fileTypeRender(currentDetailFile.file_type),
+                  children: fileTypeRender(currentDetailFile.file_type || 10),
                 },
                 {
                   key: 'ext',

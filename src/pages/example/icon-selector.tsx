@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, Space, Divider, Typography, message } from 'antd';
-import { ProForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import XinForm, { type XinFormRef } from '@/components/XinForm';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 import IconSelect from '@/components/XinFormField/IconSelector';
 
 const { Title, Paragraph, Text } = Typography;
@@ -10,6 +11,35 @@ const { Title, Paragraph, Text } = Typography;
  */
 const IconSelectExample: React.FC = () => {
   const [icon, setIcon] = useState<string>('');
+  const formRef = useRef<XinFormRef>(undefined);
+
+  // 表单列配置
+  const columns: FormColumn<any>[] = [
+    {
+      dataIndex: 'systemName',
+      title: '系统名称',
+      valueType: 'text',
+      rules: [{ required: true, message: '请输入系统名称' }],
+      fieldProps: {
+        placeholder: '请输入系统名称',
+      },
+    },
+    {
+      dataIndex: 'systemIcon',
+      title: '系统图标',
+      rules: [{ required: true, message: '请选择系统图标' }],
+      fieldRender: () => <IconSelect placeholder="请选择系统图标" />,
+    },
+    {
+      dataIndex: 'description',
+      title: '系统描述',
+      valueType: 'textarea',
+      fieldProps: {
+        placeholder: '请输入系统描述',
+        rows: 4,
+      },
+    },
+  ];
 
   return (
     <div>
@@ -64,47 +94,21 @@ const IconSelectExample: React.FC = () => {
           </Text>
         </Card>
 
-        <Card title="在 ProForm 中使用" bordered>
-          <ProForm
+        <Card title="在 XinForm 中使用" bordered>
+          <XinForm
+            formRef={formRef}
+            columns={columns}
             onFinish={async (values) => {
-              console.log('ProForm 提交:', values);
+              console.log('XinForm 提交:', values);
               message.success('提交成功！');
               message.info(`系统图标: ${values.systemIcon}`);
               return true;
             }}
             submitter={{
-              searchConfig: {
-                submitText: '提交表单',
-              },
-              resetButtonProps: {
-                style: { display: 'none' },
-              },
+              submitText: '提交表单',
+              render: (dom) => dom.submit,
             }}
-          >
-            <ProFormText
-              name="systemName"
-              label="系统名称"
-              placeholder="请输入系统名称"
-              rules={[{ required: true, message: '请输入系统名称' }]}
-            />
-
-            <ProForm.Item
-              name="systemIcon"
-              label="系统图标"
-              rules={[{ required: true, message: '请选择系统图标' }]}
-            >
-              <IconSelect placeholder="请选择系统图标" />
-            </ProForm.Item>
-
-            <ProFormTextArea
-              name="description"
-              label="系统描述"
-              placeholder="请输入系统描述"
-              fieldProps={{
-                rows: 4,
-              }}
-            />
-          </ProForm>
+          />
         </Card>
       </Space>
     </div>

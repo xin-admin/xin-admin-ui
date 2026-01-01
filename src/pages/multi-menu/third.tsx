@@ -1,52 +1,34 @@
-import {PageContainer, ProCard} from "@ant-design/pro-components";
-import {Button} from "antd";
+import {Button, Card, Row, Col, Breadcrumb, Space} from "antd";
 
-const First = () => (
-  <PageContainer
-    header={{
-      title: '四级页面',
-      ghost: true,
-      breadcrumb: {
-        items: [
-          {
-            path: '',
-            title: '多级菜单',
-          },
-          {
-            path: '',
-            title: '二级菜单',
-          },
-          {
-            path: '',
-            title: '三级菜单',
-          },
-          {
-            path: '',
-            title: '四级页面',
-          },
-        ],
-      }
-    }}
-    tabProps={{
-      type: 'editable-card',
-      hideAdd: true,
-      onEdit: (e, action) => console.log(e, action),
-    }}
-    footer={[
-      <Button key="3">重置</Button>,
-      <Button key="2" type="primary">
-        提交
-      </Button>,
-    ]}
-  >
-    <ProCard direction="column" ghost gutter={[0, 16]}>
-      <ProCard style={{ height: 200 }} />
-      <ProCard gutter={16} ghost style={{ height: 200 }}>
-        <ProCard colSpan={16} />
-        <ProCard colSpan={8} />
-      </ProCard>
-    </ProCard>
-  </PageContainer>
+const Third = () => (
+  <div>
+    <Card style={{ marginBottom: 16 }}>
+      <Breadcrumb items={[
+        { title: '多级菜单' },
+        { title: '二级菜单' },
+        { title: '三级菜单' },
+        { title: '四级页面' },
+      ]} />
+      <h2 style={{ marginTop: 16, marginBottom: 0 }}>四级页面</h2>
+    </Card>
+    <Row gutter={[16, 16]}>
+      <Col span={24}>
+        <Card style={{height: 200}} />
+      </Col>
+      <Col span={16}>
+        <Card style={{height: 200}} />
+      </Col>
+      <Col span={8}>
+        <Card style={{height: 200}} />
+      </Col>
+    </Row>
+    <Card style={{ marginTop: 16 }}>
+      <Space>
+        <Button>重置</Button>
+        <Button type="primary">提交</Button>
+      </Space>
+    </Card>
+  </div>
 );
 
-export default First;
+export default Third;

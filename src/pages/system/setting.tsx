@@ -21,7 +21,9 @@ import {
   Typography,
 } from 'antd';
 import {DeleteOutlined, EditOutlined, PlusOutlined, SettingOutlined,} from '@ant-design/icons';
-import {BetaSchemaForm, type ProFormInstance} from '@ant-design/pro-components';
+import XinForm from '@/components/XinForm';
+import type { XinFormRef } from '@/components/XinForm/typings';
+import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 import {useTranslation} from 'react-i18next';
 import type {ISettingGroup} from '@/domain/iSettingGroup';
 import type {ISetting} from '@/domain/iSetting';
@@ -62,14 +64,12 @@ const SettingManagement: React.FC = () => {
   const [itemsLoading, setItemsLoading] = useState(false);
 
   // 设置组表单
-  const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [editingGroup, setEditingGroup] = useState<ISettingGroup | null>(null);
-  const groupFormRef = useRef<ProFormInstance>(null);
+  const groupFormRef = useRef<XinFormRef | undefined>(undefined);
 
   // 设置项表单
-  const [itemModalOpen, setItemModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ISetting | null>(null);
-  const itemFormRef = useRef<ProFormInstance>(null);
+  const itemFormRef = useRef<XinFormRef | undefined>(undefined);
 
   // 设置项值表单
   const [valuesForm] = Form.useForm();
@@ -138,14 +138,14 @@ const SettingManagement: React.FC = () => {
   const handleAddGroup = () => {
     setEditingGroup(null);
     groupFormRef.current?.resetFields();
-    setGroupModalOpen(true);
+    groupFormRef.current?.open();
   };
 
   /** 打开编辑设置组对话框 */
   const handleEditGroup = (group: ISettingGroup) => {
     setEditingGroup(group);
     groupFormRef.current?.setFieldsValue(group);
-    setGroupModalOpen(true);
+    groupFormRef.current?.open();
   };
 
   /** 保存设置组 */
@@ -158,7 +158,7 @@ const SettingManagement: React.FC = () => {
         await createSettingGroup(values);
         message.success(t('setting.group.createSuccess'));
       }
-      setGroupModalOpen(false);
+      groupFormRef.current?.close();
       await loadSettingGroups();
       return true;
     } catch {
@@ -186,14 +186,14 @@ const SettingManagement: React.FC = () => {
     setEditingItem(null);
     itemFormRef.current?.resetFields();
     itemFormRef.current?.setFieldsValue({ group_id: selectedGroupId });
-    setItemModalOpen(true);
+    itemFormRef.current?.open();
   };
 
   /** 打开编辑设置项对话框 */
   const handleEditItem = (item: ISetting) => {
     setEditingItem(item);
     itemFormRef.current?.setFieldsValue(item);
-    setItemModalOpen(true);
+    itemFormRef.current?.open();
   };
 
   /** 保存设置项 */
@@ -206,7 +206,7 @@ const SettingManagement: React.FC = () => {
         await createSettingItem(values);
         message.success(t('setting.item.createSuccess'));
       }
-      setItemModalOpen(false);
+      itemFormRef.current?.close();
       await loadSettingItems(selectedGroupId);
       return true;
     } catch {
@@ -392,86 +392,76 @@ const SettingManagement: React.FC = () => {
   };
 
   /** 设置组表单列 */
-  const groupColumns = [
+  const groupColumns: FormColumn<ISettingGroup>[] = [
     {
       title: t('setting.group.field.title'),
       dataIndex: 'title',
-      valueType: 'text' as const,
-      formItemProps: {
-        rules: [{ required: true, message: t('setting.group.field.title.required') }],
-      },
+      valueType: 'text',
+      rules: [{ required: true, message: t('setting.group.field.title.required') }],
     },
     {
       title: t('setting.group.field.key'),
       dataIndex: 'key',
-      valueType: 'text' as const,
-      formItemProps: {
-        rules: [{ required: true, message: t('setting.group.field.key.required') }],
-      },
+      valueType: 'text',
+      rules: [{ required: true, message: t('setting.group.field.key.required') }],
     },
     {
       title: t('setting.group.field.remark'),
       dataIndex: 'remark',
-      valueType: 'textarea' as const,
+      valueType: 'textarea',
     },
   ];
 
   /** 设置项表单列 */
-  const itemColumns = [
+  const itemColumns: FormColumn<ISetting>[] = [
     {
       title: t('setting.item.field.key'),
       dataIndex: 'key',
-      valueType: 'text' as const,
-      formItemProps: {
-        rules: [{ required: true, message: t('setting.item.field.key.required') }],
-      },
+      valueType: 'text',
+      rules: [{ required: true, message: t('setting.item.field.key.required') }],
     },
     {
       title: t('setting.item.field.title'),
       dataIndex: 'title',
-      valueType: 'text' as const,
-      formItemProps: {
-        rules: [{ required: true, message: t('setting.item.field.title.required') }],
-      },
+      valueType: 'text',
+      rules: [{ required: true, message: t('setting.item.field.title.required') }],
     },
     {
       title: t('setting.item.field.type'),
       dataIndex: 'type',
-      valueType: 'select' as const,
+      valueType: 'select',
       fieldProps: {
         options: FORM_COMPONENT_OPTIONS,
       },
-      formItemProps: {
-        rules: [{ required: true, message: t('setting.item.field.type.required') }],
-      },
+      rules: [{ required: true, message: t('setting.item.field.type.required') }],
     },
     {
       title: t('setting.item.field.describe'),
       dataIndex: 'describe',
-      valueType: 'textarea' as const,
+      valueType: 'textarea',
       colProps: { span: 24 },
     },
     {
       title: t('setting.item.field.options'),
       dataIndex: 'options',
-      valueType: 'textarea' as const,
+      valueType: 'textarea',
       tooltip: t('setting.item.field.options.tooltip'),
     },
     {
       title: t('setting.item.field.props'),
       dataIndex: 'props',
-      valueType: 'textarea' as const,
+      valueType: 'textarea',
       tooltip: t('setting.item.field.props.tooltip'),
     },
     {
       title: t('setting.item.field.values'),
       dataIndex: 'values',
-      valueType: 'text' as const,
+      valueType: 'text',
     },
     {
       title: t('setting.item.field.sort'),
       dataIndex: 'sort',
-      valueType: 'digit' as const,
+      valueType: 'digit',
     },
   ];
 
@@ -599,34 +589,34 @@ const SettingManagement: React.FC = () => {
       </Col>
 
       {/* 设置组表单弹窗 */}
-      <BetaSchemaForm<ISettingGroup>
-        title={editingGroup ? t('setting.group.edit') : t('setting.group.create')}
-        open={groupModalOpen}
+      <XinForm<ISettingGroup>
+        formRef={groupFormRef}
         layoutType="ModalForm"
         columns={groupColumns}
-        formRef={groupFormRef}
         onFinish={handleSaveGroup}
         modalProps={{
-          onCancel: () => setGroupModalOpen(false),
+          title: editingGroup ? t('setting.group.edit') : t('setting.group.create'),
+          onCancel: () => groupFormRef.current?.close(),
           forceRender: true,
         }}
+        trigger={<span style={{display: 'none'}} />}
       />
 
       {/* 设置项表单弹窗 */}
-      <BetaSchemaForm<ISetting>
-        title={editingItem ? t('setting.item.edit') : t('setting.item.create')}
-        open={itemModalOpen}
+      <XinForm<ISetting>
+        formRef={itemFormRef}
         layoutType="ModalForm"
         columns={itemColumns}
-        formRef={itemFormRef}
         onFinish={handleSaveItem}
+        grid={true}
+        colProps={{ span: 12 }}
         modalProps={{
-          onCancel: () => setItemModalOpen(false),
+          title: editingItem ? t('setting.item.edit') : t('setting.item.create'),
+          onCancel: () => itemFormRef.current?.close(),
           forceRender: true,
           width: 600,
         }}
-        grid={true}
-        colProps={{ span: 12 }}
+        trigger={<span style={{display: 'none'}} />}
       />
     </Row>
   );

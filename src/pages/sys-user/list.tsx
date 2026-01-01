@@ -1,19 +1,17 @@
 import {Avatar, Button, Form, Input, message, Modal, Tag, Tooltip} from 'antd';
 import React, {useEffect, useState} from 'react';
-import XinTable from '@/components/XinTable';
-import {type ProTableProps} from '@ant-design/pro-components';
-import type {XinTableColumn} from "@/components/XinTable/typings.ts";
+import XinTableV2 from '@/components/XinTableV2';
+import type {XinTableColumn} from "@/components/XinTableV2/typings";
 import type ISysUser from "@/domain/iSysUser.ts";
 import AuthButton from "@/components/AuthButton";
 import type {DeptFieldType, ResetPasswordType, RoleFieldType} from "@/api/sys/sysUserList";
 import {deptField, resetPassword, roleField} from "@/api/sys/sysUserList";
 import {RedoOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-interface TableParams {
-  keywordSearch?: string;
-  dept_id?: string | number | bigint;
-}
+dayjs.extend(relativeTime);
 
 const Table: React.FC = () => {
   const {t} = useTranslation();
@@ -21,6 +19,7 @@ const Table: React.FC = () => {
   const [roles, setRoles] = useState<RoleFieldType[]>([]);
   /** 部门选项数据 */
   const [depts, setDepts] = useState<DeptFieldType[]>([]);
+
   /** 高级表格列配置 */
   const columns: XinTableColumn<ISysUser>[] = [
     {
@@ -35,7 +34,8 @@ const Table: React.FC = () => {
       dataIndex: 'username',
       valueType: 'text',
       align: 'center',
-      formItemProps: {rules: [{required: true, message: t("sysUserList.username.required")}]},
+      required: true,
+      rules: [{required: true, message: t("sysUserList.username.required")}],
     },
     {
       title: t("sysUserList.nickname"),
@@ -43,13 +43,17 @@ const Table: React.FC = () => {
       valueType: 'text',
       colProps: {md: 7},
       align: 'center',
-      formItemProps: {rules: [{required: true, message: t("sysUserList.nickname.required")}]},
+      required: true,
+      rules: [{required: true, message: t("sysUserList.nickname.required")}],
     },
     {
       title: t("sysUserList.sex"),
       dataIndex: 'sex',
       valueType: 'radio',
-      filters: true,
+      filters: [
+        { text: t("sysUserList.sex.0"), value: 0 },
+        { text: t("sysUserList.sex.1"), value: 1 },
+      ],
       align: 'center',
       hideInSearch: true,
       fieldProps: {
@@ -58,9 +62,8 @@ const Table: React.FC = () => {
           { value: 1, label: t("sysUserList.sex.1") },
         ]
       },
-      valueEnum: {
-        0: {text: t("sysUserList.sex.0")},
-        1: {text: t("sysUserList.sex.1")},
+      render: (value: number) => {
+        return value === 0 ? t("sysUserList.sex.0") : t("sysUserList.sex.1");
       }
     },
     {
@@ -69,7 +72,8 @@ const Table: React.FC = () => {
       valueType: 'text',
       colProps: {md: 6},
       align: 'center',
-      formItemProps: {rules: [{required: true, message: t("sysUserList.email.required")}]},
+      required: true,
+      rules: [{required: true, message: t("sysUserList.email.required")}],
     },
     {
       title: t("sysUserList.role"),
@@ -77,14 +81,12 @@ const Table: React.FC = () => {
       valueType: 'select',
       align: 'center',
       hideInSearch: true,
-      formItemProps: {
-        rules: [{required: true, message: t("sysUserList.role.required")}],
-      },
-      render: (dom) => <Tag color={'magenta'}>{dom}</Tag>,
+      required: true,
+      rules: [{required: true, message: t("sysUserList.role.required")}],
+      render: (value: any) => <Tag color={'magenta'}>{value}</Tag>,
       fieldProps: {
         mode: 'multiple',
-        options: roles,
-        fieldNames: {label: 'name', value: 'role_id'},
+        options: roles.map(r => ({ label: r.name, value: r.role_id })),
       },
     },
     {
@@ -92,12 +94,11 @@ const Table: React.FC = () => {
       dataIndex: 'dept_id',
       valueType: 'treeSelect',
       align: 'center',
-      formItemProps: {
-        rules: [{required: true, message: t("sysUserList.dept.required")}],
-      },
-      render: (dom) => <Tag color={'volcano'}>{dom}</Tag>,
+      required: true,
+      rules: [{required: true, message: t("sysUserList.dept.required")}],
+      render: (value: any) => <Tag color={'volcano'}>{value}</Tag>,
       fieldProps: {
-        options: depts,
+        treeData: depts,
         fieldNames: {label: 'name', value: 'dept_id'}
       }
     },
@@ -111,12 +112,17 @@ const Table: React.FC = () => {
           { value: 1, label: t("sysUserList.status.1") },
         ]
       },
-      valueEnum: {
-        0: {text: t("sysUserList.status.0"), status: 'Error'},
-        1: {text: t("sysUserList.status.1"), status: 'Success'},
+      render: (value: number) => {
+        return value === 1 
+          ? <Tag color="success">{t("sysUserList.status.1")}</Tag>
+          : <Tag color="error">{t("sysUserList.status.0")}</Tag>;
       },
-      formItemProps: {rules: [{required: true, message: t("sysUserList.status.required")}]},
-      filters: true,
+      required: true,
+      rules: [{required: true, message: t("sysUserList.status.required")}],
+      filters: [
+        { text: t("sysUserList.status.0"), value: 0 },
+        { text: t("sysUserList.status.1"), value: 1 },
+      ],
       hideInSearch: true,
       align: 'center',
     },
@@ -124,91 +130,65 @@ const Table: React.FC = () => {
       title: t("sysUserList.mobile"),
       dataIndex: 'mobile',
       valueType: 'text',
-      formItemProps: {rules: [{required: true, message: t("sysUserList.mobile.required")}]},
+      required: true,
+      rules: [{required: true, message: t("sysUserList.mobile.required")}],
       align: 'center',
     },
     {
       title: t("sysUserList.avatar"),
       dataIndex: 'avatar_url',
       hideInSearch: true,
-      valueType: 'avatar',
       hideInForm: true,
-      render: (_, entity) => <Avatar size={'small'} src={entity.avatar_url}></Avatar>,
+      render: (_, entity: ISysUser) => <Avatar size={'small'} src={entity.avatar_url}></Avatar>,
       align: 'center',
     },
     {
-      valueType: 'dependency',
+      title: t("sysUserList.password"),
+      dataIndex: 'password',
+      valueType: 'password',
       hideInTable: true,
       hideInSearch: true,
-      name: ['id'],
-      columns: ({id}) => {
-        if (! id) {
-          return [
-            {
-              title: t("sysUserList.password"),
-              dataIndex: 'password',
-              valueType: 'password',
-              formItemProps: {rules: [{required: true, message: t("sysUserList.password.required")}]},
-              fieldProps: {autoComplete: ''},
-            },
-            {
-              title: t("sysUserList.rePassword"),
-              dataIndex: 'rePassword',
-              valueType: 'password',
-              formItemProps: {rules: [{required: true, message: t("sysUserList.rePassword.required")}]},
-              fieldProps: {autoComplete: ''},
-            },
-          ];
-        }
-        return [];
-      },
+      rules: [{required: true, message: t("sysUserList.password.required")}],
+      fieldProps: {autoComplete: 'new-password'},
     },
     {
-      valueType: 'fromNow',
+      title: t("sysUserList.rePassword"),
+      dataIndex: 'rePassword',
+      valueType: 'password',
+      hideInTable: true,
+      hideInSearch: true,
+      rules: [{required: true, message: t("sysUserList.rePassword.required")}],
+      fieldProps: {autoComplete: 'new-password'},
+    },
+    {
       title: t("sysUserList.created_at"),
       hideInForm: true,
+      hideInSearch: true,
       dataIndex: 'created_at',
       align: 'center',
+      render: (value: string) => value ? dayjs(value).fromNow() : '-',
     },
     {
-      valueType: 'fromNow',
       title: t("sysUserList.updated_at"),
       hideInForm: true,
+      hideInSearch: true,
       dataIndex: 'updated_at',
       align: 'center',
+      render: (value: string) => value ? dayjs(value).fromNow() : '-',
     },
   ];
-  /** 表格查询参数 */
-  const [tableParams, setParams] = useState<TableParams>();
-  /** 表格参数 */
-  const tableProps: ProTableProps<ISysUser, any> = {
-    params: tableParams,
-    toolbar: {
-      search: {
-        placeholder: t("sysUserList.searchPlaceholder"),
-        style: {width: 304},
-        onSearch: (value: string) => {
-          setParams({keywordSearch: value});
-        },
-      },
-      settings: [],
-    },
-    bordered: true,
-    cardProps: {
-      bordered: true
-    },
-    search: {},
-    scroll: {x: 1400},
-  }
+
   /** 修改密码相关状态 */
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resetUserId, setResetUserId] = useState<number>();
   const [buttonLoading, setButtonLoading] = useState<boolean>(false);
+
   /** 打开重置密码框 */
   const showRedoModal = (id: number) => {
     setIsModalOpen(true);
     setResetUserId(id);
   };
+
   /** 提交重置密码 */
   const handleRedoSubmit = async (values: ResetPasswordType) => {
     try {
@@ -228,11 +208,12 @@ const Table: React.FC = () => {
 
   return (
     <>
-      <XinTable<ISysUser>
+      <XinTableV2<ISysUser>
         api={'/sys-user/list'}
         columns={columns}
         rowKey={'id'}
         accessName={'sys-user.list'}
+        scroll={{x: 1400}}
         beforeOperateRender={(record) => (
           <>
             {record.id !== 1 &&
@@ -252,8 +233,11 @@ const Table: React.FC = () => {
         )}
         editShow={(i) => i.id !== 1}
         deleteShow={(i) => i.id !== 1}
-        tableProps={tableProps}
-        formProps={{grid: true, colProps: {span: 12}}}
+        formProps={{
+          grid: true, 
+          colProps: {span: 12}
+        }}
+        pagination={{}}
       />
       <Modal
         title={t("sysUserList.resetPassword")}

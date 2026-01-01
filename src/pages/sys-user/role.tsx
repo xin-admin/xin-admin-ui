@@ -1,5 +1,5 @@
-import XinTable from "@/components/XinTable";
-import type {XinTableColumn} from "@/components/XinTable/typings.ts";
+import XinTableV2 from "@/components/XinTableV2";
+import type {XinTableColumn} from "@/components/XinTableV2/typings";
 import {Button, Card, type CardProps, Col, message, Row, Switch, Table, type TableProps, Tag, Tooltip, Tree, type TreeProps} from "antd";
 import {type RuleFieldsList, rulesList, saveRoleRules, statusRole, users as usersApi} from "@/api/sys/sysUserRole";
 import type {ISysRole} from "@/domain/iSysRole";
@@ -8,6 +8,10 @@ import type ISysUser from "@/domain/iSysUser.ts";
 import {KeyOutlined, SaveOutlined, SmileOutlined, TeamOutlined} from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { isArray } from "lodash";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const Role = () => {
   const {t} = useTranslation();
@@ -44,10 +48,9 @@ const Role = () => {
       dataIndex: "name",
       valueType: "text",
       align: "center",
-      formItemProps: {
-        rules: [{ required: true, message: t('sysUserRole.table.roleName.required') }],
-      },
-      render: (value, record) => (
+      required: true,
+      rules: [{ required: true, message: t('sysUserRole.table.roleName.required') }],
+      render: (value: any, record: ISysRole) => (
         <>
           <Tooltip title={record.description}>
             <Tag bordered={false} color="blue">{value}</Tag>
@@ -61,10 +64,9 @@ const Role = () => {
       valueType: "digit",
       hideInSearch: true,
       align: "center",
-      formItemProps: {
-        rules: [{ required: true, message: t('sysUserRole.table.sort.required') }],
-      },
-      render: (value) => <Tag bordered={false} color="purple">{value}</Tag>,
+      required: true,
+      rules: [{ required: true, message: t('sysUserRole.table.sort.required') }],
+      render: (value: number) => <Tag bordered={false} color="purple">{value}</Tag>,
     },
     {
       title: t('sysUserRole.table.userCount'),
@@ -72,23 +74,21 @@ const Role = () => {
       valueType: "text",
       hideInForm: true,
       align: "center",
-      renderText: (value: number) => <a><u>{value}{t('sysUserRole.userTable.person')}</u></a>,
+      render: (value: number) => <a><u>{value}{t('sysUserRole.userTable.person')}</u></a>,
     },
     {
       title: t('sysUserRole.table.status'),
       dataIndex: "status",
       valueType: "switch",
       align: "center",
-      filters: true,
+      filters: [
+        { text: t('sysUserRole.table.status.disable'), value: 0 },
+        { text: t('sysUserRole.table.status.enable'), value: 1 },
+      ],
       hideInSearch: true,
-      formItemProps: {
-        rules: [{ required: true, message: t('sysUserRole.table.status.required') }],
-      },
-      valueEnum: {
-        0: { text: t('sysUserRole.table.status.disable'), status: 'Error' as const },
-        1: { text: t('sysUserRole.table.status.enable'), status: 'Success' as const },
-      },
-      render: (_, record) => (
+      required: true,
+      rules: [{ required: true, message: t('sysUserRole.table.status.required') }],
+      render: (_, record: ISysRole) => (
         <Switch
           disabled={record.id === 1}
           checked={record.status === 1}
@@ -114,18 +114,20 @@ const Role = () => {
       hideInTable: true,
     },
     {
-      valueType: 'fromNow',
       title: t('sysUserRole.table.createdAt'),
       hideInForm: true,
+      hideInSearch: true,
       dataIndex: 'created_at',
       align: 'center',
+      render: (value: string) => value ? dayjs(value).fromNow() : '-',
     },
     {
-      valueType: 'fromNow',
       title: t('sysUserRole.table.updatedAt'),
       hideInForm: true,
+      hideInSearch: true,
       dataIndex: 'updated_at',
       align: 'center',
+      render: (value: string) => value ? dayjs(value).fromNow() : '-',
     },
   ];
   // 用户列表表格列配置
@@ -298,34 +300,21 @@ const Role = () => {
     <Row gutter={[20, 20]}>
       {/* 角色列表 */}
       <Col xxl={12} lg={12} xs={24}>
-        <XinTable<ISysRole>
+        <XinTableV2<ISysRole>
           api="/sys-user/role"
           accessName="sys-user.role"
           columns={roleColumns}
           rowKey="id"
-          tableProps={{
-            headerTitle: t('sysUserRole.table.headerTitle'),
-            search: false,
-            bordered: true,
-            rowSelection: {
-              type: 'radio',
-              selectedRowKeys: selectedRoleId ? [selectedRoleId] : [],
-              onChange: (_, rows) => handleRoleSelect(rows[0])
-            },
-            onRow: (record) => ({
-              onClick: () => handleRoleSelect(record)
-            }),
-            tableAlertRender: false,
-            tableStyle: { minHeight: '70vh' },
-            cardProps: { bordered: true },
-            scroll: {x: 900},
-          }}
+          titleRender={<span>{t('sysUserRole.table.headerTitle')}</span>}
+          searchProps={false}
+          scroll={{x: 900}}
           editShow={(row) => row.id !== 1}
           deleteShow={(row) => row.id !== 1}
           formProps={{
             grid: true,
             colProps: { span: 12 },
           }}
+          pagination={{}}
         />
       </Col>
 

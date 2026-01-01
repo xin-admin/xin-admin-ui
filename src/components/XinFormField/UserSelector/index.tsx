@@ -1,7 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Modal, Tag, Select } from 'antd';
-import { ProTable } from '@ant-design/pro-components';
-import type { ProTableProps, ProColumns } from '@ant-design/pro-components';
+import { Modal, Tag, Select, Table, Input, type TableProps, type TableColumnType } from 'antd';
 import type ISysUser from '@/domain/iSysUser';
 import { List } from '@/api/common/table';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +36,12 @@ const UserSelector: React.FC<UserSelectorProps> = ({
   const [loading, setLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<ISysUser[]>([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  // 表格加载状态
+  const [tableLoading, setTableLoading] = useState(false);
+  // 表格数据
+  const [dataSource, setDataSource] = useState<ISysUser[]>([]);
+  // 分页参数
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
   /** 表格查询参数 */
   const [tableParams, setParams] = useState<{ keywordSearch: string }>();
 
@@ -71,13 +75,12 @@ const UserSelector: React.FC<UserSelectorProps> = ({
   }, [value]);
 
   // 表格列配置
-  const columns: ProColumns<ISysUser>[] = useMemo(() => [
+  const columns: TableColumnType<ISysUser>[] = useMemo(() => [
     {
       title: t('sysUserList.id'),
       dataIndex: 'id',
       width: 80,
       align: 'center',
-      search: false,
     },
     {
       title: t('sysUserList.username'),
@@ -90,21 +93,18 @@ const UserSelector: React.FC<UserSelectorProps> = ({
       dataIndex: 'nickname',
       width: 120,
       align: 'center',
-      search: false,
     },
     {
       title: t('sysUserList.mobile'),
       dataIndex: 'mobile',
       width: 130,
       align: 'center',
-      search: false,
     },
     ...(showDept ? [{
       title: t('sysUserList.dept'),
       dataIndex: 'dept_name',
       width: 120,
       align: 'center' as const,
-      search: false,
       render: (text: any) => text ? <Tag color="volcano">{text}</Tag> : '-',
     }] : []),
     {
@@ -112,11 +112,11 @@ const UserSelector: React.FC<UserSelectorProps> = ({
       dataIndex: 'status',
       width: 100,
       align: 'center',
-      valueEnum: {
-        0: { text: t('sysUserList.status.0'), status: 'Error' },
-        1: { text: t('sysUserList.status.1'), status: 'Success' },
+      render: (value: number) => {
+        return value === 1 
+          ? <Tag color="success">{t('sysUserList.status.1')}</Tag>
+          : <Tag color="error">{t('sysUserList.status.0')}</Tag>;
       },
-      search: false,
     },
   ], [t, showDept]);
 
@@ -139,48 +139,58 @@ const UserSelector: React.FC<UserSelectorProps> = ({
     }
   }, [mode]);
 
-  // ProTable 配置
-  const proTableProps: ProTableProps<ISysUser, any> = useMemo(() => ({
+  // 获取表格数据
+  const fetchTableData = useCallback(async (page = 1, pageSize = 10, keywordSearch?: string) => {
+    setTableLoading(true);
+    try {
+      const api = '/sys-user/list';
+      const response = await List<ISysUser>(api, { page, pageSize, keywordSearch });
+      setDataSource(response.data.data?.data || []);
+      setPagination(prev => ({
+        ...prev,
+        current: page,
+        pageSize,
+        total: response.data.data?.total || 0,
+      }));
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      setDataSource([]);
+    } finally {
+      setTableLoading(false);
+    }
+  }, []);
+
+  // 打开弹窗时加载数据
+  useEffect(() => {
+    if (open) {
+      fetchTableData(1, pagination.pageSize, tableParams?.keywordSearch);
+    }
+  }, [open]);
+
+  // 表格配置
+  const tableProps: TableProps<ISysUser> = useMemo(() => ({
     columns,
     rowKey: 'id',
-    params: tableParams,
-    cardProps: { bodyStyle: { padding: 0 } },
+    dataSource,
+    loading: tableLoading,
     rowSelection: {
       type: mode === 'single' ? 'radio' : 'checkbox',
       selectedRowKeys,
       onChange: handleRowSelectionChange,
       preserveSelectedRowKeys: true,
     },
-    toolbar: {
-      search: {
-        placeholder: t("sysUserList.searchPlaceholder"),
-        style: {width: 304},
-        onSearch: (value: string) => {
-          setParams({keywordSearch: value});
-        },
+    pagination: {
+      ...pagination,
+      showSizeChanger: true,
+      showQuickJumper: true,
+      onChange: (page, pageSize) => {
+        fetchTableData(page, pageSize, tableParams?.keywordSearch);
       },
-      settings: [],
     },
-    request: async (params: any) => {
-      try {
-        const api = '/sys-user/list';
-        const response = await List<ISysUser>(api, params);
-        return {
-          data: response.data.data?.data || [],
-          total: response.data.data?.total || 0,
-          success: true,
-        };
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-        return { data: [], total: 0, success: false };
-      }
-    },
-    search: false,
-    pagination: { defaultPageSize: 10, showSizeChanger: true, showQuickJumper: true },
     bordered: true,
     size: 'small',
     scroll: { x: 800 },
-  }), [columns, mode, selectedRowKeys, handleRowSelectionChange, t, tableParams]);
+  }), [columns, dataSource, tableLoading, mode, selectedRowKeys, handleRowSelectionChange, pagination, tableParams, fetchTableData]);
 
   // 处理 Select 的 onChange
   const handleSelectChange = useCallback((selectedValue: number | number[]) => {
@@ -246,7 +256,18 @@ const UserSelector: React.FC<UserSelectorProps> = ({
         okText={t('xinForm.userSelector.modal.okText')}
         cancelText={t('xinForm.userSelector.modal.cancelText')}
       >
-        <ProTable {...proTableProps} />
+        <div style={{ marginBottom: 16 }}>
+          <Input.Search
+            placeholder={t("sysUserList.searchPlaceholder")}
+            style={{ width: 304 }}
+            onSearch={(value: string) => {
+              setParams({ keywordSearch: value });
+              fetchTableData(1, pagination.pageSize, value);
+            }}
+            allowClear
+          />
+        </div>
+        <Table {...tableProps} />
       </Modal>
     </>
   );

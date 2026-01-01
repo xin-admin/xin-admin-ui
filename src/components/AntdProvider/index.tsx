@@ -3,7 +3,7 @@ import {type PropsWithChildren, useMemo} from 'react';
 import '@ant-design/v5-patch-for-react-19';
 import algorithm from "@/layout/algorithm.ts";
 import {useGlobalStore} from "@/stores";
-import {ProConfigProvider} from "@ant-design/pro-components";
+
 import { useAntdLocale } from '@/hooks/useLanguage';
 
 function ContextHolder() {
@@ -54,9 +54,7 @@ const AppProvider = ({ children }: PropsWithChildren) => {
     <ConfigProvider theme={{...theme, cssVar: true}} locale={locale}>
       <App>
         <ContextHolder />
-        <ProConfigProvider dark={themeConfig.themeScheme === 'dark'}>
-          {children}
-        </ProConfigProvider>
+        {children}
       </App>
     </ConfigProvider>
   );

@@ -16,8 +16,8 @@ import {useEffect, useRef, useState} from "react";
 import {listDept, addDept, updateDept, deleteDept, deptUsers} from "@/api/sys/sysUserDept";
 import type {ISysDept} from "@/domain/iSysDept.ts";
 import {isArray, omit} from 'lodash';
-import type {XinTableColumn} from "@/components/XinTable/typings.ts";
-import {BetaSchemaForm, type ProFormInstance} from "@ant-design/pro-components";
+import type {FormColumn} from "@/components/XinFormField/FieldRender/typings";
+import XinForm, {type XinFormRef} from "@/components/XinForm";
 import * as React from "react";
 import {useTranslation} from "react-i18next";
 import AuthButton from "@/components/AuthButton";
@@ -36,11 +36,9 @@ const Dept = () => {
   const {t} = useTranslation();
   const {auth} = useAuth();
   /** 部门信息表单 */
-  const formRef = useRef<ProFormInstance>(null);
+  const formRef = useRef<XinFormRef<ISysDept>>(undefined);
   /** 新增表单 */
-  const modalFormRef = useRef<ProFormInstance>(null);
-  /** 新增表单对话框打开状态 */
-  const [formOpen, setFormOpen] = useState<boolean>(false);
+  const modalFormRef = useRef<XinFormRef<ISysDept>>(undefined);
   /** 当前选中的部门 key */
   const [selectKey, setSelectKey] = useState<string>('');
   /** 当前（多选框）选择的部门 keys */
@@ -117,19 +115,23 @@ const Dept = () => {
   };
   /** 新增部门点击事件 */
   const addChange = (children: boolean = false) => {
-    setFormOpen(true);
+    modalFormRef.current?.resetFields();
     modalFormRef.current?.setFieldsValue({
-      parent_id: children ? selectKey : 0,
+      parent_id: children ? Number(selectKey) : 0,
       sort: 0,
       status: 0,
       type: 0
     })
+    modalFormRef.current?.open();
   }
   /** 部门选择事件 */
   const onSelect: TreeProps['onSelect'] = (key) => {
     if(key && key.length >= 1) {
       setSelectKey(key[0].toString());
-      formRef.current?.setFieldsValue(deptMap.get(key[0].toString()));
+      const deptInfo = deptMap.get(key[0].toString());
+      if (deptInfo) {
+        formRef.current?.setFieldsValue(deptInfo);
+      }
       selectUsers(Number(key[0])).then();
     }
   }
@@ -148,7 +150,7 @@ const Dept = () => {
       if(!update) {
         await addDept(data);
         message.success(t("sysUserDept.createSuccess"));
-        setFormOpen(false);
+        modalFormRef.current?.close();
       }else {
         await updateDept(Number(selectKey), data);
         message.success(t("sysUserDept.updateSuccess"));
@@ -171,18 +173,18 @@ const Dept = () => {
     }
   }
   /** 表单列数据 */
-  const columns: XinTableColumn[] = [
+  const columns: FormColumn<ISysDept>[] = [
     {
       title: t("sysUserDept.column.name"),
       valueType: 'text',
       dataIndex: 'name',
-      formItemProps: {rules: [{required: true, message: t("sysUserDept.column.name.required")}]},
+      rules: [{required: true, message: t("sysUserDept.column.name.required")}],
     },
     {
       title: t("sysUserDept.column.code"),
       valueType: 'text',
       dataIndex: 'code',
-      formItemProps: {rules: [{required: true, message: t("sysUserDept.column.code.required")}]},
+      rules: [{required: true, message: t("sysUserDept.column.code.required")}],
     },
     {
       title: t("sysUserDept.column.type"),
@@ -195,24 +197,24 @@ const Dept = () => {
           { value: 2, label: t("sysUserDept.column.type.2") },
         ],
       },
-      formItemProps: {rules: [{required: true, message: t("sysUserDept.column.type.required")}]},
+      rules: [{required: true, message: t("sysUserDept.column.type.required")}],
     },
     {
       title: t("sysUserDept.column.parent"),
       valueType: 'treeSelect',
       dataIndex: 'parent_id',
       fieldProps: {
-        options: [
+        treeData: [
           {
             title: t("sysUserDept.column.parent.0"),
-            key: 0,
+            value: 0,
             children: deptData
           }
         ],
         fieldNames: { label: 'title', value: 'key' },
         disabled: true
       },
-      formItemProps: {rules: [{required: true, message: t("sysUserDept.column.parent.required")}]},
+      rules: [{required: true, message: t("sysUserDept.column.parent.required")}],
     },
     {
       title: t("sysUserDept.column.email"),
@@ -233,7 +235,7 @@ const Dept = () => {
       title: t("sysUserDept.column.sort"),
       valueType: 'digit',
       dataIndex: 'sort',
-      formItemProps: {rules: [{required: true, message: t("sysUserDept.column.sort.required")}]},
+      rules: [{required: true, message: t("sysUserDept.column.sort.required")}],
     },
     {
       title: t("sysUserDept.column.status"),
@@ -245,7 +247,7 @@ const Dept = () => {
           { value: 1, label: t("sysUserDept.column.status.1") },
         ]
       },
-      formItemProps: {rules: [{required: true, message: t("sysUserDept.column.status.required")}]},
+      rules: [{required: true, message: t("sysUserDept.column.status.required")}],
     },
     {
       title: t("sysUserDept.column.remark"),
@@ -304,17 +306,17 @@ const Dept = () => {
   return (
     <Row gutter={[20, 20]}>
       <Col xxl={12} lg={12} xs={24}>
-        <BetaSchemaForm<ISysDept>
+        <XinForm<ISysDept>
           layoutType={'ModalForm'}
-          open={formOpen}
+          formRef={modalFormRef}
           modalProps={{
             title: t("sysUserDept.createModalTitle"),
-            forceRender: true,
             styles: { body: { paddingTop: 20, paddingRight: 40 } },
-            onCancel: () => setFormOpen(false),
           }}
-          formRef={modalFormRef}
-          onFinish={(data) => onSubmit(data, false)}
+          onFinish={async (data: ISysDept) => {
+            await onSubmit(data, false);
+            return true;
+          }}
           columns={columns}
           layout={'horizontal'}
         />
@@ -389,20 +391,24 @@ const Dept = () => {
           onTabChange={setTabKey}
           styles={{ body: { minHeight: '70vh' } }}
         >
-          <BetaSchemaForm<ISysDept>
+          <XinForm<ISysDept>
             formRef={formRef}
-            onFinish={(data) => onSubmit(data, true)}
+            onFinish={async (data: ISysDept) => {
+              await onSubmit(data, true);
+              return true;
+            }}
             columns={columns}
             layout={'horizontal'}
             style={{ display: tabKey === 'info' ? "block" : "none" }}
             submitter={{
-              render: () => (
+              render: (dom) => (
                 <AuthButton auth={"sys-user.dept.update"}>
                   <Button
                     children={t("sysUserDept.saveInfo")}
                     loading={loading}
                     htmlType={'submit'}
                     type={'primary'}
+                    onClick={() => formRef.current?.submit()}
                   />
                 </AuthButton>
               )

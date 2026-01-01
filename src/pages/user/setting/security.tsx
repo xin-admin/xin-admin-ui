@@ -1,7 +1,6 @@
-import {Button, Form, Input, message} from 'antd';
+import {Button, Form, Input, message, type FormProps} from 'antd';
 import {useState} from "react";
 import {type PasswordParams, updatePassword} from "@/api/sys/sysUser";
-import type {FormProps} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 
 const Security = () => {
