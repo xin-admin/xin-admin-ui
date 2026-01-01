@@ -1,7 +1,7 @@
 import {Avatar, Button, Form, Input, message, Modal, Tag, Tooltip} from 'antd';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import XinTableV2 from '@/components/XinTableV2';
-import type {XinTableColumn} from "@/components/XinTableV2/typings";
+import type {XinTableColumn, XinTableV2Props} from "@/components/XinTableV2/typings";
 import type ISysUser from "@/domain/iSysUser.ts";
 import AuthButton from "@/components/AuthButton";
 import type {DeptFieldType, ResetPasswordType, RoleFieldType} from "@/api/sys/sysUserList";
@@ -18,7 +18,21 @@ const Table: React.FC = () => {
   /** 角色选项数据 */
   const [roles, setRoles] = useState<RoleFieldType[]>([]);
   /** 部门选项数据 */
-  const [depts, setDepts] = useState<DeptFieldType[]>([]);
+  const [departments, setDepartments] = useState<DeptFieldType[]>([]);
+  /** 部门选项数据映射 */
+  const departmentMap: Map<number, string> = useMemo(() => {
+    const map: Map<number, string> = new Map();
+    const buildMap = (dept: DeptFieldType[]) => {
+      dept.forEach(item => {
+        map.set(item.dept_id, item.name);
+        if (item.children && item.children.length > 0) {
+          buildMap(item.children);
+        }
+      })
+    }
+    buildMap(departments);
+    return map;
+  }, [departments]);
 
   /** 高级表格列配置 */
   const columns: XinTableColumn<ISysUser>[] = [
@@ -41,7 +55,6 @@ const Table: React.FC = () => {
       title: t("sysUserList.nickname"),
       dataIndex: 'nickname',
       valueType: 'text',
-      colProps: {md: 7},
       align: 'center',
       required: true,
       rules: [{required: true, message: t("sysUserList.nickname.required")}],
@@ -70,7 +83,6 @@ const Table: React.FC = () => {
       title: t("sysUserList.email"),
       dataIndex: 'email',
       valueType: 'text',
-      colProps: {md: 6},
       align: 'center',
       required: true,
       rules: [{required: true, message: t("sysUserList.email.required")}],
@@ -83,7 +95,15 @@ const Table: React.FC = () => {
       hideInSearch: true,
       required: true,
       rules: [{required: true, message: t("sysUserList.role.required")}],
-      render: (value: any) => <Tag color={'magenta'}>{value}</Tag>,
+      render: (value: number[]) => (
+        <>
+          {value.map(item => (
+            <Tag color={'magenta'}>
+              {roles.find(r => r.role_id === item)?.name || '-'}
+            </Tag>
+          ))}
+        </>
+      ),
       fieldProps: {
         mode: 'multiple',
         options: roles.map(r => ({ label: r.name, value: r.role_id })),
@@ -96,9 +116,12 @@ const Table: React.FC = () => {
       align: 'center',
       required: true,
       rules: [{required: true, message: t("sysUserList.dept.required")}],
-      render: (value: any) => <Tag color={'volcano'}>{value}</Tag>,
+      render: (value) => (
+        // 嵌套寻找部门名称
+        <Tag color={'volcano'}>{departmentMap.get(value) || '-'}</Tag>
+      ),
       fieldProps: {
-        treeData: depts,
+        treeData: departments,
         fieldNames: {label: 'name', value: 'dept_id'}
       }
     },
@@ -148,6 +171,7 @@ const Table: React.FC = () => {
       valueType: 'password',
       hideInTable: true,
       hideInSearch: true,
+      hideInUpdate: true,
       rules: [{required: true, message: t("sysUserList.password.required")}],
       fieldProps: {autoComplete: 'new-password'},
     },
@@ -157,6 +181,7 @@ const Table: React.FC = () => {
       valueType: 'password',
       hideInTable: true,
       hideInSearch: true,
+      hideInUpdate: true,
       rules: [{required: true, message: t("sysUserList.rePassword.required")}],
       fieldProps: {autoComplete: 'new-password'},
     },
@@ -202,43 +227,61 @@ const Table: React.FC = () => {
   };
 
   useEffect(() => {
-    deptField().then(res => setDepts(res.data.data!));
+    deptField().then(res => setDepartments(res.data.data!));
     roleField().then(res => setRoles(res.data.data!));
-  }, [])
+  }, []);
+
+  /** 操作栏之后渲染 */
+  const beforeOperateRender: XinTableV2Props['beforeOperateRender'] = (record) => (
+    <>
+      {record.id !== 1 &&
+        <AuthButton auth={'sys-user.list.resetPassword'}>
+          <Tooltip title={t("sysUserList.resetPassword")}>
+            <Button
+              variant={'solid'}
+              color={'pink'}
+              icon={<RedoOutlined/>}
+              size={'small'}
+              onClick={() => showRedoModal(record.id!)}
+            />
+          </Tooltip>
+        </AuthButton>
+      }
+    </>
+  );
+
+  /** 表格配置 */
+  const tableProps: XinTableV2Props<ISysUser> = {
+    api: '/sys-user/list',
+    columns,
+    rowKey: 'id',
+    accessName: 'sys-user.list',
+    beforeOperateRender,
+    scroll: { x: 1400 },
+    editShow: (i) => i.id !== 1,
+    deleteShow: (i) => i.id !== 1,
+    formProps: {
+      grid: true,
+        colProps: {span: 12},
+      rowProps: {gutter: [20, 0]},
+    },
+    modalProps: {
+      width: 800,
+    },
+    cardProps: {
+      variant: 'borderless'
+    },
+    pagination: {
+      size: 'small',
+        style: {
+        marginBottom: 0
+      }
+    }
+  }
 
   return (
     <>
-      <XinTableV2<ISysUser>
-        api={'/sys-user/list'}
-        columns={columns}
-        rowKey={'id'}
-        accessName={'sys-user.list'}
-        scroll={{x: 1400}}
-        beforeOperateRender={(record) => (
-          <>
-            {record.id !== 1 &&
-              <AuthButton auth={'sys-user.list.resetPassword'}>
-                <Tooltip title={t("sysUserList.resetPassword")}>
-                  <Button
-                    variant={'solid'}
-                    color={'pink'}
-                    icon={<RedoOutlined/>}
-                    size={'small'}
-                    onClick={() => showRedoModal(record.id!)}
-                  />
-                </Tooltip>
-              </AuthButton>
-            }
-          </>
-        )}
-        editShow={(i) => i.id !== 1}
-        deleteShow={(i) => i.id !== 1}
-        formProps={{
-          grid: true, 
-          colProps: {span: 12}
-        }}
-        pagination={{}}
-      />
+      <XinTableV2<ISysUser> {...tableProps} />
       <Modal
         title={t("sysUserList.resetPassword")}
         closable={{'aria-label': 'Custom Close Button'}}
