@@ -1,6 +1,6 @@
 import {Alert, Card, Space, Tag} from "antd";
 import {CheckCard} from "@ant-design/pro-components"
-import useAuthStore from "@/stores/user.ts";
+import { useAuthStore } from "@/stores";
 import defaultRoute from "@/router/default.ts";
 
 const PageAuth = () => {

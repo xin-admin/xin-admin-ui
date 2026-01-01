@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {Button, ConfigProvider, Layout, Menu, type MenuProps, type ThemeConfig} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
-import {useGlobalStore} from "@/stores";
+import { useGlobalStore, useAuthStore } from "@/stores";
 import HeaderLeftRender from "@/layout/HeaderLeftRender";
 import HeaderRightRender from "@/layout/HeaderRightRender";
-import useAuthStore from "@/stores/user.ts";
+
 import IconFont from "@/components/IconFont";
 import {useNavigate} from "react-router";
 import BreadcrumbRender from "@/layout/BreadcrumbRender.tsx";

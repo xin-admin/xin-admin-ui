@@ -1,5 +1,5 @@
 import {Alert, Button, Card, Flex, Space, Tag} from "antd";
-import useAuthStore from "@/stores/user.ts";
+import { useAuthStore } from "@/stores";
 import ButtonAccess from "@/components/AuthButton";
 
 const ButtonAuth = () => {

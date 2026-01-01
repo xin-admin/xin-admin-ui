@@ -12,9 +12,9 @@ import {
   UserOutlined,
   VerticalLeftOutlined
 } from "@ant-design/icons";
-import {useGlobalStore} from "@/stores";
+import { useGlobalStore, useAuthStore } from "@/stores";
 import {useTranslation} from "react-i18next";
-import useAuthStore from "@/stores/user";
+
 import {useNavigate} from "react-router";
 import {useState} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";

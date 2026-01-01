@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { AuthStore, AuthenticationState, AuthenticationAction } from '@/stores';
+import type { AuthStore, AuthenticationState, AuthenticationAction } from '../../types';
 import type { LoginParams, InfoResponse } from "@/api/sys/sysUser";
 import { info, login, logout } from "@/api/sys/sysUser";
 import defaultRoute from "@/router/default";

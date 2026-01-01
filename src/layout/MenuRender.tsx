@@ -1,10 +1,10 @@
 import type {IMenus} from "@/domain/iSysRule.ts";
 import IconFont from "@/components/IconFont";
 import {useTranslation} from "react-i18next";
-import useAuthStore from "@/stores/user.ts";
+
 import {Menu, type MenuProps} from "antd";
 import {useCallback, useMemo} from "react";
-import {useGlobalStore} from "@/stores";
+import { useGlobalStore, useAuthStore } from "@/stores";
 import {useNavigate} from "react-router";
 import {usePageTitle} from "@/hooks/usePageTitle";
 type MenuItem = Required<MenuProps>['items'][number];

@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { AuthStore, MenuState, MenuAction, BreadcrumbItem, MenuIndexes } from '@/stores';
+import type { AuthStore, MenuState, MenuAction, BreadcrumbItem, MenuIndexes } from '../../types';
 import type { IMenus } from "@/domain/iSysRule";
 
 export type MenuSlice = MenuState & MenuAction;

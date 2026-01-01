@@ -1,6 +1,5 @@
 /**
  * Store 共享类型定义
- * 参考 Lobe Chat 的类型组织方式
  */
 import type { LayoutType, ThemeProps } from "@/layout/typing";
 import type { IMenus } from "@/domain/iSysRule";

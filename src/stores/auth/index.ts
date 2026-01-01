@@ -1,8 +1,6 @@
 /**
  * Auth Store
  * 组合所有认证相关 Slices
- * 
- * 参考 Lobe Chat 的 Store 组织模式
  */
 
 import { create } from 'zustand';

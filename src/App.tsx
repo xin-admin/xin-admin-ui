@@ -1,10 +1,10 @@
 import createRouter from "@/router";
 import {RouterProvider, type  RouterProviderProps} from "react-router";
-import useAuthStore from "@/stores/user";
+import { useAuthStore, useGlobalStore } from "@/stores";
 import AuthRoute from "@/components/AuthRoute"
 import PageTitle from "@/components/PageTitle";
 import AntdProvider from "@/components/AntdProvider";
-import { useGlobalStore } from "@/stores";
+
 import {useEffect, useRef} from "react";
 import { useMobile } from "@/hooks/useMobile";
 import Loading from "@/components/Loading";

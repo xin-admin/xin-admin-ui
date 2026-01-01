@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { AuthStore, UserState, UserAction } from '@/stores';
+import type { AuthStore, UserState, UserAction } from '../../types';
 
 export type UserSlice = UserState & UserAction;
 

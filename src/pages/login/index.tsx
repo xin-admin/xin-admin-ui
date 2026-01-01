@@ -12,11 +12,11 @@ import { LoginForm, ProFormCheckbox, ProFormText } from '@ant-design/pro-compone
 import { Col, Divider, message, Row, Space, Button } from 'antd';
 import {type CSSProperties, useEffect, useState} from 'react';
 import React from 'react';
-import useAuthStore from "@/stores/user.ts";
+import { useAuthStore, useGlobalStore } from '@/stores';
 import {useNavigate} from "react-router";
 import type { LoginParams } from '@/api/sys/sysUser';
 import { useTranslation } from 'react-i18next';
-import { useGlobalStore } from '@/stores';
+
 import { darkColorTheme, defaultColorTheme } from '@/layout/theme';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { usePageTitle } from '@/hooks/usePageTitle';

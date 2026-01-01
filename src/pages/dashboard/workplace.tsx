@@ -14,7 +14,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import useAuthStore from "@/stores/user.ts";
+import { useAuthStore } from "@/stores";
 import type {ReactNode} from "react";
 const { Meta } = Card;
 const { Text, Title } = Typography;
