@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { GlobalStore, LayoutState, LayoutAction, BreadcrumbItem } from '../../types';
+import type { GlobalStore, LayoutState, LayoutAction, BreadcrumbItem } from '@/stores/types';
 import type { LayoutType } from "@/layout/typing";
 
 export type LayoutSlice = LayoutState & LayoutAction;

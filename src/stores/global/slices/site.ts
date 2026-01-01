@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { GlobalStore, SiteState, SiteAction } from '../../types';
+import type { GlobalStore, SiteState, SiteAction } from '@/stores/types';
 import { getWebInfo } from "@/api";
 
 export type SiteSlice = SiteState & SiteAction;

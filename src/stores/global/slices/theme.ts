@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { GlobalStore, ThemeState, ThemeAction } from '../../types';
+import type { GlobalStore, ThemeState, ThemeAction } from '@/stores/types';
 import type { ThemeProps } from "@/layout/typing";
 import { configTheme, defaultColorTheme } from "@/layout/theme";
 
