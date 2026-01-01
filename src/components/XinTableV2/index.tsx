@@ -207,8 +207,14 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   /** 表单列 */
   const formColumn: FormColumn<T>[] = useMemo(() => {
-    return columns.filter((column) => column.hideInForm !== true);
-  }, [columns]);
+    return columns.filter((column) => {
+      if(formMode === 'update') {
+        return column.hideInForm !== true && column.hideInUpdate !== true;
+      } else {
+        return column.hideInForm !== true && column.hideInCreate !== true;
+      }
+    });
+  }, [columns, formMode]);
 
   /** 默认表格列 */
   const defaultTableColumns = useMemo(() => {
@@ -430,7 +436,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   return (
     <div>
-      <Card style={{marginBottom: 20}}>
+      <Card style={{marginBottom: 20}} {...cardProps}>
         {/* 搜索表单 */}
         <SearchForm<T>
           form={searchRef}

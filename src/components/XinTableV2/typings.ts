@@ -21,6 +21,8 @@ export type XinTableColumn<T = any> = Omit<TableColumnType<T>, 'dataIndex'> & {
   hideInSearch?: boolean;
   hideInForm?: boolean;
   hideInTable?: boolean;
+  hideInUpdate?: boolean;
+  hideInCreate?: boolean;
   search?: FormColumn<T>;
 } & FormColumn<T>;
 
@@ -90,7 +92,7 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 卡片属性 */
   cardProps?: Pick<CardProps, 'variant' | 'hoverable' | 'size' | 'classNames' | 'styles'>;
   /** 分页配置 */
-  pagination?: Omit<PaginationProps, 'total' | 'onChange' | 'size' | 'current'>;
+  pagination?: Omit<PaginationProps, 'total' | 'onChange' | 'pageSize' | 'current'>;
 
   /** 标题渲染 */
   titleRender?: ReactNode;
