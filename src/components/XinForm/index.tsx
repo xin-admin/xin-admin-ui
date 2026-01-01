@@ -76,7 +76,8 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
       title = '',
       fieldProps = {},
       dependency,
-      fieldRender
+      fieldRender,
+      colProps: columnColProps = {}
     } = column;
 
     // Form.Item 允许的属性列表
@@ -163,7 +164,7 @@ function XinForm<T extends Record<string, any> = any>(props: XinFormProps<T>) {
         </Form.Item>
       );
     }
-    return grid ? <Col {...Object.assign(colProps, column.colProps)} key={key}>{formItemContent}</Col> : formItemContent;
+    return grid ? <Col {...Object.assign(colProps, columnColProps)} key={key}>{formItemContent}</Col> : formItemContent;
   }, [grid, form]);
 
   // 渲染提交按钮

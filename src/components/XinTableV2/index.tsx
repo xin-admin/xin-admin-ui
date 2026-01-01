@@ -46,10 +46,13 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     accessName,
     rowKey,
     columns,
-    searchProps,
+
     formProps,
+    modalProps,
     cardProps,
+    searchProps,
     operateProps,
+
     tableRef,
     addShow = true,
     editShow = true,
@@ -64,6 +67,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     pagination: customPagination = {},
     handleRequest: customHandleRequest,
     requestParams: customRequestParams,
+    handleFinish: customHandleFinish,
   } = props;
 
   const {t} = useTranslation();
@@ -245,7 +249,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
               </AuthButton>
             )}
             {(typeof deleteShow === 'function' ? deleteShow(record) : deleteShow) !== false && (
-              <AuthButton auth={props.accessName + '.update'} key={'update'}>
+              <AuthButton auth={props.accessName + '.delete'} key={'delete'}>
                 <Tooltip title={t('xinTableV2.delete')}>
                   <Button
                     danger
@@ -317,8 +321,8 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     try {
       formRef.current?.setLoading(true);
       // 如果有自定义 onFinish，优先调用
-      if (formProps && formProps.onFinish) {
-        const result = await formProps.onFinish(values, formMode, formRef, formDefaultValues);
+      if (customHandleFinish) {
+          const result = await customHandleFinish(values, formMode, formRef, formDefaultValues);
         if (result) {
           await handleRequest(requestParams);
           formRef.current?.close();
@@ -531,17 +535,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
       </Card>
 
       {/* 新增编辑表单 */}
-      <XinForm 
+      <XinForm
+        {...formProps}
         columns={formColumn}
         formRef={formRef}
         layoutType="ModalForm"
         modalProps={{
           title: formMode === 'update' ? t('xinTableV2.form.editTitle') : t('xinTableV2.form.createTitle'),
           styles: { header: { marginBottom: 16 } },
-          ...(formProps && typeof formProps === 'object' ? formProps.modalProps : {}),
+          ...modalProps,
         }}
         onFinish={handleFinish}
-        {...formProps}
       />
     </div>
   );

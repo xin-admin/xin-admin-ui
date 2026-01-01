@@ -7,7 +7,7 @@ import type {
 import {type ReactNode, type RefObject} from 'react';
 import type { FormColumn } from '@/components/XinFormField/FieldRender/typings';
 import type { SearchFormProps } from './SearchForm';
-import type { XinFormRef } from '@/components/XinForm/typings';
+import type {XinFormProps, XinFormRef} from '@/components/XinForm/typings';
 
 /**
  * 表单模式
@@ -41,16 +41,6 @@ export interface XinTableV2Ref<T = any> {
 export interface SorterParams {
   field: string;
   order: 'asc' | 'desc';
-}
-
-/**
- * 表单属性接口
- */
-export interface FormProps<T = any> {
-  /** 表单提交 */
-  onFinish?: (values: T, mode?: FormMode, formRef?: RefObject<XinFormRef<T> | undefined>, defaultValues?: T) => Promise<boolean>;
-  /** 其他属性可以通过 XinForm 的属性扩展 */
-  [key: string]: any;
 }
 
 /** 请求参数类型 */
@@ -90,7 +80,9 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   keywordSearchShow?: boolean;
 
   /** 表单属性  */
-  formProps?: FormProps<T> | false;
+  formProps?: Omit<XinFormProps<T>, 'onFinish' | 'modalProps' | 'columns' | 'formRef' | 'layoutType'> | false;
+  /** 表单属性  */
+  modalProps?: XinFormProps<T>['modalProps'];
   /** 搜索栏属性  */
   searchProps?: Omit<SearchFormProps<T>, 'form'> | false;
   /** 操作栏属性 */
@@ -98,7 +90,7 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 卡片属性 */
   cardProps?: Pick<CardProps, 'variant' | 'hoverable' | 'size' | 'classNames' | 'styles'>;
   /** 分页配置 */
-  pagination: Omit<PaginationProps, 'total' | 'onChange' | 'size' | 'current'>;
+  pagination?: Omit<PaginationProps, 'total' | 'onChange' | 'size' | 'current'>;
 
   /** 标题渲染 */
   titleRender?: ReactNode;
@@ -113,6 +105,8 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   handleRequest?: (params: RequestParams) => Promise<{ data: T[]; total: number }>;
   /** 请求参数处理 */
   requestParams?: (params: RequestParams) => RequestParams;
+  /** 自定义表单请求 */
+  handleFinish?: (values: T, mode: FormMode, formRef: RefObject<XinFormRef<T> | undefined>, defaultValue?: T) => Promise<boolean>;
 
   /** 开启批量操作 */
   batchOperation?: boolean;
