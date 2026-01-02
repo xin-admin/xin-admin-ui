@@ -49,6 +49,7 @@ const Role = () => {
       valueType: "text",
       align: "center",
       required: true,
+      width: 120,
       rules: [{ required: true, message: t('sysUserRole.table.roleName.required') }],
       render: (value: any, record: ISysRole) => (
         <>
@@ -64,6 +65,7 @@ const Role = () => {
       valueType: "digit",
       hideInSearch: true,
       align: "center",
+      width: 80,
       required: true,
       rules: [{ required: true, message: t('sysUserRole.table.sort.required') }],
       render: (value: number) => <Tag bordered={false} color="purple">{value}</Tag>,
@@ -72,6 +74,7 @@ const Role = () => {
       title: t('sysUserRole.table.userCount'),
       dataIndex: "countUser",
       valueType: "text",
+      width: 80,
       hideInForm: true,
       align: "center",
       render: (value: number) => <a><u>{value}{t('sysUserRole.userTable.person')}</u></a>,
@@ -305,16 +308,28 @@ const Role = () => {
           accessName="sys-user.role"
           columns={roleColumns}
           rowKey="id"
+          searchShow={false}
           titleRender={<span>{t('sysUserRole.table.headerTitle')}</span>}
           searchProps={false}
-          scroll={{x: 900}}
+          scroll={{x: 800}}
           editShow={(row) => row.id !== 1}
           deleteShow={(row) => row.id !== 1}
           formProps={{
             grid: true,
+            rowProps: { gutter: [20, 0] },
             colProps: { span: 12 },
           }}
-          pagination={{}}
+          operateProps={{
+            fixed: 'right'
+          }}
+          rowSelection={{
+            type: 'radio',
+            selectedRowKeys: selectedRoleId ? [selectedRoleId] : [],
+            onChange: (_, rows) => handleRoleSelect(rows[0])
+          }}
+          onRow ={(record) => ({
+            onClick: () => handleRoleSelect(record)
+          })}
         />
       </Col>
 
