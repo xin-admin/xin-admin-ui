@@ -80,6 +80,8 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   searchShow?: boolean;
   /** 表格操作列显示 */
   operateShow?: boolean;
+  /** 分页显示 */
+  paginationShow?: boolean;
   /** 快速搜索显示 */
   keywordSearchShow?: boolean;
 
@@ -94,7 +96,7 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   /** 卡片属性 */
   cardProps?: Pick<CardProps, 'variant' | 'hoverable' | 'size' | 'classNames' | 'styles'>;
   /** 分页配置 */
-  pagination?: Omit<PaginationProps, 'total' | 'onChange' | 'pageSize' | 'current'>;
+  pagination?: Omit<PaginationProps, 'total' | 'onChange' | 'current'>;
 
   /** 标题渲染 */
   titleRender?: ReactNode;

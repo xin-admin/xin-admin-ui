@@ -59,6 +59,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     deleteShow = true,
     searchShow = true,
     operateShow = true,
+    paginationShow = true,
     keywordSearchShow = true,
     titleRender,
     toolBarRender = [],
@@ -436,6 +437,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     }
   }
 
+  /** 分页配置 */
+  const paginationProps: TableProps['pagination'] = {
+    showQuickJumper: true,
+    showSizeChanger: true,
+    showTotal: (total) => t('xinTableV2.total', { total }),
+    pageSize: requestParams.pageSize,
+    ...customPagination,
+    current: requestParams.page,
+    total,
+  }
+
   return (
     <div>
       {/* 搜索表单 */}
@@ -532,15 +544,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
           columns={tableColumns}
           rowKey={rowKey}
           onChange={handleTableChange}
-          pagination={{
-            showQuickJumper: true,
-            showSizeChanger: true,
-            showTotal: (total) => t('xinTableV2.total', { total }),
-            ...customPagination,
-            pageSize: requestParams.pageSize,
-            current: requestParams.page,
-            total,
-          }}
+          pagination={paginationShow ? paginationProps : false}
         />
       </Card>
 
