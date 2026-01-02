@@ -76,6 +76,8 @@ export interface XinTableV2Props<T = any> extends Omit<TableProps<T>, 'columns' 
   editShow?: boolean | ((record: T) => boolean);
   /** 删除按钮显示 */
   deleteShow?: boolean | ((record: T) => boolean);
+  /** 搜索栏显示 */
+  searchShow?: boolean;
   /** 表格操作列显示 */
   operateShow?: boolean;
   /** 快速搜索显示 */

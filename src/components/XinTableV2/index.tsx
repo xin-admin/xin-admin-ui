@@ -57,6 +57,7 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
     addShow = true,
     editShow = true,
     deleteShow = true,
+    searchShow = true,
     operateShow = true,
     keywordSearchShow = true,
     titleRender,
@@ -202,8 +203,9 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   /** 搜索列 */
   const searchColumn: FormColumn<T>[] = useMemo(() => {
+    if(!searchShow) return [];
     return columns.filter((column) => column.hideInSearch !== true);
-  }, [columns]);
+  }, [columns, searchShow]);
 
   /** 表单列 */
   const formColumn: FormColumn<T>[] = useMemo(() => {
@@ -436,15 +438,17 @@ export default function XinTableV2<T extends Record<string, any> = any>(props: X
 
   return (
     <div>
-      <Card style={{marginBottom: 20}} {...cardProps}>
-        {/* 搜索表单 */}
-        <SearchForm<T>
-          form={searchRef}
-          columns={searchColumn}
-          handleSearch={handleSearch}
-          {...searchProps}
-        />
-      </Card>
+      {/* 搜索表单 */}
+      { searchShow && (
+        <Card style={{marginBottom: 20}} {...cardProps}>
+          <SearchForm<T>
+            form={searchRef}
+            columns={searchColumn}
+            handleSearch={handleSearch}
+            {...searchProps}
+          />
+        </Card>
+      )}
       <Card {...cardProps}>
         <div style={{ marginBottom: 20 }}>
           {/* 操作栏 */}
