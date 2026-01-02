@@ -403,15 +403,10 @@ const Dept = () => {
             submitter={{
               render: (dom) => (
                 <AuthButton auth={"sys-user.dept.update"}>
-                  <Button
-                    children={t("sysUserDept.saveInfo")}
-                    loading={loading}
-                    htmlType={'submit'}
-                    type={'primary'}
-                    onClick={() => formRef.current?.submit()}
-                  />
+                  {dom['submit']}
                 </AuthButton>
-              )
+              ),
+              submitText: t("sysUserDept.saveInfo")
             }}
           />
           <AuthButton auth={"sys-user.dept.users"}>
