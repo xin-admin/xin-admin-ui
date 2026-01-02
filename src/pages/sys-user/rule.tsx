@@ -3,14 +3,16 @@ import {listRule, ruleParent, showRule, statusRule} from "@/api/sys/sysUserRule"
 import {useTranslation} from "react-i18next";
 import IconFont from "@/components/IconFont";
 import XinTableV2 from "@/components/XinTableV2";
-import type {XinTableColumn} from "@/components/XinTableV2/typings";
-import {Button, message, Switch, Tag, Tooltip} from "antd";
+import type {XinTableColumn, XinTableV2Ref} from "@/components/XinTableV2/typings";
+import {Button, message, Switch, Tag, Tooltip, Typography} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import useAuth from "@/hooks/useAuth";
 import AuthButton from "@/components/AuthButton";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+
+const { Title } = Typography;
 
 dayjs.extend(relativeTime);
 
@@ -24,6 +26,7 @@ const Rule =  () => {
   const {t} = useTranslation();
   const {auth} = useAuth();
   const [parentOptions, setParentOptions] = useState<RuleParent[]>([]);
+  const tableRef = useRef<XinTableV2Ref>(undefined);
 
   // 加载父级选项
   useEffect(() => {
@@ -51,7 +54,7 @@ const Rule =  () => {
       valueType: 'radioButton',
       hideInTable: true,
       hideInSearch: true,
-      colProps: { span: 9 },
+      colProps: { span: 24 },
       rules: [{ required: true, message: t("sysUserRule.type.required") }],
       fieldProps: {
         options: [
@@ -69,7 +72,6 @@ const Rule =  () => {
       hideInSearch: true,
       valueType: 'treeSelect',
       rules: [{ required: true, message: t("sysUserRule.parent.required") }],
-      colProps: { span: 9 },
       fieldProps: {
         treeData: parentOptions,
         fieldNames: { label: 'name', value: 'id' },
@@ -82,7 +84,6 @@ const Rule =  () => {
       hideInSearch: true,
       dataIndex: 'order',
       valueType: 'digit',
-      colProps: { span: 6 },
       rules: [{ required: true, message: t("sysUserRule.order.required") }],
     },
     {
@@ -153,7 +154,7 @@ const Rule =  () => {
       title: t("sysUserRule.icon"),
       dataIndex: 'icon',
       align: 'center',
-      width: 60,
+      width: 120,
       hideInForm: true,
       hideInSearch: true,
       render: (data: string) => data ? <IconFont name={data} /> : '-'
@@ -179,7 +180,7 @@ const Rule =  () => {
       )
     },
     {
-      width: 60,
+      width: 120,
       title: t("sysUserRule.order"),
       align: 'center',
       dataIndex: 'order',
@@ -270,9 +271,14 @@ const Rule =  () => {
           total: data.data?.length || 0
         };
       }}
-      titleRender={<span>{t("sysUserRule.title")}</span>}
+      tableRef={tableRef}
+      searchShow={false}
+      titleRender={<Title level={5}>{t("sysUserRule.title")}</Title>}
       searchProps={false}
-      scroll={{x: 1400}}
+      paginationShow={false}
+      scroll={{x: 1800}}
+      bordered={true}
+      size={'small'}
       beforeOperateRender={(data) => (
         <AuthButton auth={"sys-user.rule.create"}>
           <Tooltip title={t("sysUserRule.addChildButton")}>
@@ -282,22 +288,27 @@ const Rule =  () => {
               icon={<PlusOutlined />}
               size={'small'}
               onClick={() => {
-                // TODO: 实现新增子级功能
-                message.info(t("sysUserRule.addChildButton") + `: ${data.name}`);
+                tableRef.current?.form?.()?.setFieldsValue({
+                  parent_id: data.id || 0,
+                })
+                tableRef.current?.form?.()?.open();
               }}
             />
           </Tooltip>
         </AuthButton>
       )}
+      operateProps={{
+        fixed: 'right',
+      }}
       formProps={{
         grid: true,
-        colProps: {span: 12}
+        rowProps: {gutter: [20, 0]},
+        colProps: {span: 6}
       }}
       columns={columns}
       api={'/sys-user/rule'}
       rowKey={"id"}
       accessName={"sys-user.rule"}
-      pagination={{}}
     />
   )
 }
