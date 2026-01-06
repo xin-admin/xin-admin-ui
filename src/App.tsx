@@ -4,10 +4,14 @@ import { useAuthStore, useGlobalStore } from "@/stores";
 import AuthRoute from "@/components/AuthRoute"
 import PageTitle from "@/components/PageTitle";
 import AntdProvider from "@/components/AntdProvider";
-
 import {useEffect, useRef} from "react";
 import { useMobile } from "@/hooks/useMobile";
 import Loading from "@/components/Loading";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const App = () => {
   const menus = useAuthStore(state => state.menus);
