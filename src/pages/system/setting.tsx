@@ -203,7 +203,7 @@ const SettingManagement: React.FC = () => {
         await updateSettingItem(editingItem.id!, { ...values, group_id: selectedGroupId });
         message.success(t('setting.item.updateSuccess'));
       } else {
-        await createSettingItem(values);
+        await createSettingItem({ ...values, group_id: selectedGroupId });
         message.success(t('setting.item.createSuccess'));
       }
       itemFormRef.current?.close();
