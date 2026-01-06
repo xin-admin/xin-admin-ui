@@ -35,6 +35,7 @@ export default {
   // 操作プロンプト
   'dict.searchPlaceholder': '辞書ID、辞書名、辞書コードで検索',
   'dict.refreshCache': '辞書キャッシュを更新',
+  'dict.refreshSuccess': '辞書キャッシュが正常に更新されました',
   'dict.selectWarning': '辞書を選択してください！',
   'dict.editSuccess': '編集成功',
   'dict.addSuccess': '追加成功',

@@ -32,9 +32,10 @@ export default {
   'dictItem.createTime': 'Créé le',
   'dictItem.updateTime': 'Mis à jour le',
   
-  // Messages d\'opération
+  // Messages d'opération
   'dict.searchPlaceholder': 'Rechercher par ID, nom ou code de dictionnaire',
   'dict.refreshCache': 'Actualiser le cache du dictionnaire',
+  'dict.refreshSuccess': 'Le cache du dictionnaire a été actualisé avec succès',
   'dict.selectWarning': 'Veuillez sélectionner un dictionnaire!',
   'dict.editSuccess': 'Modification réussie',
   'dict.addSuccess': 'Ajout réussi',

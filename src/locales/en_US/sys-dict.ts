@@ -35,6 +35,7 @@ export default {
   // Operation prompts
   'dict.searchPlaceholder': 'Search by dictionary ID, name, or code',
   'dict.refreshCache': 'Refresh Dictionary Cache',
+  'dict.refreshSuccess': 'Dictionary cache refreshed successfully',
   'dict.selectWarning': 'Please select a dictionary!',
   'dict.editSuccess': 'Edit successful',
   'dict.addSuccess': 'Add successful',

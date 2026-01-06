@@ -28,6 +28,8 @@ export default {
   'dictItem.status.processing': 'processing',
   'dictItem.status.warning': 'warning',
   'dictItem.switch': '状态',
+  'dictItem.switch.on': '开启',
+  'dictItem.switch.off': '关闭',
   'dictItem.switch.required': '状态不能为空',
   'dictItem.createTime': '创建时间',
   'dictItem.updateTime': '修改时间',
@@ -35,6 +37,7 @@ export default {
   // 操作提示
   'dict.searchPlaceholder': '请输入字典ID、字典名、字典编码搜索',
   'dict.refreshCache': '刷新字典缓存',
+  'dict.refreshSuccess': '字典缓存刷新成功',
   'dict.selectWarning': '请选择字典！',
   'dict.editSuccess': '编辑成功',
   'dict.addSuccess': '添加成功',
