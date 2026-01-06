@@ -1,17 +1,11 @@
-import { type MenuProps, type ConfigProviderProps } from 'antd';
-import { useTranslation } from 'react-i18next';
-import { useMemo } from 'react';
+import {type ConfigProviderProps, type MenuProps} from 'antd';
+import {useTranslation} from 'react-i18next';
+import {useMemo} from 'react';
 import en_US from 'antd/es/locale/en_US';
-import ja_JP from 'antd/es/locale/ja_JP';
 import zh_CN from 'antd/es/locale/zh_CN';
-import fr_FR from 'antd/es/locale/fr_FR';
-import ru_RU from 'antd/es/locale/ru_RU';
 import dayjs from 'dayjs';
 import 'dayjs/locale/en';
-import 'dayjs/locale/ja';
 import 'dayjs/locale/zh-cn';
-import 'dayjs/locale/fr';
-import 'dayjs/locale/ru';
 
 type Locale = ConfigProviderProps['locale'];
 
@@ -21,9 +15,6 @@ type Locale = ConfigProviderProps['locale'];
 export const LANGUAGE_OPTIONS = [
   { label: '简体中文', value: 'zh', antdLocale: zh_CN, dayjsLocale: 'zh-cn' },
   { label: 'English', value: 'en', antdLocale: en_US, dayjsLocale: 'en' },
-  { label: '日本語です', value: 'jp', antdLocale: ja_JP, dayjsLocale: 'ja' },
-  { label: 'Français', value: 'fr', antdLocale: fr_FR, dayjsLocale: 'fr' },
-  { label: 'Русский', value: 'ru', antdLocale: ru_RU, dayjsLocale: 'ru' },
 ] as const;
 
 /**
@@ -78,12 +69,10 @@ export const useLanguage = () => {
  */
 export const useAntdLocale = (): Locale => {
   const { i18n } = useTranslation();
-  
-  const locale = useMemo(() => {
+
+  return useMemo(() => {
     const currentLang = i18n.language;
     const config = LANGUAGE_OPTIONS.find(opt => opt.value === currentLang);
     return config ? config.antdLocale : LANGUAGE_OPTIONS[0].antdLocale;
   }, [i18n.language]);
-
-  return locale;
 };
