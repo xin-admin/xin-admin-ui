@@ -587,68 +587,6 @@ const defaultRoute: IMenus[] = [
         hidden: 1,
         link: 0
       },
-      {
-        type: "menu",
-        key: "system.watcher",
-        name: "监控中心",
-        path: "",
-        icon: "",
-        elementPath: "",
-        order: 5,
-        local: "menu.system.watcher",
-        hidden: 1,
-        link: 0,
-        children: [
-          {
-            type: "route",
-            key: "system.watcher.request",
-            name: "请求记录",
-            path: "/system/watcher/request",
-            icon: "",
-            elementPath: "/system/watcher/request",
-            order: 0,
-            local: "menu.system.watcher.request",
-            hidden: 1,
-            link: 0
-          },
-          {
-            type: "route",
-            key: "system.watcher.query",
-            name: "SQL记录",
-            path: "/system/watcher/query",
-            icon: "",
-            elementPath: "/system/watcher/query",
-            order: 2,
-            local: "menu.system.watcher.query",
-            hidden: 1,
-            link: 0
-          },
-          {
-            type: "route",
-            key: "system.watcher.cache",
-            name: "缓存记录",
-            path: "/system/watcher/cache",
-            icon: "",
-            elementPath: "/system/watcher/cache",
-            order: 3,
-            local: "menu.system.watcher.cache",
-            hidden: 1,
-            link: 0
-          },
-          {
-            type: "route",
-            key: "system.watcher.redis",
-            name: "Redis记录",
-            path: "/system/watcher/redis",
-            icon: "",
-            elementPath: "/system/watcher/redis",
-            order: 4,
-            local: "menu.system.watcher.redis",
-            hidden: 1,
-            link: 0
-          }
-        ]
-      }
     ]
   },
   {
