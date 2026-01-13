@@ -36,43 +36,6 @@ export const darkColorTheme: ThemeProps = {
   algorithm: "darkAlgorithm",
 }
 
-// 粉色主题
-export const pinkColorTheme: ThemeProps = {
-  themeScheme: "pink",
-  background: "url(/theme/pink.webp)",
-  colorPrimary: "#ED4192",
-  borderRadius: 20,
-  colorText: "#000",
-  colorBg: "#ffdceb",
-  bodyBg: "transparent",
-  footerBg: "transparent",
-  headerBg: "rgba(255, 255, 255, 0.29)",
-  headerColor: "#000",
-  siderBg: "rgba(255, 255, 255, 0.29)",
-  siderColor: "#000",
-  colorBorder: "#ffa8d1",
-  layoutBorder: false,
-  algorithm: "defaultAlgorithm",
-}
-
-// 知识协作
-export const greenColorTheme: ThemeProps = {
-  themeScheme: "green",
-  colorPrimary: "#00B96B",
-  background: "url(/theme/green.webp)",
-  borderRadius: 8,
-  colorText: "#000",
-  colorBg: "#c3ffef",
-  bodyBg: "transparent",
-  footerBg: "transparent",
-  headerBg: "rgba(255, 255, 255, 0.29)",
-  headerColor: "#000",
-  siderBg: "rgba(255, 255, 255, 0.29)",
-  siderColor: "#000",
-  colorBorder: "#f0f0f0",
-  algorithm: "defaultAlgorithm",
-}
-
 export const configTheme: ThemeProps = {
   // 主题
   themeScheme: "light",

@@ -2,7 +2,7 @@ import React from 'react';
 import {debounce} from 'lodash';
 import {Button, Col, ColorPicker, Divider, Drawer, InputNumber, Row, Select, Switch, theme, Tooltip} from 'antd';
 import { useGlobalStore, useAuthStore } from "@/stores";
-import {configTheme, darkColorTheme, defaultColorTheme, greenColorTheme, pinkColorTheme} from "@/layout/theme.ts";
+import {configTheme, darkColorTheme, defaultColorTheme} from "@/layout/theme.ts";
 import {algorithmOptions} from "@/layout/algorithm.ts";
 
 import {useTranslation} from 'react-i18next';
@@ -44,8 +44,6 @@ const STYLE_CONFIGS = [
 const THEME_LIST = [
   {background: '/theme/default.svg', name: 'light', title: 'layout.themeLight'},
   {background: '/theme/dark.svg', name: 'dark', title: 'layout.themeDark'},
-  {background: '/theme/pink.svg', name: 'pink', title: 'layout.themePink'},
-  {background: '/theme/green.svg', name: 'green', title: 'layout.themeGreen'},
 ];
 
 // 布局配置
@@ -134,9 +132,7 @@ const SettingDrawer: React.FC = () => {
     const themeName = (target as HTMLElement).dataset.theme;
     const themeMap = {
       dark: darkColorTheme,
-      light: defaultColorTheme,
-      pink: pinkColorTheme,
-      green: greenColorTheme,
+      light: defaultColorTheme
     };
 
     if (themeMap[themeName as keyof typeof themeMap]) {
