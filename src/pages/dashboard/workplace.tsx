@@ -14,7 +14,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore } from "@/stores";
+import useAuthStore from "@/stores/user";
 import type {ReactNode} from "react";
 const { Meta } = Card;
 const { Text, Title } = Typography;
@@ -31,7 +31,7 @@ interface AppType {
 const PersonalCenter = () => {
   const { t } = useTranslation();
   // 用户信息数据
-  const userInfo = useAuthStore(state => state.user);
+  const userInfo = useAuthStore(state => state.userinfo);
   if (! userInfo ) return <></>;
 
   // 标签页列表数据

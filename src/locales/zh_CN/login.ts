@@ -8,6 +8,6 @@ export default {
   "login.remember": "保持登录",
   "login.forgotPassword": "忘记密码",
   "login.otherLogin": "其他登录方式",
-  "login.success": "登录成功！",
+  "login.success": "登录成功，即将跳转到首页！",
   "login.alreadyLoggedIn": "已登录，路由重定向！",
 }

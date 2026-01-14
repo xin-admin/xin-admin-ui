@@ -2,7 +2,7 @@ import {useLocation, useOutlet} from "react-router";
 import {useMemo, useRef} from "react";
 import {SwitchTransition, CSSTransition} from "react-transition-group";
 import './transition.css';
-import { useAuthStore } from "@/stores";
+import useMenuStore from "@/stores/menu";
 
 /**
  * 带动画的 Outlet 组件
@@ -12,7 +12,7 @@ export default function AnimatedOutlet() {
   const location = useLocation();
   const currentOutlet = useOutlet();
   const nodeRef = useRef<HTMLDivElement>(null);
-  const menuMap = useAuthStore(state => state.menuMap);
+  const menuMap = useMenuStore(state => state.menuMap);
 
   // 查找所有 menuMap 中 type 为 嵌套路由的 pathname
   const nestedRoutes = useMemo(() => {

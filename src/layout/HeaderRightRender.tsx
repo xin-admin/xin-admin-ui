@@ -12,7 +12,9 @@ import {
   UserOutlined,
   VerticalLeftOutlined
 } from "@ant-design/icons";
-import { useGlobalStore, useAuthStore } from "@/stores";
+import { useGlobalStore } from "@/stores";
+import useAuthStore from "@/stores/user";
+import useMenuStore from "@/stores/menu";
 import {useTranslation} from "react-i18next";
 
 import {useNavigate} from "react-router";
@@ -28,10 +30,10 @@ const HeaderLeftRender = () => {
   const navigate = useNavigate()
   const themeDrawer = useGlobalStore(state => state.themeDrawer);
   const setThemeDrawer = useGlobalStore(state => state.setThemeDrawer);
-  const userInfo = useAuthStore(state => state.user);
+  const userInfo = useAuthStore(state => state.userinfo);
   const logout = useAuthStore(state => state.logout);
-  const menuMap = useAuthStore(state => state.menuMap);
-  const breadcrumbMap = useAuthStore(state => state.breadcrumbMap);
+  const menuMap = useMenuStore(state => state.menuMap);
+  const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
   const setBreadcrumb = useGlobalStore(state => state.setBreadcrumb);
   const isMobile = useGlobalStore(state => state.isMobile);
   const { setPageTitle } = usePageTitle();

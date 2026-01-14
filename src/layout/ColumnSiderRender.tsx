@@ -1,5 +1,6 @@
 import {ConfigProvider, Layout, theme} from "antd";
-import { useGlobalStore, useAuthStore } from "@/stores";
+import { useGlobalStore } from "@/stores";
+import useMenuStore from "@/stores/menu";
 import React from "react";
 
 import IconFont from "@/components/IconFont";
@@ -19,7 +20,7 @@ const ColumnSiderRender: React.FC = () => {
   const title = useGlobalStore(state => state.title);
   const menuParentKey = useGlobalStore(state => state.menuParentKey);
   const setMenuParentKey = useGlobalStore(state => state.setMenuParentKey);
-  const menus = useAuthStore(state => state.menus);
+  const menus = useMenuStore(state => state.menus);
   const {token} = useToken();
 
   const menuClick = (rule: ISysRule) => {

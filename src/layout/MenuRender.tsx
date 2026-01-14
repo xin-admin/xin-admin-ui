@@ -4,7 +4,8 @@ import {useTranslation} from "react-i18next";
 
 import {Menu, type MenuProps} from "antd";
 import {useCallback, useMemo} from "react";
-import { useGlobalStore, useAuthStore } from "@/stores";
+import { useGlobalStore } from "@/stores";
+import useMenuStore from "@/stores/menu";
 import {useNavigate} from "react-router";
 import {usePageTitle} from "@/hooks/usePageTitle";
 type MenuItem = Required<MenuProps>['items'][number];
@@ -34,9 +35,9 @@ const transformMenus = (nodes: IMenus[], t: any): MenuItem[] => {
 
 const MenuRender = () => {
   const {t} = useTranslation();
-  const menus = useAuthStore(state => state.menus);
-  const menuMap = useAuthStore(state => state.menuMap);
-  const breadcrumbMap = useAuthStore(state => state.breadcrumbMap);
+  const menus = useMenuStore(state => state.menus);
+  const menuMap = useMenuStore(state => state.menuMap);
+  const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
   const layout = useGlobalStore(state => state.layout);
   const menuParentKey = useGlobalStore(state => state.menuParentKey);
   const setBreadcrumb = useGlobalStore(state => state.setBreadcrumb);

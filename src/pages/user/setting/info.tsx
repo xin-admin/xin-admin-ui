@@ -1,13 +1,13 @@
 import {UploadOutlined} from '@ant-design/icons';
 import {Avatar, Button, Form, Input, message, Radio, Upload, type UploadProps, type FormProps} from 'antd';
-import { useAuthStore } from "@/stores";
+import useAuthStore from "@/stores/user";
 import {type InfoParams, updateInfo} from "@/api/sys/sysUser";
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 
 const Info = () => {
-  const userInfo = useAuthStore(state => state.user);
-  const getInfo = useAuthStore(state => state.getInfo);
+  const userInfo = useAuthStore(state => state.userinfo);
+  const getInfo = useAuthStore(state => state.info);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState<boolean>(false);
   const {t} = useTranslation();

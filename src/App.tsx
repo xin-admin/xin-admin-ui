@@ -1,62 +1,54 @@
 import createRouter from "@/router";
-import {RouterProvider, type  RouterProviderProps} from "react-router";
-import { useAuthStore, useGlobalStore } from "@/stores";
-import AuthRoute from "@/components/AuthRoute"
+import {RouterProvider, type RouterProviderProps} from "react-router";
+import {useGlobalStore} from "@/stores";
 import PageTitle from "@/components/PageTitle";
 import AntdProvider from "@/components/AntdProvider";
-import {useEffect, useRef} from "react";
+import {useEffect, useState} from "react";
 import { useMobile } from "@/hooks/useMobile";
 import Loading from "@/components/Loading";
-
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-
-dayjs.extend(relativeTime);
+import useMenuStore from "@/stores/menu";
+import useAuthStore from "@/stores/user";
+// import defaultRoute from "@/router/default";
 
 const App = () => {
-  const menus = useAuthStore(state => state.menus);
-  const initialized = useAuthStore(state => state.initialized);
-  const initApp = useAuthStore(state => state.initApp);
+  const menus = useMenuStore(state => state.menus);
+  const fetchUser = useAuthStore(state => state.info);
+  const fetchMenu = useMenuStore(state => state.menu);
   const initWebInfo = useGlobalStore(state => state.initWebInfo);
   const setIsMobile = useGlobalStore(state => state.setIsMobile);
   
   // 移动端检测
   const mobileDetected = useMobile();
-  
-  // 使用 useRef 缓存路由
-  const routerRef = useRef<RouterProviderProps['router'] | null>(null);
-  
-  // 初始化
+  // 路由
+  const [routes, setRoutes] = useState<RouterProviderProps['router']>();
+
+  useEffect(() => { initWebInfo() }, []);
+
   useEffect(() => {
-    Promise.all([
-      initApp(),
-      initWebInfo()
-    ]).then();
-  }, [initApp, initWebInfo]);
+    if(localStorage.getItem('token')) {
+      // 初始化用户信息
+      Promise.all([ fetchUser(), fetchMenu()]).then(() => {
+        // 开发环境可使用本地路由
+        // setRoutes(createRouter(defaultRoute));
+        setRoutes(createRouter(menus));
+      });
+    } else if (window.location.pathname !== '/login') {
+      // 未登录跳转到登录页
+      window.location.href =  '/login';
+    }
+  }, [fetchUser, fetchMenu]);
   
   // 移动端状态同步
   useEffect(() => { setIsMobile(mobileDetected) }, [mobileDetected, setIsMobile]);
-  
-  // 初始化完成后创建路由器
-  if (initialized && !routerRef.current) {
-    routerRef.current = createRouter(menus);
-  }
-  
-  // 未初始化完成时显示 Loading
-  if (!initialized || !routerRef.current) {
-    return (
-      <AntdProvider>
-        <Loading />
-      </AntdProvider>
-    );
-  }
 
   return (
     <AntdProvider>
       <PageTitle>
-        <AuthRoute>
-          <RouterProvider router={routerRef.current} />
-        </AuthRoute>
+        { routes ? (
+          <RouterProvider router={routes} />
+        ) : (
+          <Loading />
+        )}
       </PageTitle>
     </AntdProvider>
   );

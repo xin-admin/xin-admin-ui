@@ -8,10 +8,11 @@ import {
   WeiboOutlined,
   BulbOutlined,
 } from '@ant-design/icons';
-import { Col, Divider, message, Row, Space, Button, Form, Input, Checkbox, Typography } from 'antd';
+import { Col, Divider, Row, Space, Button, Form, Input, Checkbox, Typography } from 'antd';
 import {type CSSProperties, useEffect, useState} from 'react';
 import React from 'react';
-import { useAuthStore, useGlobalStore } from '@/stores';
+import { useGlobalStore } from '@/stores';
+import useAuthStore from '@/stores/user';
 import {useNavigate} from "react-router";
 import type { LoginParams } from '@/api/sys/sysUser';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +79,8 @@ const getIconDivStyle = (isDark: boolean): CSSProperties => ({
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, user } = useAuthStore();
+  const login = useAuthStore(state => state.login);
+  const user = useAuthStore(state => state.userinfo);
   const { t } = useTranslation();
   const themeConfig = useGlobalStore(state => state.themeConfig);
   const setThemeConfig = useGlobalStore(state => state.setThemeConfig);
@@ -99,15 +101,17 @@ const Login: React.FC = () => {
     }
   }, [user, navigate, t, subtitle, setPageTitle]);
 
-  const handleSubmit = async (values: LoginParams) => {
-    try {
-      setLoading(true);
-      await login(values);
-      message.success(t('login.success'));
-      window.location.href = '/';
-    } finally {
+  const handleSubmit = (values: LoginParams) => {
+    setLoading(true);
+    login(values).then(() => {
+      window.$message?.success(t('login.success'));
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    }).catch((err) => {
+      console.log(err);
       setLoading(false);
-    }
+    })
   };
   
   // 暗黑模式切换

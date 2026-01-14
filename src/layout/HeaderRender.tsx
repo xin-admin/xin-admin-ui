@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Button, ConfigProvider, Layout, Menu, type MenuProps, type ThemeConfig} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
-import { useGlobalStore, useAuthStore } from "@/stores";
+import { useGlobalStore } from "@/stores";
+import useMenuStore from "@/stores/menu";
 import HeaderLeftRender from "@/layout/HeaderLeftRender";
 import HeaderRightRender from "@/layout/HeaderRightRender";
 
@@ -16,7 +17,7 @@ const {Header} = Layout;
 const HeaderRender: React.FC = () => {
   const {t} = useTranslation();
   const navigate = useNavigate();
-  const menus = useAuthStore(state => state.menus);
+  const menus = useMenuStore(state => state.menus);
   const layout = useGlobalStore(state => state.layout);
   const themeConfig = useGlobalStore(state => state.themeConfig);
   const collapsed = useGlobalStore(state => state.collapsed);

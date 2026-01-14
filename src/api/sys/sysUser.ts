@@ -14,14 +14,7 @@ export interface LoginParams {
 
 export interface LoginResponse {
   /** token */
-  plainTextToken: string;
-  accessToken?: {
-    created_at: string;
-    expires_at: string | null;
-    id: number;
-    name: string;
-    abilities: string[];
-  }
+  token: string;
 }
 
 export interface InfoResponse {
@@ -29,6 +22,9 @@ export interface InfoResponse {
   info: ISysUser;
   /** 管理员权限 */
   access: string[];
+}
+
+export interface MenuResponse {
   /** 管理员菜单 */
   menus: IMenus[];
 }
@@ -76,6 +72,14 @@ export async function logout() {
 export async function info() {
   return createAxios<InfoResponse>({
     url: '/admin/info',
+    method: 'get',
+  });
+}
+
+/** 获取管理员用户信息 */
+export async function menu() {
+  return createAxios<MenuResponse>({
+    url: '/admin/menu',
     method: 'get',
   });
 }

@@ -1,10 +1,11 @@
 import {Alert, Card, Space, Tag, Radio} from "antd";
-import { useAuthStore } from "@/stores";
+import useAuthStore from "@/stores/user";
+import useMenuStore from "@/stores/menu";
 import defaultRoute from "@/router/default.ts";
 
 const PageAuth = () => {
   const access = useAuthStore(state => state.access)
-  const setRules = useAuthStore(state => state.setMenus)
+  const setRules = useMenuStore(state => state.setMenus)
 
   return (
     <Card variant={"borderless"} title={'路由权限'}>

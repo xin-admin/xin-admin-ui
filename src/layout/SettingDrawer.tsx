@@ -1,7 +1,7 @@
 import React from 'react';
 import {debounce} from 'lodash';
 import {Button, Col, ColorPicker, Divider, Drawer, InputNumber, Row, Select, Switch, theme, Tooltip} from 'antd';
-import { useGlobalStore, useAuthStore } from "@/stores";
+import { useGlobalStore } from "@/stores";
 import {configTheme, darkColorTheme, defaultColorTheme} from "@/layout/theme.ts";
 import {algorithmOptions} from "@/layout/algorithm.ts";
 
@@ -98,9 +98,6 @@ const SettingDrawer: React.FC = () => {
   const themeConfig = useGlobalStore(state => state.themeConfig);
   const layout = useGlobalStore(state => state.layout);
   const setLayout = useGlobalStore(state => state.setLayout);
-  const localRoute = useAuthStore(state => state.localRoute);
-  const setLocalRoute = useAuthStore(state => state.setLocalRoute);
-  const getUserInfo = useAuthStore(state => state.getInfo);
   
   // 主题过渡动画 Hook
   const { transitionTheme, transitionThemeWithCircle, isTransitioning } = useThemeTransition();
@@ -117,12 +114,6 @@ const SettingDrawer: React.FC = () => {
       setThemeConfig({...themeConfig, [key]: value});
     });
   }, 300, {leading: true, trailing: false});
-
-  // 切换路由
-  const changeLocaleRoute = async (value: boolean) => {
-    await setLocalRoute(value)
-    await getUserInfo()
-  }
 
   // 处理主题切换（带圆形扩散动画）
   const handleThemeChange = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -255,16 +246,6 @@ const SettingDrawer: React.FC = () => {
           )}
         </div>
       ))}
-
-      {/* 系统配置 */}
-      <Divider>{t('layout.systemConfig')}</Divider>
-      <div className="flex justify-between items-center mb-2.5">
-        <div>{t('layout.localRoute')}</div>
-        <Switch
-          value={localRoute}
-          onChange={changeLocaleRoute}
-        />
-      </div>
     </Drawer>
   );
 };

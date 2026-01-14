@@ -4,7 +4,6 @@
 
 // ============== Stores ==============
 export { useGlobalStore } from './global';
-export { useAuthStore } from './auth';
 
 // ============== Selectors ==============
 export * from './selectors';

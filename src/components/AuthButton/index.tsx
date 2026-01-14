@@ -1,5 +1,5 @@
 import { type ReactNode, useMemo } from 'react';
-import { useAuthStore } from "@/stores";
+import useAuthStore from "@/stores/user";
 
 interface AuthButtonProps {
   auth?: string;
