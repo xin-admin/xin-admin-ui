@@ -32,9 +32,12 @@ const App = () => {
         // setRoutes(createRouter(defaultRoute));
         setRoutes(createRouter(menus));
       });
-    } else if (window.location.pathname !== '/login') {
-      // 未登录跳转到登录页
-      window.location.href =  '/login';
+    } else {
+      setRoutes(createRouter([]));
+      if (window.location.pathname !== '/login') {
+        // 未登录跳转到登录页
+        setTimeout(() => window.location.href =  '/login', 1000)
+      }
     }
   }, [fetchUser, fetchMenu]);
   
