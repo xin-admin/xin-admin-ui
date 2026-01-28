@@ -7,7 +7,6 @@ import {useCallback, useMemo} from "react";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
 import {useNavigate} from "react-router";
-import {usePageTitle} from "@/hooks/usePageTitle";
 type MenuItem = Required<MenuProps>['items'][number];
 
 // 菜单项转换
@@ -20,7 +19,7 @@ const transformMenus = (nodes: IMenus[], t: any): MenuItem[] => {
     const menuItem: MenuItem = {
       label: node.local ? t(node.local) : node.name,
       icon: node.icon ? <IconFont name={node.icon}/> : undefined,
-      key: node.key!,
+      key: node.path || node.key!,
     };
 
     // 仅当有子菜单时才递归处理
@@ -36,45 +35,49 @@ const transformMenus = (nodes: IMenus[], t: any): MenuItem[] => {
 const MenuRender = () => {
   const {t} = useTranslation();
   const menus = useMenuStore(state => state.menus);
-  const menuMap = useMenuStore(state => state.menuMap);
-  const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
   const layout = useGlobalStore(state => state.layout);
-  const menuParentKey = useGlobalStore(state => state.menuParentKey);
+  const selectKey = useMenuStore(state => state.selectKey);
+  const setSelectKey = useMenuStore(state => state.setSelectKey);
   const isMobile = useGlobalStore(state => state.isMobile);
   const navigate = useNavigate();
-  const { setPageTitle } = usePageTitle();
 
   // 使用 useMemo 缓存菜单数据源
   const menuSource = useMemo(() => {
     if (layout === 'mix' || layout === 'columns') {
-      const rule = menus.find(item => item.key === menuParentKey);
+      const rule = menus.find(item => item.key === selectKey[selectKey.length - 1]);
       return rule?.children || [];
     }
     return menus;
-  }, [menus, layout, menuParentKey]);
+  }, [menus, layout, selectKey]);
 
   // 使用 useMemo 缓存转换后的菜单项
   const menuItems = useMemo(() => {
     return transformMenus(menuSource, t);
   }, [menuSource, t]);
 
-  const menuClick: MenuProps['onClick'] = useCallback((info: any) => {
-    const menu = menuMap[info.key];
-    const headTitle = menu.local ? t(menu.local) : menu.name;
-    setPageTitle(headTitle || '');
-    if(! menu.path) return;
-    if (menu.link) {
-      window.open(menu.path, '_blank');
+  const onSelect: MenuProps['onSelect'] = useCallback((info: any) => {
+    if (info.key.includes('http://') || info.key.includes('https://')) {
+      window.open(info.key, '_blank');
     } else {
-      navigate(menu.path);
+      navigate(info.key);
     }
-  }, [menuMap, breadcrumbMap, t, navigate, setPageTitle])
+  }, [t, navigate]);
 
   return (
     <Menu
       mode={ layout === 'top' && !isMobile ? 'horizontal' : 'inline' }
       items={menuItems}
-      onClick={menuClick}
+      style={{ borderBottom: 'none' }}
+      defaultOpenKeys={selectKey}
+      defaultSelectedKeys={selectKey}
+      onClick={({keyPath}) => {
+        if (layout === 'mix' || layout === 'columns') {
+          setSelectKey([...keyPath, selectKey[selectKey.length - 1]])
+        } else {
+          setSelectKey(keyPath)
+        }
+      }}
+      onSelect={onSelect}
     />
   )
 }

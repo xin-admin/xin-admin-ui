@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Button, ConfigProvider, Layout, Menu, type MenuProps, type ThemeConfig} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
 import HeaderLeftRender from "@/layout/HeaderLeftRender";
 import HeaderRightRender from "@/layout/HeaderRightRender";
-
 import IconFont from "@/components/IconFont";
-import {useNavigate} from "react-router";
 import BreadcrumbRender from "@/layout/BreadcrumbRender.tsx";
 import {useTranslation} from "react-i18next";
 import MenuRender from "@/layout/MenuRender.tsx";
+import {useNavigate} from "react-router";
 
 const {Header} = Layout;
 
@@ -22,8 +21,9 @@ const HeaderRender: React.FC = () => {
   const themeConfig = useGlobalStore(state => state.themeConfig);
   const collapsed = useGlobalStore(state => state.collapsed);
   const setCollapsed = useGlobalStore(state => state.setCollapsed);
-  const menuParentKey = useGlobalStore(state => state.menuParentKey);
-  const setMenuParentKey = useGlobalStore(state => state.setMenuParentKey);
+  const setSelectKey = useMenuStore(state => state.setSelectKey);
+  const selectKey = useMenuStore(state => state.selectKey);
+  const routeMap = useMenuStore(state => state.routeMap);
   const isMobile = useGlobalStore(state => state.isMobile);
   const theme: ThemeConfig = {
     cssVar: true,
@@ -38,43 +38,24 @@ const HeaderRender: React.FC = () => {
   const [mixMenu, setMixMenu] = useState<MenuProps['items']>([]);
 
   useEffect(() => {
-    setMixMenu(menus.filter(item => item.hidden).map(item => {
-      if (item.type === "menu") {
-        return {
-          label: (
-            <a onClick={() => setMenuParentKey(item.key!)}>
-              {item.local ? t(item.local) : item.name}
-            </a>
-          ),
-          icon: item.icon ? <IconFont name={item.icon}/> : false,
-          key: item.key!,
-          path: item.path,
-        }
+    setMixMenu(menus.filter(item => item.hidden).map(item => ({
+      label: item.local ? t(item.local) : item.name,
+      icon: item.icon ? <IconFont name={item.icon}/> : false,
+      key: item.path || item.key!,
+    })));
+  }, [menus, t]);
+
+  const onSelect: MenuProps['onSelect'] = useCallback((info: any) => {
+    setSelectKey([info.key!])
+    if(routeMap[info.key]) {
+      if (info.key.includes('http://') || info.key.includes('https://')) {
+        window.open(info.key, '_blank');
+      } else {
+        navigate(info.key);
       }
-      if (item.link) {
-        return {
-          label: (
-            <a onClick={() => window.open(item.path, '_blank')}>
-              { item.local ? t(item.local) : item.name }
-            </a>
-          ),
-          icon: item.icon ? <IconFont name={item.icon}/> : false,
-          key: item.key!,
-          path: item.path,
-        }
-      }
-      return {
-        label: (
-          <a onClick={() => navigate(item.path!)}>
-            { item.local ? t(item.local) : item.name }
-          </a>
-        ),
-        icon: item.icon ? <IconFont name={item.icon}/> : false,
-        key: item.key!,
-        path: item.path,
-      };
-    }));
-  }, [menus, navigate, setMenuParentKey, t]);
+    }
+  }, [t, navigate]);
+
   
   return (
     <ConfigProvider theme={theme}>
@@ -118,7 +99,9 @@ const HeaderRender: React.FC = () => {
                 style={{ borderBottom: 'none' }}
                 mode="horizontal"
                 items={mixMenu}
-                selectedKeys={[menuParentKey!]}
+                onSelect={onSelect}
+                selectedKeys={selectKey}
+                onClick={({keyPath}) => setSelectKey(keyPath)}
               />
             )}
           </div>

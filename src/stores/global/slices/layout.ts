@@ -17,7 +17,6 @@ export const initialLayoutState: LayoutState = {
   collapsed: false,
   isMobile: false,
   mobileMenuOpen: false,
-  menuParentKey: null,
 };
 
 /**
@@ -40,9 +39,5 @@ export const createLayoutSlice: StateCreator<GlobalStore, [], [], LayoutSlice> =
   
   setMobileMenuOpen: (mobileMenuOpen: boolean) => {
     set({ mobileMenuOpen });
-  },
-  
-  setMenuParentKey: (menuParentKey: string) => {
-    set({ menuParentKey });
   },
 });

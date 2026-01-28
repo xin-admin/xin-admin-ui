@@ -1,15 +1,29 @@
 import type {IMenus} from "@/domain/iSysRule.ts";
 import type {BreadcrumbItem} from "@/stores";
 
+export type RouteMapType = Record<string, IMenus & {
+  breadcrumb: BreadcrumbItem[],
+  topMenuKey: string
+}>
+
+export interface BreadcrumbItem {
+  href?: string;
+  title?: string;
+  icon?: string;
+  local?: string;
+}
+
+
 export interface MenuStoreState {
   menus: IMenus[];
-  menuMap: Record<string, IMenus>;
-  breadcrumbMap: Record<string, BreadcrumbItem[]>;
+  selectKey: string[];
+  routeMap: RouteMapType;
 }
 
 export interface MenuStoreActions {
   menu: () => Promise<void>;
   setMenus: (menus: IMenus[]) => void;
+  setSelectKey: (selectKey: string[]) => void;
 }
 
 export type MenuStore = MenuStoreState & MenuStoreActions;

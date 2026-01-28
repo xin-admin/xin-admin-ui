@@ -17,7 +17,6 @@ export const initialSiteState: SiteState = {
   title: "Xin Admin",
   subtitle: "基于 Ant Design 的后台管理框架",
   describe: "Xin Admin 是一个基于 Ant Design 的后台管理框架",
-  documentTitle: "Xin Admin",
 };
 
 /**
@@ -35,9 +34,5 @@ export const createSiteSlice: StateCreator<GlobalStore, [], [], SiteSlice> = (se
     } catch (error) {
       console.error('获取网站信息失败:', error);
     }
-  },
-  
-  setDocumentTitle: (documentTitle: string) => {
-    set({ documentTitle });
   },
 });

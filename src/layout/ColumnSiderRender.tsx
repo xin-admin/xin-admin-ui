@@ -18,20 +18,19 @@ const ColumnSiderRender: React.FC = () => {
   const themeConfig = useGlobalStore(state => state.themeConfig);
   const logo = useGlobalStore(state => state.logo);
   const title = useGlobalStore(state => state.title);
-  const menuParentKey = useGlobalStore(state => state.menuParentKey);
-  const setMenuParentKey = useGlobalStore(state => state.setMenuParentKey);
+  const setSelectKey = useMenuStore(state => state.setSelectKey);
+  const selectKey = useMenuStore(state => state.selectKey);
   const menus = useMenuStore(state => state.menus);
   const {token} = useToken();
 
   const menuClick = (rule: ISysRule) => {
+    setSelectKey([rule.key!])
     if (rule.type === 'route') {
       if (rule.link) {
         window.open(rule.path, '_blank')
       } else {
         navigate(rule.path!)
       }
-    } else {
-      setMenuParentKey(rule.key!)
     }
   }
 
@@ -60,8 +59,8 @@ const ColumnSiderRender: React.FC = () => {
               <div
                 key={rule.key}
                 style={{
-                  backgroundColor: menuParentKey === rule.key ? token.colorPrimaryBg : 'transparent',
-                  color: menuParentKey === rule.key ? token.colorPrimary : themeConfig.siderColor,
+                  backgroundColor: selectKey[selectKey.length - 1] === rule.key ? token.colorPrimaryBg : 'transparent',
+                  color: selectKey[selectKey.length - 1] === rule.key ? token.colorPrimary : themeConfig.siderColor,
                 }}
                 className={"flex items-center justify-center flex-col p-2 mb-2 pt-3 pb-3 cursor-pointer"}
                 onClick={() => menuClick(rule)}

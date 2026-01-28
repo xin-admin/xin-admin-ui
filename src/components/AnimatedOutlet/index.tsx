@@ -12,14 +12,14 @@ export default function AnimatedOutlet() {
   const location = useLocation();
   const currentOutlet = useOutlet();
   const nodeRef = useRef<HTMLDivElement>(null);
-  const menuMap = useMenuStore(state => state.menuMap);
+  const routeMap = useMenuStore(state => state.routeMap);
 
   // 查找所有 menuMap 中 type 为 嵌套路由的 pathname
   const nestedRoutes = useMemo(() => {
-    return Object.values(menuMap)
-      .filter(menu => menu.type === 'nested-route')
-      .map(menu => menu.path);
-  }, [menuMap]);
+    return Object.values(routeMap)
+      .filter(route => route.type === 'nested-route')
+      .map(route => route.path);
+  }, [routeMap]);
 
   if (nestedRoutes.includes(location.pathname)) {
     return currentOutlet;

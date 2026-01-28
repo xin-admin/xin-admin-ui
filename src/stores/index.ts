@@ -10,9 +10,6 @@ export * from './selectors';
 
 // ============== Types ==============
 export type {
-  // 共享类型
-  BreadcrumbItem,
-  MenuIndexes,
   // Global Store 类型
   GlobalStore,
   GlobalState,
@@ -23,14 +20,4 @@ export type {
   LayoutAction,
   ThemeState,
   ThemeAction,
-  // Auth Store 类型
-  AuthStore,
-  AuthState,
-  AuthAction,
-  UserState,
-  UserAction,
-  MenuState,
-  MenuAction,
-  AuthenticationState,
-  AuthenticationAction,
 } from './types';

@@ -1,7 +1,6 @@
 import createRouter from "@/router";
 import {RouterProvider, type RouterProviderProps} from "react-router";
 import {useGlobalStore} from "@/stores";
-import PageTitle from "@/components/PageTitle";
 import AntdProvider from "@/components/AntdProvider";
 import {useEffect, useState} from "react";
 import { useMobile } from "@/hooks/useMobile";
@@ -46,13 +45,11 @@ const App = () => {
 
   return (
     <AntdProvider>
-      <PageTitle>
-        { routes ? (
+      { routes ? (
           <RouterProvider router={routes} />
-        ) : (
+      ) : (
           <Loading />
-        )}
-      </PageTitle>
+      )}
     </AntdProvider>
   );
 };

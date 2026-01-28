@@ -14,13 +14,11 @@ import {
 } from "@ant-design/icons";
 import { useGlobalStore } from "@/stores";
 import useAuthStore from "@/stores/user";
-import useMenuStore from "@/stores/menu";
 import {useTranslation} from "react-i18next";
 
 import {useNavigate} from "react-router";
 import {useState} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import {usePageTitle} from "@/hooks/usePageTitle";
 
 const {useToken} = theme;
 
@@ -32,9 +30,7 @@ const HeaderLeftRender = () => {
   const setThemeDrawer = useGlobalStore(state => state.setThemeDrawer);
   const userInfo = useAuthStore(state => state.userinfo);
   const logout = useAuthStore(state => state.logout);
-  const menuMap = useMenuStore(state => state.menuMap);
   const isMobile = useGlobalStore(state => state.isMobile);
-  const { setPageTitle } = usePageTitle();
 
   const [fullscreen, setFullscreen] = useState<boolean>(false);
   const [searchOpen, setSearch] = useState<boolean>(false);
@@ -60,12 +56,7 @@ const HeaderLeftRender = () => {
       key: '1',
       label: t('layout.userSetting'),
       icon: <UserOutlined/> ,
-      onClick: () => {
-        const menu = menuMap['user.setting'];
-        const headTitle = menu.local ? t(menu.local) : menu.name;
-        setPageTitle(headTitle || '');
-        navigate('/user/setting');
-      },
+      onClick: () => navigate('/user/setting')
     },
     {
       key: '2',

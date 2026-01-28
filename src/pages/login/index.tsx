@@ -16,10 +16,8 @@ import useAuthStore from '@/stores/user';
 import {useNavigate} from "react-router";
 import type { LoginParams } from '@/api/sys/sysUser';
 import { useTranslation } from 'react-i18next';
-
 import { darkColorTheme, defaultColorTheme } from '@/layout/theme';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { usePageTitle } from '@/hooks/usePageTitle';
 import {useThemeTransition} from '@/hooks/useThemeTransition';
 
 // 样式定义函数，支持暗黑模式
@@ -88,18 +86,16 @@ const Login: React.FC = () => {
   const title = useGlobalStore(state => state.title);
   const subtitle = useGlobalStore(state => state.subtitle);
   const [isDark, setIsDark] = useState(themeConfig.algorithm === 'darkAlgorithm');
-  const { setPageTitle } = usePageTitle();
   const [loading, setLoading] = useState(false);
   // 主题过渡动画 Hook
   const { transitionThemeWithCircle } = useThemeTransition();
 
   useEffect(() => {
-    setPageTitle(subtitle);
     if(localStorage.getItem('token') && user) {
       console.log(t('login.alreadyLoggedIn'));
       window.location.href = '/';
     }
-  }, [user, navigate, t, subtitle, setPageTitle]);
+  }, [user, navigate, t]);
 
   const handleSubmit = (values: LoginParams) => {
     setLoading(true);

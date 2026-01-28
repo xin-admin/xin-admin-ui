@@ -1,32 +1,34 @@
-import { type ReactNode, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useGlobalStore } from "@/stores";
-
-interface PageTitleProps {
-  children: ReactNode;
-}
+import {useLocation} from "react-router";
+import {useTranslation} from "react-i18next";
+import useMenuStore from "@/stores/menu";
 
 /**
  * 页面标题组件
- * 职责：监听 documentTitle 状态变化，负责实际的 document.title 更新
- * 标题格式化由 usePageTitle Hook 负责
  */
-const PageTitle = ({ children }: PageTitleProps) => {
-  const documentTitle = useGlobalStore(state => state.documentTitle);
+const PageTitle = () => {
+  const {t} = useTranslation();
+  const location = useLocation();
+  const routeMap = useMenuStore(data => data.routeMap);
   const defaultSiteName = useGlobalStore(state => state.title);
-  const lastTitleRef = useRef<string>("");
 
   useEffect(() => {
-    // 使用已格式化的标题，或回退到默认站点名
-    const title = documentTitle || defaultSiteName || "Xin Admin";
-
-    // 性能优化: 避免设置相同的标题
-    if (lastTitleRef.current !== title) {
+    const title = defaultSiteName || "Xin Admin";
+    const route = routeMap[location.pathname];
+    if(!route) {
       document.title = title;
-      lastTitleRef.current = title;
+      return;
     }
-  }, [documentTitle, defaultSiteName]);
+    const pageTitle = route.local ? t(route.local) : route.name;
+    if(pageTitle) {
+      document.title = pageTitle+  ' - ' + title;
+    } else {
+      document.title = title;
+    }
+  }, [location, defaultSiteName, t, routeMap]);
 
-  return <>{children}</>;
+  return null;
 }
 
 export default PageTitle;

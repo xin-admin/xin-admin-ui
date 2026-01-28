@@ -27,7 +27,6 @@ export const initialGlobalState = {
 const persistedKeys: (keyof typeof initialGlobalState)[] = [
   'layout',
   'themeConfig',
-  'menuParentKey',
 ];
 
 /**

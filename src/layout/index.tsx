@@ -8,6 +8,7 @@ import MenuRender from "@/layout/MenuRender";
 import MobileDrawerMenu from "@/layout/MobileDrawerMenu";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import SettingDrawer from "@/layout/SettingDrawer";
+import PageTitle from "@/components/PageTitle";
 
 const {Content, Sider} = Layout;
 
@@ -29,6 +30,8 @@ const LayoutRender = () => {
       
       {/* 主题设置抽屉 */}
       <SettingDrawer />
+      {/* 页面标题 */}
+      <PageTitle />
 
       {/* 移动端布局：隐藏侧边栏，使用抽屉菜单 */}
       {isMobile ? (

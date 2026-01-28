@@ -6,31 +6,39 @@ import {useTranslation} from "react-i18next";
 import useMenuStore from "@/stores/menu";
 import {useLocation} from "react-router";
 
+const defaultBreadcrumb: BreadcrumbProps['items'] = [
+  {
+    title: <HomeOutlined />,
+  }
+]
+
 const BreadcrumbRender = () => {
   const {t} = useTranslation();
   const location = useLocation();
-  const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
-  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbProps['items']>([
-    {
-      title: <HomeOutlined />,
-    }
-  ]);
+  const routeMap = useMenuStore(state => state.routeMap);
+  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbProps['items']>(defaultBreadcrumb);
   useEffect(() => {
     const path = location.pathname;
-    setBreadcrumbItems([
-      {
-        title: <HomeOutlined />,
-      },
-      ...breadcrumbMap[path].map(item => ({
-        title: (
+    const route = routeMap[path];
+    if(!route) {
+      setBreadcrumbItems(defaultBreadcrumb)
+    } else {
+      setBreadcrumbItems([
+        {
+          title: <HomeOutlined />,
+        },
+        ...route.breadcrumb.map(item => ({
+          title: (
             <>
               {item.icon && <IconFont name={item.icon} />}
               <span>{item.local ? t(item.local) : item.title}</span>
             </>
-        ),
-      }))
-    ]);
-  }, [breadcrumbMap, t, location]);
+          ),
+        }))
+      ]);
+    }
+
+  }, [routeMap, t, location]);
 
   return (
     <Breadcrumb items={breadcrumbItems}/>
