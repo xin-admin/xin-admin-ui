@@ -4,7 +4,7 @@
  */
 
 import type { StateCreator } from 'zustand';
-import type { GlobalStore, LayoutState, LayoutAction, BreadcrumbItem } from '@/stores/types';
+import type { GlobalStore, LayoutState, LayoutAction } from '@/stores/types';
 import type { LayoutType } from "@/layout/typing";
 
 export type LayoutSlice = LayoutState & LayoutAction;
@@ -17,7 +17,6 @@ export const initialLayoutState: LayoutState = {
   collapsed: false,
   isMobile: false,
   mobileMenuOpen: false,
-  breadcrumb: [],
   menuParentKey: null,
 };
 
@@ -41,10 +40,6 @@ export const createLayoutSlice: StateCreator<GlobalStore, [], [], LayoutSlice> =
   
   setMobileMenuOpen: (mobileMenuOpen: boolean) => {
     set({ mobileMenuOpen });
-  },
-  
-  setBreadcrumb: (breadcrumb: BreadcrumbItem[]) => {
-    set({ breadcrumb });
   },
   
   setMenuParentKey: (menuParentKey: string) => {

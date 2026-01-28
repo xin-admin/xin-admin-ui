@@ -40,7 +40,6 @@ const MenuRender = () => {
   const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
   const layout = useGlobalStore(state => state.layout);
   const menuParentKey = useGlobalStore(state => state.menuParentKey);
-  const setBreadcrumb = useGlobalStore(state => state.setBreadcrumb);
   const isMobile = useGlobalStore(state => state.isMobile);
   const navigate = useNavigate();
   const { setPageTitle } = usePageTitle();
@@ -61,7 +60,6 @@ const MenuRender = () => {
 
   const menuClick: MenuProps['onClick'] = useCallback((info: any) => {
     const menu = menuMap[info.key];
-    setBreadcrumb(breadcrumbMap[info.key]);
     const headTitle = menu.local ? t(menu.local) : menu.name;
     setPageTitle(headTitle || '');
     if(! menu.path) return;
@@ -70,7 +68,7 @@ const MenuRender = () => {
     } else {
       navigate(menu.path);
     }
-  }, [menuMap, breadcrumbMap, t, navigate, setPageTitle, setBreadcrumb])
+  }, [menuMap, breadcrumbMap, t, navigate, setPageTitle])
 
   return (
     <Menu

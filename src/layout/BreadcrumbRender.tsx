@@ -1,49 +1,36 @@
 import {Breadcrumb, type BreadcrumbProps} from "antd";
-import {useGlobalStore} from "@/stores";
 import {useEffect, useState} from "react";
 import {HomeOutlined} from "@ant-design/icons";
 import IconFont from "@/components/IconFont";
 import {useTranslation} from "react-i18next";
+import useMenuStore from "@/stores/menu";
+import {useLocation} from "react-router";
 
 const BreadcrumbRender = () => {
   const {t} = useTranslation();
-  const breadcrumb = useGlobalStore(state => state.breadcrumb);
+  const location = useLocation();
+  const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbProps['items']>([
     {
-      href: '/',
       title: <HomeOutlined />,
     }
-  ])
+  ]);
   useEffect(() => {
+    const path = location.pathname;
     setBreadcrumbItems([
       {
-        href: '/',
         title: <HomeOutlined />,
       },
-      ...breadcrumb.map(item => {
-        if(item.href) {
-          return {
-            href: item.href,
-            title: (
-              <>
-                {item.icon && <IconFont name={item.icon} />}
-                <span>{item.local ? t(item.local) : item.title}</span>
-              </>
-            ),
-          }
-        }else {
-          return {
-            title: (
-              <>
-                {item.icon && <IconFont name={item.icon} />}
-                <span>{item.local ? t(item.local) : item.title}</span>
-              </>
-            ),
-          }
-        }
-      })
-    ])
-  }, [breadcrumb, t]);
+      ...breadcrumbMap[path].map(item => ({
+        title: (
+            <>
+              {item.icon && <IconFont name={item.icon} />}
+              <span>{item.local ? t(item.local) : item.title}</span>
+            </>
+        ),
+      }))
+    ]);
+  }, [breadcrumbMap, t, location]);
 
   return (
     <Breadcrumb items={breadcrumbItems}/>

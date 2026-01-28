@@ -26,7 +26,7 @@ const buildMenuIndexes = (menus: IMenus[]): MenuIndexes => {
         ...parentBreadcrumb,
         { href: menu.path, title: menu.name, icon: menu.icon, local: menu.local }
       ];
-      breadcrumbMap[menu.key] = currentBreadcrumb;
+      breadcrumbMap[menu.path!] = currentBreadcrumb;
       if (menu.children?.length) {
         traverse(menu.children, currentBreadcrumb);
       }

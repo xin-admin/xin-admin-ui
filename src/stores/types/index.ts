@@ -55,7 +55,6 @@ export interface LayoutState {
   collapsed: boolean;
   isMobile: boolean;
   mobileMenuOpen: boolean;
-  breadcrumb: BreadcrumbItem[];
   menuParentKey: string | null;
 }
 

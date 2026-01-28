@@ -33,8 +33,6 @@ const HeaderLeftRender = () => {
   const userInfo = useAuthStore(state => state.userinfo);
   const logout = useAuthStore(state => state.logout);
   const menuMap = useMenuStore(state => state.menuMap);
-  const breadcrumbMap = useMenuStore(state => state.breadcrumbMap);
-  const setBreadcrumb = useGlobalStore(state => state.setBreadcrumb);
   const isMobile = useGlobalStore(state => state.isMobile);
   const { setPageTitle } = usePageTitle();
 
@@ -64,7 +62,6 @@ const HeaderLeftRender = () => {
       icon: <UserOutlined/> ,
       onClick: () => {
         const menu = menuMap['user.setting'];
-        setBreadcrumb(breadcrumbMap['user.setting']);
         const headTitle = menu.local ? t(menu.local) : menu.name;
         setPageTitle(headTitle || '');
         navigate('/user/setting');
