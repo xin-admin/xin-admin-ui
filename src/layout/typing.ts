@@ -21,8 +21,6 @@ export interface ThemeProps {
   borderRadius?: number;
   // 按钮和输入框等基础控件的高度
   controlHeight?: number;
-  // 是否开启动画
-  motion?: boolean;
   // 头部两侧内边距
   headerPadding?: number;
   // 头部高度
@@ -51,8 +49,6 @@ export interface ThemeProps {
   siderColor?: string;
   // 布局分割线边框颜色
   colorBorder?: string;
-  // 开启布局边框
-  layoutBorder?: boolean;
   // 算法
   algorithm?: algorithmType;
 }

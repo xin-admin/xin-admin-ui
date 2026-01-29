@@ -20,7 +20,7 @@ const FooterRender: React.FC = () => {
           " z-10 w-full bottom-0 pt-2.5 pb-2.5"
         }
         style={{
-          borderTop: themeConfig.layoutBorder ? '1px solid ' + themeConfig.colorBorder : 'none',
+          borderTop: '1px solid ' + themeConfig.colorBorder,
         }}
       >
         <div className={"flex items-center justify-center w-full"}>

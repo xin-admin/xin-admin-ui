@@ -35,7 +35,7 @@ const MobileDrawerMenu: React.FC = () => {
       width={280}
       styles={{
         header: {
-          borderBottom: themeConfig.layoutBorder ? '1px solid ' + themeConfig.colorBorder : 'none',
+          borderBottom: '1px solid ' + themeConfig.colorBorder,
           background: themeConfig.siderBg,
           color: themeConfig.siderColor,
         },

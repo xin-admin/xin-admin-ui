@@ -33,8 +33,6 @@ export default {
   "layout.colorBorder": "Border Color",
   "layout.styleConfig": "Style Configuration",
   "layout.fixedFooter": "Fixed Footer",
-  "layout.motion": "Enable Motion",
-  "layout.layoutBorder": "Layout Border",
   "layout.borderRadius": "Border Radius",
   "layout.controlHeight": "Control Height",
   "layout.headerPadding": "Header Padding",

@@ -30,8 +30,6 @@ const THEME_CONFIGS = [
 // 风格配置项
 const STYLE_CONFIGS = [
   {key: 'fixedFooter', label: 'layout.fixedFooter', type: 'switch'},
-  {key: 'motion', label: 'layout.motion', type: 'switch'},
-  {key: 'layoutBorder', label: 'layout.layoutBorder', type: 'switch'},
   {key: 'borderRadius', label: 'layout.borderRadius', type: 'number', min: 0, max: 30},
   {key: 'controlHeight', label: 'layout.controlHeight', type: 'number', min: 0},
   {key: 'headerPadding', label: 'layout.headerPadding', type: 'number', min: 0},

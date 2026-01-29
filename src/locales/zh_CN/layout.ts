@@ -33,8 +33,6 @@ export default {
   "layout.colorBorder": "布局边框颜色",
   "layout.styleConfig": "风格配置",
   "layout.fixedFooter": "固定页脚",
-  "layout.motion": "开启动画",
-  "layout.layoutBorder": "开启边框",
   "layout.borderRadius": "圆角大小",
   "layout.controlHeight": "基础控件高度",
   "layout.headerPadding": "头部两侧内边距",

@@ -51,8 +51,6 @@ export const configTheme: ThemeProps = {
   borderRadius: 10,
   // 按钮和输入框等基础控件的高度
   controlHeight: 32,
-  // 是否开启动画
-  motion: true,
   // 头部两侧内边距
   headerPadding: 20,
   // 头部高度
