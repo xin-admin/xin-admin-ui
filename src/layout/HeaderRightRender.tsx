@@ -15,7 +15,6 @@ import {
 import { useGlobalStore } from "@/stores";
 import useAuthStore from "@/stores/user";
 import {useTranslation} from "react-i18next";
-
 import {useNavigate} from "react-router";
 import {useState} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -31,7 +30,6 @@ const HeaderLeftRender = () => {
   const userInfo = useAuthStore(state => state.userinfo);
   const logout = useAuthStore(state => state.logout);
   const isMobile = useGlobalStore(state => state.isMobile);
-
   const [fullscreen, setFullscreen] = useState<boolean>(false);
   const [searchOpen, setSearch] = useState<boolean>(false);
 
