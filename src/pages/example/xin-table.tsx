@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { Button, Tag, message } from 'antd';
+import { Button, Tag } from 'antd';
 import { ExportOutlined } from '@ant-design/icons';
 import type { XinTableColumn } from '@/components/XinTableV2/typings';
 import XinTableV2 from '@/components/XinTableV2';
@@ -31,8 +30,7 @@ const mockData: User[] = Array.from({ length: 50 }, (_, i) => ({
 /**
  * XinTableV2 示例页面
  */
-const XinTableExample: React.FC = () => {
-  const [data] = useState<User[]>(mockData);
+const XinTableExample = () => {
 
   // 表格列配置
   const columns: XinTableColumn<User>[] = [
@@ -120,57 +118,6 @@ const XinTableExample: React.FC = () => {
     },
   ];
 
-  // 自定义请求（模拟后端分页）
-  const handleRequest = async (params: any) => {
-    console.log('请求参数:', params);
-    
-    // 模拟搜索过滤
-    let filteredData = [...data];
-    
-    if (params.search?.name) {
-      filteredData = filteredData.filter(item => 
-        item.name.includes(params.search.name)
-      );
-    }
-    if (params.search?.email) {
-      filteredData = filteredData.filter(item => 
-        item.email.includes(params.search.email)
-      );
-    }
-    if (params.search?.status !== undefined && params.search?.status !== '') {
-      filteredData = filteredData.filter(item => 
-        item.status === Number(params.search.status)
-      );
-    }
-    if (params.search?.role) {
-      filteredData = filteredData.filter(item => 
-        item.role === params.search.role
-      );
-    }
-
-    // 模拟分页
-    const { current = 1, pageSize = 10 } = params;
-    const start = (current - 1) * pageSize;
-    const end = start + pageSize;
-    const pageData = filteredData.slice(start, end);
-
-    // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    return {
-      data: pageData,
-      total: filteredData.length,
-      success: true,
-    };
-  };
-
-  // 批量删除
-  const handleBatchDelete = async (keys: React.Key[], rows: User[]) => {
-    console.log('批量删除:', { keys, rows });
-    message.success(`成功删除 ${keys.length} 条记录`);
-    return true;
-  };
-
   // 自定义工具栏
   const customToolbar = [
     <Button key="export" icon={<ExportOutlined />}>
@@ -182,7 +129,7 @@ const XinTableExample: React.FC = () => {
     <XinTableV2 
       columns={columns}
       rowKey="id"
-      selectionType={'radio'}
+      dataSource={mockData}
       accessName='system.user.list'
       api={'/sys-user/list'}
       toolBarRender={customToolbar}

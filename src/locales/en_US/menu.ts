@@ -29,6 +29,8 @@ export default {
   "menu.example.user-selector": "User Selector",
   "menu.example.icon-selector": "Icon Selector",
   "menu.example.image-uploader": "Image Uploader",
+  "menu.example.xin-form": "Xin Form",
+  "menu.example.xin-table": "Xin Table",
   "menu.user": "User Center",
   "menu.user.index": "Profile",
   "menu.user.setting": "User Settings",

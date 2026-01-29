@@ -71,7 +71,7 @@ const ColumnSiderRender: React.FC = () => {
             ))}
           </div>
 
-          <div style={{ width: themeConfig.siderWeight }}>
+          <div style={{ width: themeConfig.siderWeight }} className={"p-2.5"}>
             <div className={"font-semibold text-[20px] text-center pt-2.5 pb-2.5"}>
               {title}
             </div>

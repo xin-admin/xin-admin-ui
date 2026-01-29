@@ -33,6 +33,7 @@ const AppProvider = ({ children }: PropsWithChildren) => {
       Menu: {
         activeBarBorderWidth: 0,
         itemBg: 'transparent',
+        subMenuItemBg: 'transparent',
       }
     },
     token: {

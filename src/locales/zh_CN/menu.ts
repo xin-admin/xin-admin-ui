@@ -29,6 +29,8 @@ export default {
   "menu.example.user-selector": "用户选择器",
   "menu.example.icon-selector": "图标选择器",
   "menu.example.image-uploader": "图片上传器",
+  "menu.example.xin-form": "Xin Form",
+  "menu.example.xin-table": "Xin Table",
   "menu.user": "个人中心",
   "menu.user.index": "个人中心",
   "menu.user.setting": "用户设置",
