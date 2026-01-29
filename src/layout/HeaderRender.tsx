@@ -57,10 +57,9 @@ const HeaderRender: React.FC = () => {
     }
   }, [t, navigate]);
 
-  return (
-    <ConfigProvider theme={theme}>
-      {/* 移动端菜单按钮 */}
-      {isMobile ? (
+  if (isMobile) {
+    return (
+      <ConfigProvider theme={theme}>
         <Header className={"flex sticky z-1 top-0 backdrop-blur-xs justify-between items-center"}>
           <div className={"flex items-center"}>
             <img className={"w-9 mr-5"} src={logo} alt="logo"/>
@@ -68,44 +67,54 @@ const HeaderRender: React.FC = () => {
           </div>
           <HeaderRightRender/>
         </Header>
-      ) : (
-        <Header className={"flex sticky z-1 top-0 backdrop-blur-xs"}>
-          { layout !== 'columns' && (
-            <div className={"flex items-center"}>
-              <img className={"w-9 mr-5"} src={logo} alt="logo"/>
-              <span className={"font-semibold text-[20px] mr-2"}>{title}</span>
-              {/* 侧边栏开关 */}
-              {['mix', 'side'].includes(layout) && (
-                <Button
-                  type={'text'}
-                  className={'text-[16px] mr-2'}
-                  onClick={() => setCollapsed(!collapsed)}
-                >
-                  { collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/> }
-                </Button>
-              )}
-              {/* 面包屑 */}
-              { ['columns', 'side'].includes(layout) && <BreadcrumbRender/> }
-            </div>
+      </ConfigProvider>
+    )
+  }
+
+  return (
+    <ConfigProvider theme={theme}>
+      <Header
+        className={"flex sticky z-1 top-0 backdrop-blur-xs"}
+        style={{borderBottom: "1px solid " + themeConfig.colorBorder}}
+      >
+        <div className={"flex items-center relative"}>
+          {/* 顶栏标题 */}
+          {layout === 'top' && (
+            <>
+              <img className={"w-9"} src={logo} alt="logo"/>
+              <span className={"font-semibold text-[20px] ml-5"}>{title}</span>
+            </>
           )}
-          <div className={"overflow-auto flex-1"}>
-            {/* 顶部菜单 */}
-            { layout == 'top' && <MenuRender /> }
-            {/* 混合布局模式下的顶部菜单 */}
-            { layout == 'mix' && (
-              <Menu
-                className={"border-b-0 w-full"}
-                mode="horizontal"
-                items={mixMenu}
-                onSelect={onSelect}
-                selectedKeys={selectKey}
-                onClick={({keyPath}) => setSelectKey(keyPath)}
-              />
-            )}
-          </div>
-          <HeaderRightRender/>
-        </Header>
-      )}
+          {/* 侧边栏开关 */}
+          {['mix', 'side'].includes(layout) && (
+            <Button
+              type={'text'}
+              className={'text-[16px] mr-2.5'}
+              onClick={() => setCollapsed(!collapsed)}
+            >
+              { collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/> }
+            </Button>
+          )}
+          {/* 面包屑 */}
+          {['columns', 'side'].includes(layout) && <BreadcrumbRender/> }
+        </div>
+        <div className={"overflow-hidden flex-1"}>
+          {/* 顶部菜单 */}
+          { layout == 'top' && <MenuRender /> }
+          {/* 混合布局模式下的顶部菜单 */}
+          { layout == 'mix' && (
+            <Menu
+              className={"border-b-0 w-full"}
+              mode="horizontal"
+              items={mixMenu}
+              onSelect={onSelect}
+              selectedKeys={selectKey}
+              onClick={({keyPath}) => setSelectKey(keyPath)}
+            />
+          )}
+        </div>
+        <HeaderRightRender/>
+      </Header>
     </ConfigProvider>
   )
 }

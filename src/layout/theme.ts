@@ -8,7 +8,7 @@ export const defaultColorTheme: ThemeProps = {
   borderRadius: 8,
   colorText: "#000",
   colorBg: "#fff",
-  bodyBg: "#F2F8FC",
+  bodyBg: "#f9f9f9",
   footerBg: "#fff",
   headerBg: "#fff",
   headerColor: "#000",

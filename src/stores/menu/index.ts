@@ -19,15 +19,7 @@ const initialState: MenuStoreState = {
 export function buildRouteMap(menus: IMenus[], parentBreadcrumbs: BreadcrumbItem[] = []): RouteMapType {
   const routeMap: RouteMapType = {};
 
-  const processMenu = (
-    menu: IMenus,
-    breadcrumbs: BreadcrumbItem[],
-    topMenuKey?: string
-  ) => {
-    const isTopLevel = menu.pid === 0 || menu.pid === undefined;
-    const currentTopMenuKey = isTopLevel && menu.key
-      ? menu.key
-      : topMenuKey;
+  const processMenu = ( menu: IMenus, breadcrumbs: BreadcrumbItem[]) => {
     const currentBreadcrumb: BreadcrumbItem = {
       href: menu.path,
       title: menu.name,
@@ -39,14 +31,13 @@ export function buildRouteMap(menus: IMenus[], parentBreadcrumbs: BreadcrumbItem
     if (menu.path) {
       routeMap[menu.path] = {
         ...menu,
-        topMenuKey: currentTopMenuKey || '',
         breadcrumb: newBreadcrumbs,
       };
     }
 
     if (menu.children && menu.children.length > 0) {
       menu.children.forEach(child => {
-        processMenu(child, newBreadcrumbs, currentTopMenuKey);
+        processMenu(child, newBreadcrumbs);
       });
     }
   };
@@ -57,7 +48,6 @@ export function buildRouteMap(menus: IMenus[], parentBreadcrumbs: BreadcrumbItem
 
   return routeMap;
 }
-
 
 const createAuthSlice: StateCreator<MenuStore> = (set) => ({
   ...initialState,

@@ -52,21 +52,23 @@ const MenuRender = () => {
   }, [t, navigate]);
 
   return (
-    <Menu
-      className={"border-b-0 w-full"}
-      mode={ layout === 'top' && !isMobile ? 'horizontal' : 'inline' }
-      items={transformMenus(menuSource, t)}
-      defaultOpenKeys={selectKey}
-      defaultSelectedKeys={selectKey}
-      onClick={({keyPath}) => {
-        if (layout === 'mix' || layout === 'columns') {
-          setSelectKey([...keyPath, selectKey[selectKey.length - 1]])
-        } else {
-          setSelectKey(keyPath)
-        }
-      }}
-      onSelect={onSelect}
-    />
+    <div className={'pl-2.5 pr-2.5'}>
+      <Menu
+        className={"border-b-0 w-full"}
+        mode={ layout === 'top' && !isMobile ? 'horizontal' : 'inline' }
+        items={transformMenus(menuSource, t)}
+        defaultOpenKeys={selectKey}
+        defaultSelectedKeys={selectKey}
+        onClick={({keyPath}) => {
+          if (layout === 'mix' || layout === 'columns') {
+            setSelectKey([...keyPath, selectKey[selectKey.length - 1]])
+          } else {
+            setSelectKey(keyPath)
+          }
+        }}
+        onSelect={onSelect}
+      />
+    </div>
   )
 }
 

@@ -1,8 +1,7 @@
 import {ConfigProvider, Layout, theme} from "antd";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
-import React from "react";
-
+import React, {useMemo, useState} from "react";
 import IconFont from "@/components/IconFont";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
@@ -22,17 +21,26 @@ const ColumnSiderRender: React.FC = () => {
   const selectKey = useMenuStore(state => state.selectKey);
   const menus = useMenuStore(state => state.menus);
   const {token} = useToken();
+  const [showSubMenu, setShowSubMenu] = useState(false);
 
   const menuClick = (rule: ISysRule) => {
-    setSelectKey([rule.key!])
+    setSelectKey([rule.key!]);
     if (rule.type === 'route') {
       if (rule.link) {
         window.open(rule.path, '_blank')
       } else {
-        navigate(rule.path!)
+        navigate(rule.path!);
+        setShowSubMenu(false);
       }
+    } else {
+      setShowSubMenu(true);
     }
   }
+
+  const siderWidth = useMemo(() => {
+    const menuWidth = themeConfig.siderWeight ? themeConfig.siderWeight : 226;
+    return 72 + (showSubMenu ? menuWidth : 0);
+  }, [themeConfig.siderWeight, showSubMenu]);
 
   return (
     <ConfigProvider
@@ -42,13 +50,13 @@ const ColumnSiderRender: React.FC = () => {
       }}
     >
       <Sider
-        width={(themeConfig.siderWeight ? themeConfig.siderWeight : 226) + 72}
+        width={siderWidth}
         className={"h-screen sticky top-0 bottom-0"}
         style={{color: themeConfig.siderColor}}
       >
         <div className={"w-full flex h-full"}>
           <div
-            className={'w-[72px] box-border h-full overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'}
+            className={'w-18 box-border h-full overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'}
             style={{borderRight: "1px solid " + themeConfig.colorBorder}}
           >
             <div className={"w-full flex items-center justify-center pt-2.5 pb-2.5"}>
@@ -59,8 +67,8 @@ const ColumnSiderRender: React.FC = () => {
               <div
                 key={rule.key}
                 style={{
-                  backgroundColor: selectKey[selectKey.length - 1] === rule.key ? token.colorPrimaryBg : 'transparent',
-                  color: selectKey[selectKey.length - 1] === rule.key ? token.colorPrimary : themeConfig.siderColor,
+                  backgroundColor: selectKey.at(-1) === rule.key ? token.colorPrimaryBg : 'transparent',
+                  color: selectKey.at(-1) === rule.key ? token.colorPrimary : themeConfig.siderColor,
                 }}
                 className={"flex items-center justify-center flex-col p-2 mb-2 pt-3 pb-3 cursor-pointer"}
                 onClick={() => menuClick(rule)}
@@ -71,12 +79,19 @@ const ColumnSiderRender: React.FC = () => {
             ))}
           </div>
 
-          <div style={{ width: themeConfig.siderWeight }} className={"p-2.5"}>
-            <div className={"font-semibold text-[20px] text-center pt-2.5 pb-2.5"}>
-              {title}
+          {showSubMenu && (
+            <div
+              style={{
+                width: themeConfig.siderWeight,
+                borderRight: "1px solid " + themeConfig.colorBorder
+              }}
+            >
+              <div className={"font-semibold text-[20px] text-center pt-2.5 pb-2.5"}>
+                {title}
+              </div>
+              <MenuRender/>
             </div>
-            <MenuRender/>
-          </div>
+          )}
         </div>
       </Sider>
     </ConfigProvider>

@@ -1,10 +1,4 @@
 import type {IMenus} from "@/domain/iSysRule.ts";
-import type {BreadcrumbItem} from "@/stores";
-
-export type RouteMapType = Record<string, IMenus & {
-  breadcrumb: BreadcrumbItem[],
-  topMenuKey: string
-}>
 
 export interface BreadcrumbItem {
   href?: string;
@@ -12,6 +6,10 @@ export interface BreadcrumbItem {
   icon?: string;
   local?: string;
 }
+
+export type RouteMapType = Record<string, IMenus & {
+  breadcrumb: BreadcrumbItem[]
+}>
 
 
 export interface MenuStoreState {
