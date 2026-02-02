@@ -6,7 +6,6 @@ import useMenuStore from "@/stores/menu";
 
 /**
  * 带动画的 Outlet 组件
- * 使用 react-transition-group 实现路由切换动画
  */
 export default function AnimatedOutlet() {
   const location = useLocation();
@@ -14,21 +13,26 @@ export default function AnimatedOutlet() {
   const nodeRef = useRef<HTMLDivElement>(null);
   const routeMap = useMenuStore(state => state.routeMap);
 
-  // 查找所有 menuMap 中 type 为 嵌套路由的 pathname
-  const nestedRoutes = useMemo(() => {
+  // 获取所有嵌套路由的父级路径
+  const nestedParentPaths = useMemo(() => {
     return Object.values(routeMap)
       .filter(route => route.type === 'nested-route')
-      .map(route => route.path);
+      .map(route => route.path)
+      .filter(Boolean) as string[];
   }, [routeMap]);
 
-  if (nestedRoutes.includes(location.pathname)) {
-    return currentOutlet;
-  }
+  // 计算动画 key
+  const animationKey = useMemo(() => {
+    const parentPath = nestedParentPaths.find(path => 
+      location.pathname.startsWith(path + '/') || location.pathname === path
+    );
+    return parentPath || location.pathname;
+  }, [location.pathname, nestedParentPaths]);
 
   return (
     <SwitchTransition mode="out-in">
       <CSSTransition
-        key={location.pathname}
+        key={animationKey}
         nodeRef={nodeRef}
         timeout={360}
         classNames="page"
