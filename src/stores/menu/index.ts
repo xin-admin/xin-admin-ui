@@ -2,24 +2,36 @@ import {create, type StateCreator} from 'zustand';
 import {createJSONStorage, devtools, persist} from "zustand/middleware";
 import {menu} from "@/api/sys/sysUser.ts";
 import type {IMenus} from "@/domain/iSysRule.ts";
-import type {MenuStore, MenuStoreState, MenuStoreActions, RouteMapType, BreadcrumbItem} from "./types";
+import type {MenuStore, MenuStoreState, MenuStoreActions, BreadcrumbItem} from "./types";
 
 const initialState: MenuStoreState = {
   menus: [],
   selectKey: [],
   routeMap: {},
+  pathMap: {},
+  breadcrumbMap: {},
+  parentKeyMap: {}
 };
 
 /**
- * 将菜单树转换为路径映射表
+ * 将菜单树转换为路径映射表和 key->path 映射表
  * @param menus 菜单数组
- * @param parentBreadcrumbs 父级面包屑
- * @returns 路径映射表
+ * @returns 路径映射表和 key->path 映射表
  */
-export function buildRouteMap(menus: IMenus[], parentBreadcrumbs: BreadcrumbItem[] = []): RouteMapType {
-  const routeMap: RouteMapType = {};
+export function buildRouteMap(menus: IMenus[]): {
+  routeMap: MenuStoreState['routeMap'];
+  pathMap: MenuStoreState['pathMap'];
+  breadcrumbMap: MenuStoreState['breadcrumbMap'];
+  parentKeyMap: MenuStoreState['parentKeyMap'];
+} {
+  const routeMap: MenuStoreState['routeMap'] = {};
+  const pathMap: MenuStoreState['pathMap'] = {};
+  const parentKeyMap: MenuStoreState['parentKeyMap'] = {};
+  const breadcrumbMap: MenuStoreState['breadcrumbMap'] = {};
 
-  const processMenu = ( menu: IMenus, breadcrumbs: BreadcrumbItem[]) => {
+  const processMenu = (menu: IMenus, breadcrumbs: BreadcrumbItem[], parentKey: string[]) => {
+    if(!menu.key) return;
+    routeMap[menu.key] = menu;
     const currentBreadcrumb: BreadcrumbItem = {
       href: menu.path,
       title: menu.name,
@@ -27,36 +39,38 @@ export function buildRouteMap(menus: IMenus[], parentBreadcrumbs: BreadcrumbItem
       local: menu.local,
     };
     const newBreadcrumbs = [...breadcrumbs, currentBreadcrumb];
-
+    breadcrumbMap[menu.key] = newBreadcrumbs;
+    const newParentKey = [menu.key, ...parentKey];
+    parentKeyMap[menu.key] = newParentKey;
     if (menu.path) {
-      routeMap[menu.path] = {
-        ...menu,
-        breadcrumb: newBreadcrumbs,
-      };
+      pathMap[menu.key] = menu.path;
     }
 
     if (menu.children && menu.children.length > 0) {
       menu.children.forEach(child => {
-        processMenu(child, newBreadcrumbs);
+        processMenu(child, newBreadcrumbs, newParentKey);
       });
     }
   };
 
   menus.forEach(menu => {
-    processMenu(menu, parentBreadcrumbs);
+    processMenu(menu, [], []);
   });
 
-  return routeMap;
+  return { routeMap, pathMap, breadcrumbMap, parentKeyMap };
 }
 
 const createAuthSlice: StateCreator<MenuStore> = (set) => ({
   ...initialState,
   menu: async () => {
     const { data } = await menu();
-    const routeMap = buildRouteMap(data.data!.menus);
+    const { routeMap, pathMap, breadcrumbMap, parentKeyMap } = buildRouteMap(data.data!.menus);
     set({
       menus: data.data!.menus,
       routeMap,
+      pathMap,
+      parentKeyMap,
+      breadcrumbMap
     });
   },
   setMenus: (menus) => set({menus}),
@@ -76,5 +90,5 @@ const useMenuStore = create<MenuStore>()(
   )
 );
 
-export type { MenuStore, MenuStoreState, MenuStoreActions, BreadcrumbItem, RouteMapType};
+export type { MenuStore, MenuStoreState, MenuStoreActions, BreadcrumbItem};
 export default useMenuStore;

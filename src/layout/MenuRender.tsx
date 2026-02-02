@@ -2,7 +2,7 @@ import type {IMenus} from "@/domain/iSysRule.ts";
 import IconFont from "@/components/IconFont";
 import {useTranslation} from "react-i18next";
 import {Menu, type MenuProps} from "antd";
-import {useCallback, useMemo} from "react";
+import {useMemo} from "react";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
 import {useNavigate} from "react-router";
@@ -16,7 +16,7 @@ const transformMenus = (nodes: IMenus[], t: any): MenuItem[] => {
     const menuItem: MenuItem = {
       label: node.local ? t(node.local) : node.name,
       icon: node.icon ? <IconFont name={node.icon}/> : undefined,
-      key: node.path || node.key!,
+      key: node.key!,
     };
     if (node.type === 'menu' && node.children?.length) {
       (menuItem as any).children = transformMenus(node.children, t);
@@ -34,38 +34,38 @@ const MenuRender = () => {
   const selectKey = useMenuStore(state => state.selectKey);
   const setSelectKey = useMenuStore(state => state.setSelectKey);
   const isMobile = useGlobalStore(state => state.isMobile);
+  const pathMap = useMenuStore(state => state.pathMap);
+  const parentKeyMap = useMenuStore(state => state.parentKeyMap);
 
-  const menuSource = useMemo(() => {
+  const menuItems: MenuItem[] = useMemo(() => {
+    let menuItem: IMenus[] = menus;
     if (layout === 'mix' || layout === 'columns') {
       const rule = menus.find(item => item.key === selectKey[selectKey.length - 1]);
-      return rule?.children || [];
+      menuItem = rule?.children || [];
     }
-    return menus;
-  }, [menus, layout, selectKey]);
+    return transformMenus(menuItem, t);
+  }, [menus, layout, selectKey, t]);
 
-  const onSelect: MenuProps['onSelect'] = useCallback((info: any) => {
-    if (info.key.includes('http://') || info.key.includes('https://')) {
-      window.open(info.key, '_blank');
+  const onSelect: MenuProps['onSelect'] = (info) => {
+    setSelectKey(parentKeyMap[info.key]);
+    console.log(parentKeyMap[info.key])
+    const targetPath = pathMap[info.key];
+    if (!targetPath) return;
+    if (targetPath.includes('http://') || targetPath.includes('https://')) {
+      window.open(targetPath, '_blank');
     } else {
-      navigate(info.key);
+      navigate(targetPath);
     }
-  }, [t, navigate]);
+  }
 
   return (
     <div className={'pl-2.5 pr-2.5'}>
       <Menu
         className={"border-b-0 w-full"}
         mode={ layout === 'top' && !isMobile ? 'horizontal' : 'inline' }
-        items={transformMenus(menuSource, t)}
+        items={menuItems}
         defaultOpenKeys={selectKey}
         defaultSelectedKeys={selectKey}
-        onClick={({keyPath}) => {
-          if (layout === 'mix' || layout === 'columns') {
-            setSelectKey([...keyPath, selectKey[selectKey.length - 1]])
-          } else {
-            setSelectKey(keyPath)
-          }
-        }}
         onSelect={onSelect}
       />
     </div>

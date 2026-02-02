@@ -9,18 +9,35 @@ import MobileDrawerMenu from "@/layout/MobileDrawerMenu";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import SettingDrawer from "@/layout/SettingDrawer";
 import PageTitle from "@/components/PageTitle";
+import useMenuStore from "@/stores/menu";
+import {useEffect} from "react";
+import {useLocation} from "react-router";
 
 const {Content, Sider} = Layout;
 
 const LayoutRender = () => {
   const themeConfig = useGlobalStore(state => state.themeConfig);
+  const location = useLocation();
   const layout = useGlobalStore(state => state.layout);
   const collapsed = useGlobalStore(state => state.collapsed);
   const isMobile = useGlobalStore(state => state.isMobile);
+  const setSelectKey = useMenuStore(state => state.setSelectKey);
+  const routeMap = useMenuStore(data => data.routeMap);
   const mobileMenuOpen = useGlobalStore(state => state.mobileMenuOpen);
   const setMobileMenuOpen = useGlobalStore(state => state.setMobileMenuOpen);
   const logo = useGlobalStore(state => state.logo);
   const title = useGlobalStore(state => state.title);
+  const pathMap = useMenuStore(state => state.pathMap);
+  const parentKeyMap = useMenuStore(state => state.parentKeyMap);
+
+  useEffect(() => {
+    const pathname = location.pathname;
+    const keys = Object.keys(pathMap).find(item => pathMap[item] === pathname);
+    if(!keys) {
+      return;
+    }
+    setSelectKey(parentKeyMap[keys]);
+  }, [location, setSelectKey, routeMap]);
 
   const BodyRender = (
     <Layout className={"relative"}>

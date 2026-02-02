@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, ConfigProvider, Layout, Menu, type MenuProps, type ThemeConfig} from "antd";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
@@ -42,20 +42,21 @@ const HeaderRender: React.FC = () => {
     setMixMenu(menus.filter(item => item.hidden).map(item => ({
       label: item.local ? t(item.local) : item.name,
       icon: item.icon ? <IconFont name={item.icon}/> : false,
-      key: item.path || item.key!,
+      key: item.key!,
     })));
   }, [menus, t]);
 
-  const onSelect: MenuProps['onSelect'] = useCallback((info: any) => {
-    setSelectKey([info.key!])
-    if(routeMap[info.key]) {
+  const onSelect: MenuProps['onSelect'] = (info: any) => {
+    setSelectKey([info.key]);
+    const route = routeMap[info.key];
+    if(route && route.type === 'route' && route.path) {
       if (info.key.includes('http://') || info.key.includes('https://')) {
         window.open(info.key, '_blank');
       } else {
-        navigate(info.key);
+        navigate(route.path);
       }
     }
-  }, [t, navigate]);
+  }
 
   if (isMobile) {
     return (
@@ -109,7 +110,6 @@ const HeaderRender: React.FC = () => {
               items={mixMenu}
               onSelect={onSelect}
               selectedKeys={selectKey}
-              onClick={({keyPath}) => setSelectKey(keyPath)}
             />
           )}
         </div>

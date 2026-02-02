@@ -1,7 +1,7 @@
 import {ConfigProvider, Layout, theme} from "antd";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import IconFont from "@/components/IconFont";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
@@ -21,7 +21,13 @@ const ColumnSiderRender: React.FC = () => {
   const selectKey = useMenuStore(state => state.selectKey);
   const menus = useMenuStore(state => state.menus);
   const {token} = useToken();
-  const [showSubMenu, setShowSubMenu] = useState(false);
+  const [showSubMenu, setShowSubMenu] = useState(true);
+
+  useEffect(() => {
+    if(selectKey.length <= 1) {
+      setShowSubMenu(false);
+    }
+  }, []);
 
   const menuClick = (rule: ISysRule) => {
     setSelectKey([rule.key!]);

@@ -7,15 +7,13 @@ export interface BreadcrumbItem {
   local?: string;
 }
 
-export type RouteMapType = Record<string, IMenus & {
-  breadcrumb: BreadcrumbItem[]
-}>
-
-
 export interface MenuStoreState {
   menus: IMenus[];
   selectKey: string[];
-  routeMap: RouteMapType;
+  routeMap: Record<string, IMenus>;
+  pathMap: Record<string, string>;
+  parentKeyMap: Record<string, string[]>;
+  breadcrumbMap: Record<string, BreadcrumbItem[]>;
 }
 
 export interface MenuStoreActions {
