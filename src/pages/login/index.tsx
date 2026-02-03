@@ -11,7 +11,7 @@ import {
 import { Col, Divider, Row, Space, Button, Form, Input, Checkbox, Typography } from 'antd';
 import {type CSSProperties, useEffect, useState} from 'react';
 import React from 'react';
-import { useGlobalStore } from '@/stores';
+import useGlobalStore from '@/stores/global';
 import useAuthStore from '@/stores/user';
 import {useNavigate} from "react-router";
 import type { LoginParams } from '@/api/sys/sysUser';

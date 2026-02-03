@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Drawer, Space } from 'antd';
-import { useGlobalStore } from '@/stores';
+import useGlobalStore from '@/stores/global';
 import MenuRender from '@/layout/MenuRender';
 import {GithubOutlined, HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined, SettingOutlined} from '@ant-design/icons';
 import LanguageSwitcher from '@/components/LanguageSwitcher';

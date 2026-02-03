@@ -3,7 +3,7 @@ import IconFont from "@/components/IconFont";
 import {useTranslation} from "react-i18next";
 import {Menu, type MenuProps} from "antd";
 import {useMemo} from "react";
-import { useGlobalStore } from "@/stores";
+import useGlobalStore from "@/stores/global";
 import useMenuStore from "@/stores/menu";
 import {useNavigate} from "react-router";
 import useMobile from "@/hooks/useMobile";

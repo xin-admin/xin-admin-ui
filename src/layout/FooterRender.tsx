@@ -1,6 +1,6 @@
 import React from "react";
 import {Layout} from "antd";
-import {useGlobalStore} from "@/stores";
+import useGlobalStore from "@/stores/global";
 
 const {Footer} = Layout;
 

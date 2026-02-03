@@ -1,65 +1,62 @@
-/**
- * Global Store
- * 组合所有全局状态 Slices
- */
+import {create, type StateCreator} from 'zustand';
+import {createJSONStorage, devtools, persist} from "zustand/middleware";
+import type {GlobalStoreState, GlobalStoreActions, GlobalStore} from "./types";
+import {configTheme, defaultColorTheme} from "@/layout/theme.ts";
+import type {LayoutType, ThemeProps} from "@/layout/typing.ts";
+import {getWebInfo} from "@/api";
 
-import { create } from 'zustand';
-import { devtools, persist, createJSONStorage } from 'zustand/middleware';
-import type { GlobalStore } from '../types';
-import { createSiteSlice, initialSiteState } from './slices/site';
-import { createLayoutSlice, initialLayoutState } from './slices/layout';
-import { createThemeSlice, initialThemeState } from './slices/theme';
-
-/**
- * Global Store 初始状态
- * 用于重置或测试
- */
-export const initialGlobalState = {
-  ...initialSiteState,
-  ...initialLayoutState,
-  ...initialThemeState,
+const globalState: GlobalStoreState = {
+  logo: "https://file.xinadmin.cn/file/favicons.ico",
+  title: "Xin Admin",
+  subtitle: "基于 Ant Design 的后台管理框架",
+  describe: "Xin Admin 是一个基于 Ant Design 的后台管理框架",
+  layout: "side",
+  collapsed: false,
+  themeConfig: { ...defaultColorTheme, ...configTheme },
+  themeDrawer: false,
 };
 
-/**
- * 需要持久化的状态字段
- * 排除临时性状态如 mobileMenuOpen, themeDrawer, breadcrumb
- */
-const persistedKeys: (keyof typeof initialGlobalState)[] = [
-  'layout',
-  'themeConfig',
-];
+const globalAction: StateCreator<GlobalStoreState, [], [], GlobalStoreActions> = (set) => ({
+  initWebInfo: async () => {
+    try {
+      const response = await getWebInfo();
+      if (response.data.data) {
+        set(response.data.data);
+      }
+    } catch (error) {
+      console.error('获取网站信息失败:', error);
+    }
+  },
+  setLayout: (layout: LayoutType) => {
+    set({ layout });
+  },
+  setCollapsed: (collapsed: boolean) => {
+    set({ collapsed });
+  },
+  setThemeConfig: (themeConfig: ThemeProps) => {
+    set({ themeConfig });
+  },
 
-/**
- * Global Store
- */
-export const useGlobalStore = create<GlobalStore>()(
+  setThemeDrawer: (themeDrawer: boolean) => {
+    set({ themeDrawer });
+  },
+})
+
+const useGlobalStore = create<GlobalStore>()(
   devtools(
     persist(
       (...args) => ({
-        ...createSiteSlice(...args),
-        ...createLayoutSlice(...args),
-        ...createThemeSlice(...args),
+        ...globalState,
+        ...globalAction(...args),
       }),
       {
-        name: 'global-store-storage',
+        name: 'global-storage',
         storage: createJSONStorage(() => localStorage),
-        // 只持久化需要保存的状态，排除临时状态
-        partialize: (state) => {
-          const persisted: Partial<typeof initialGlobalState> = {};
-          for (const key of persistedKeys) {
-            if (key in state) {
-              (persisted as Record<string, unknown>)[key] = state[key as keyof GlobalStore];
-            }
-          }
-          return persisted;
-        },
       }
     ),
     { name: 'XinAdmin-Global' }
   )
 );
 
-/**
- * 导出类型供外部使用
- */
-export type { GlobalStore } from '../types';
+export type {GlobalStore, GlobalStoreState, GlobalStoreActions};
+export default useGlobalStore;

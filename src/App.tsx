@@ -1,6 +1,6 @@
 import createRouter from "@/router";
 import {RouterProvider} from "react-router";
-import {useGlobalStore} from "@/stores";
+import useGlobalStore from "@/stores/global";
 import AntdProvider from "@/components/AntdProvider";
 import {useEffect, useCallback} from "react";
 import useLanguage from '@/hooks/useLanguage';

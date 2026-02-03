@@ -2,7 +2,7 @@ import {App, ConfigProvider, type ThemeConfig} from 'antd';
 import {type PropsWithChildren, useMemo} from 'react';
 import '@ant-design/v5-patch-for-react-19';
 import algorithm from "@/layout/algorithm.ts";
-import {useGlobalStore} from "@/stores";
+import useGlobalStore from "@/stores/global";
 import useLanguage from '@/hooks/useLanguage';
 
 function ContextHolder() {

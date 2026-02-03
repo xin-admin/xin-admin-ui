@@ -1,5 +1,5 @@
 import {ConfigProvider, Layout, theme} from "antd";
-import { useGlobalStore } from "@/stores";
+import useGlobalStore from "@/stores/global";
 import useMenuStore from "@/stores/menu";
 import React, {useEffect, useMemo, useState} from "react";
 import IconFont from "@/components/IconFont";

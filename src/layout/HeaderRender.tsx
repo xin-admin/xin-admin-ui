@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Button, ConfigProvider, Layout, Menu, type MenuProps, type ThemeConfig} from "antd";
-import { useGlobalStore } from "@/stores";
+import useGlobalStore from "@/stores/global";
 import useMenuStore from "@/stores/menu";
 import HeaderRightRender from "@/layout/HeaderRightRender";
 import IconFont from "@/components/IconFont";

@@ -1,7 +1,7 @@
 import React from 'react';
 import {debounce} from 'lodash';
 import {Button, Col, ColorPicker, Divider, Drawer, InputNumber, Row, Select, Switch, theme, Tooltip} from 'antd';
-import { useGlobalStore } from "@/stores";
+import useGlobalStore from "@/stores/global";
 import {configTheme, darkColorTheme, defaultColorTheme} from "@/layout/theme.ts";
 import {algorithmOptions} from "@/layout/algorithm.ts";
 

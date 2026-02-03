@@ -1,5 +1,5 @@
 import AnimatedOutlet from '@/components/AnimatedOutlet';
-import {useGlobalStore} from "@/stores";
+import useGlobalStore from "@/stores/global";
 import {Layout} from "antd";
 import HeaderRender from "@/layout/HeaderRender";
 import FooterRender from "@/layout/FooterRender";
