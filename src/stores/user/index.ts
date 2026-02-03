@@ -7,7 +7,6 @@ import type {AuthStore, AuthStoreState, AuthStoreActions} from "./types";
 const authState: AuthStoreState = {
   userinfo: {},
   access: [],
-  initialized: false,
 };
 
 const authAction: StateCreator<AuthStore, [], [], AuthStoreActions> = (set, get) => ({
@@ -16,10 +15,10 @@ const authAction: StateCreator<AuthStore, [], [], AuthStoreActions> = (set, get)
   login: async (credentials: LoginParams) => {
     const { data } = await login(credentials);
     localStorage.setItem("token", data.data!.token);
-    set({ initialized: true });
   },
   logout: async () => {
     await logout();
+    localStorage.removeItem("token");
     set(authState);
   },
   info: async () => {

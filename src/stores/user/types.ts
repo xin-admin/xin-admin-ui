@@ -3,7 +3,6 @@ import type {LoginParams} from "@/api/sys/sysUser.ts";
 export interface AuthStoreState {
   userinfo: any;
   access: any[];
-  initialized: boolean;
 }
 
 export interface AuthStoreActions {
