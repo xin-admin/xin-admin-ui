@@ -1,19 +1,29 @@
-import React from 'react';
-import { Button, Dropdown } from 'antd';
+import React, {useMemo} from 'react';
+import {Button, Dropdown, type MenuProps} from 'antd';
 import type { ButtonProps } from 'antd';
 import { TranslationOutlined } from '@ant-design/icons';
-import { useLanguage } from '@/hooks/useLanguage';
+import useLanguage from '@/hooks/useLanguage';
 
 /**
  * 语言切换器组件
- * 提供统一的语言切换下拉菜单
  */
 const LanguageSwitcher: React.FC<ButtonProps> = (props) => {
-  const { getLanguageMenuItems, language } = useLanguage();
+  const { languageOptions, language, changeLanguage } = useLanguage();
+
+  /**
+   * 生成语言下拉菜单项
+   */
+  const languageMenuItems = useMemo<MenuProps['items']>(() => {
+    return languageOptions.map((option) => ({
+      key: option.value,
+      label: option.label,
+      onClick: () => changeLanguage(option.value),
+    }));
+  }, [languageOptions, changeLanguage]);
 
   return (
     <> 
-			<Dropdown menu={{ items: getLanguageMenuItems(), selectedKeys: [language] }}>
+			<Dropdown menu={{ items: languageMenuItems, selectedKeys: [language] }}>
 				<Button icon={<TranslationOutlined />} {...props} />
 			</Dropdown>
     </>

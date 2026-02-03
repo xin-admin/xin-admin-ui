@@ -3,8 +3,7 @@ import {type PropsWithChildren, useMemo} from 'react';
 import '@ant-design/v5-patch-for-react-19';
 import algorithm from "@/layout/algorithm.ts";
 import {useGlobalStore} from "@/stores";
-
-import { useAntdLocale } from '@/hooks/useLanguage';
+import useLanguage from '@/hooks/useLanguage';
 
 function ContextHolder() {
   const { message, modal, notification } = App.useApp();
@@ -16,7 +15,7 @@ function ContextHolder() {
 
 const AppProvider = ({ children }: PropsWithChildren) => {
   const themeConfig = useGlobalStore(state => state.themeConfig);
-  const locale = useAntdLocale();
+  const { antdLocale } = useLanguage();
 
   const theme: ThemeConfig = useMemo(() => ({
     components: {
@@ -52,7 +51,7 @@ const AppProvider = ({ children }: PropsWithChildren) => {
   }), [themeConfig])
 
   return (
-    <ConfigProvider theme={{...theme, cssVar: true}} locale={locale}>
+    <ConfigProvider theme={{...theme, cssVar: true}} locale={antdLocale}>
       <App>
         <ContextHolder />
         {children}
