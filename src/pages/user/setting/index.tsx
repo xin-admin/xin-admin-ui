@@ -3,7 +3,7 @@ import {UserOutlined, LockOutlined, IdcardOutlined, SnippetsOutlined} from '@ant
 import { Outlet, useNavigate, useLocation } from 'react-router';
 import {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
-import { useMobile } from '@/hooks/useMobile';
+import useMobile from '@/hooks/useMobile';
 
 const UserSettingsPage = () => {
   const [activeTab, setActiveTab] = useState('/user/setting');

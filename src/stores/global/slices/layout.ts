@@ -15,8 +15,6 @@ export type LayoutSlice = LayoutState & LayoutAction;
 export const initialLayoutState: LayoutState = {
   layout: "side",
   collapsed: false,
-  isMobile: false,
-  mobileMenuOpen: false,
 };
 
 /**
@@ -31,13 +29,5 @@ export const createLayoutSlice: StateCreator<GlobalStore, [], [], LayoutSlice> =
   
   setCollapsed: (collapsed: boolean) => {
     set({ collapsed });
-  },
-  
-  setIsMobile: (isMobile: boolean) => {
-    set({ isMobile });
-  },
-  
-  setMobileMenuOpen: (mobileMenuOpen: boolean) => {
-    set({ mobileMenuOpen });
-  },
+  }
 });

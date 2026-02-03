@@ -6,6 +6,7 @@ import {useMemo} from "react";
 import { useGlobalStore } from "@/stores";
 import useMenuStore from "@/stores/menu";
 import {useNavigate} from "react-router";
+import useMobile from "@/hooks/useMobile";
 type MenuItem = Required<MenuProps>['items'][number];
 
 const transformMenus = (nodes: IMenus[], t: any): MenuItem[] => {
@@ -33,7 +34,7 @@ const MenuRender = () => {
   const layout = useGlobalStore(state => state.layout);
   const selectKey = useMenuStore(state => state.selectKey);
   const setSelectKey = useMenuStore(state => state.setSelectKey);
-  const isMobile = useGlobalStore(state => state.isMobile);
+  const isMobile = useMobile();
   const pathMap = useMenuStore(state => state.pathMap);
   const parentKeyMap = useMenuStore(state => state.parentKeyMap);
 
@@ -48,7 +49,6 @@ const MenuRender = () => {
 
   const onSelect: MenuProps['onSelect'] = (info) => {
     setSelectKey(parentKeyMap[info.key]);
-    console.log(parentKeyMap[info.key])
     const targetPath = pathMap[info.key];
     if (!targetPath) return;
     if (targetPath.includes('http://') || targetPath.includes('https://')) {

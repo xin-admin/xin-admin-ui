@@ -28,8 +28,6 @@ export interface SiteAction {
 export interface LayoutState {
   layout: LayoutType;
   collapsed: boolean;
-  isMobile: boolean;
-  mobileMenuOpen: boolean;
 }
 
 /**
@@ -38,8 +36,6 @@ export interface LayoutState {
 export interface LayoutAction {
   setLayout: (layout: LayoutType) => void;
   setCollapsed: (collapsed: boolean) => void;
-  setIsMobile: (isMobile: boolean) => void;
-  setMobileMenuOpen: (mobileMenuOpen: boolean) => void;
 }
 
 /**

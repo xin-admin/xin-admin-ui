@@ -3,7 +3,6 @@ import {RouterProvider} from "react-router";
 import {useGlobalStore} from "@/stores";
 import AntdProvider from "@/components/AntdProvider";
 import {useEffect, useCallback} from "react";
-import {useMobile} from "@/hooks/useMobile";
 import useLanguage from '@/hooks/useLanguage';
 import useMenuStore from "@/stores/menu";
 import useAuthStore from "@/stores/user";
@@ -11,12 +10,10 @@ import useAuthStore from "@/stores/user";
 
 const App = () => {
   const { changeLanguage } = useLanguage();
-  const mobileDetected = useMobile();
   const menus = useMenuStore(state => state.menus);
   const fetchUser = useAuthStore(state => state.info);
   const fetchMenu = useMenuStore(state => state.menu);
   const initWebInfo = useGlobalStore(state => state.initWebInfo);
-  const setIsMobile = useGlobalStore(state => state.setIsMobile);
 
   useEffect(() => {
     // 初始化网站信息
@@ -24,11 +21,6 @@ const App = () => {
     // 初始化多语言信息
     changeLanguage(localStorage.getItem('i18nextLng') || 'zh');
   }, []);
-
-  // 更新移动端状态
-  useEffect(() => {
-    setIsMobile(mobileDetected);
-  }, [mobileDetected, setIsMobile]);
 
   // 初始化用户数据
   const initUserData = useCallback(async () => {

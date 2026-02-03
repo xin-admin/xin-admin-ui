@@ -18,6 +18,7 @@ import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router";
 import {useState} from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import useMobile from "@/hooks/useMobile";
 
 const {useToken} = theme;
 
@@ -29,7 +30,7 @@ const HeaderLeftRender = () => {
   const setThemeDrawer = useGlobalStore(state => state.setThemeDrawer);
   const userInfo = useAuthStore(state => state.userinfo);
   const logout = useAuthStore(state => state.logout);
-  const isMobile = useGlobalStore(state => state.isMobile);
+  const isMobile = useMobile();
   const [fullscreen, setFullscreen] = useState<boolean>(false);
   const [searchOpen, setSearch] = useState<boolean>(false);
 

@@ -9,12 +9,14 @@ import MenuRender from "@/layout/MenuRender.tsx";
 import {useNavigate} from "react-router";
 import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
 import BreadcrumbRender from "@/layout/BreadcrumbRender.tsx";
+import useMobile from "@/hooks/useMobile";
 
 const {Header} = Layout;
 
 const HeaderRender: React.FC = () => {
   const {t} = useTranslation();
   const navigate = useNavigate();
+  const isMobile = useMobile();
   const logo = useGlobalStore(state => state.logo);
   const title = useGlobalStore(state => state.title);
   const menus = useMenuStore(state => state.menus);
@@ -23,7 +25,6 @@ const HeaderRender: React.FC = () => {
   const setSelectKey = useMenuStore(state => state.setSelectKey);
   const selectKey = useMenuStore(state => state.selectKey);
   const routeMap = useMenuStore(state => state.routeMap);
-  const isMobile = useGlobalStore(state => state.isMobile);
   const collapsed = useGlobalStore(state => state.collapsed);
   const setCollapsed = useGlobalStore(state => state.setCollapsed);
   const theme: ThemeConfig = {
@@ -58,9 +59,9 @@ const HeaderRender: React.FC = () => {
     }
   }
 
-  if (isMobile) {
-    return (
-      <ConfigProvider theme={theme}>
+  return (
+    <ConfigProvider theme={theme}>
+      { isMobile ? (
         <Header className={"flex sticky z-1 top-0 backdrop-blur-xs justify-between items-center"}>
           <div className={"flex items-center"}>
             <img className={"w-9 mr-5"} src={logo} alt="logo"/>
@@ -68,53 +69,49 @@ const HeaderRender: React.FC = () => {
           </div>
           <HeaderRightRender/>
         </Header>
-      </ConfigProvider>
-    )
-  }
-
-  return (
-    <ConfigProvider theme={theme}>
-      <Header
-        className={"flex sticky z-1 top-0 backdrop-blur-xs"}
-        style={{borderBottom: "1px solid " + themeConfig.colorBorder}}
-      >
-        <div className={"flex items-center relative"}>
-          {/* 顶栏标题 */}
-          {layout === 'top' && (
-            <>
-              <img className={"w-9"} src={logo} alt="logo"/>
-              <span className={"font-semibold text-[20px] ml-5"}>{title}</span>
-            </>
-          )}
-          {/* 侧边栏开关 */}
-          {['mix', 'side'].includes(layout) && (
-            <Button
-              type={'text'}
-              className={'text-[16px] mr-2.5'}
-              onClick={() => setCollapsed(!collapsed)}
-            >
-              { collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/> }
-            </Button>
-          )}
-          {/* 面包屑 */}
-          {['columns', 'side'].includes(layout) && <BreadcrumbRender/> }
-        </div>
-        <div className={"overflow-hidden flex-1"}>
-          {/* 顶部菜单 */}
-          { layout == 'top' && <MenuRender /> }
-          {/* 混合布局模式下的顶部菜单 */}
-          { layout == 'mix' && (
-            <Menu
-              className={"border-b-0 w-full"}
-              mode="horizontal"
-              items={mixMenu}
-              onSelect={onSelect}
-              selectedKeys={selectKey}
-            />
-          )}
-        </div>
-        <HeaderRightRender/>
-      </Header>
+      ) : (
+        <Header
+          className={"flex sticky z-1 top-0 backdrop-blur-xs"}
+          style={{borderBottom: "1px solid " + themeConfig.colorBorder}}
+        >
+          <div className={"flex items-center relative"}>
+            {/* 顶栏标题 */}
+            {layout === 'top' && (
+              <>
+                <img className={"w-9"} src={logo} alt="logo"/>
+                <span className={"font-semibold text-[20px] ml-5"}>{title}</span>
+              </>
+            )}
+            {/* 侧边栏开关 */}
+            {['mix', 'side'].includes(layout) && (
+              <Button
+                type={'text'}
+                className={'text-[16px] mr-2.5'}
+                onClick={() => setCollapsed(!collapsed)}
+              >
+                { collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/> }
+              </Button>
+            )}
+            {/* 面包屑 */}
+            {['columns', 'side'].includes(layout) && <BreadcrumbRender/> }
+          </div>
+          <div className={"overflow-hidden flex-1"}>
+            {/* 顶部菜单 */}
+            { layout == 'top' && <MenuRender /> }
+            {/* 混合布局模式下的顶部菜单 */}
+            { layout == 'mix' && (
+              <Menu
+                className={"border-b-0 w-full"}
+                mode="horizontal"
+                items={mixMenu}
+                onSelect={onSelect}
+                selectedKeys={selectKey}
+              />
+            )}
+          </div>
+          <HeaderRightRender/>
+        </Header>
+      )}
     </ConfigProvider>
   )
 }
