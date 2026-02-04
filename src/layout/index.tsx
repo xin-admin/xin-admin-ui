@@ -37,32 +37,12 @@ const LayoutRender = () => {
     setSelectKey(parentKeyMap[keys]);
   }, [location, setSelectKey, routeMap]);
 
-  const BodyRender = (
-    <Layout className={"relative"}>
-
-      {/* 主题设置抽屉 */}
-      <SettingDrawer />
-      {/* 页面标题 */}
-      <PageTitle />
-
-      <HeaderRender/>
-      <Content style={{padding: themeConfig.bodyPadding}}>
-        <AnimatedOutlet/>
-      </Content>
-      <FooterRender/>
-    </Layout>
-  )
-
   return (
-    <>
+    <Layout hasSider className="min-h-screen" style={{ background: themeConfig.background }}>
       { isMobile ? (
-        <>
-          {/* 移动端抽屉菜单 */}
-          <MobileDrawerMenu />
-          { BodyRender }
-        </>
+        <MobileDrawerMenu />
       ) : (
-        <Layout hasSider className="min-h-screen" style={{ background: themeConfig.background }}>
+        <>
           {layout === 'columns' && <ColumnSiderRender/> }
           {(layout === "mix" || layout === "side") && (
             <Sider
@@ -78,10 +58,22 @@ const LayoutRender = () => {
               <MenuRender />
             </Sider>
           )}
-          { BodyRender }
-        </Layout>
+        </>
       )}
-    </>
+      <Layout className={"relative"}>
+
+        {/* 主题设置抽屉 */}
+        <SettingDrawer />
+        {/* 页面标题 */}
+        <PageTitle />
+
+        <HeaderRender/>
+        <Content style={{padding: themeConfig.bodyPadding}}>
+          <AnimatedOutlet/>
+        </Content>
+        <FooterRender/>
+      </Layout>
+    </Layout>
   );
 };
 

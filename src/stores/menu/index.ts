@@ -72,6 +72,7 @@ const createAuthSlice: StateCreator<MenuStore> = (set) => ({
       parentKeyMap,
       breadcrumbMap
     });
+    return data.data!.menus;
   },
   setMenus: (menus) => set({menus}),
   setSelectKey: (selectKey) => set({selectKey}),

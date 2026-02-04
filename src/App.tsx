@@ -11,7 +11,6 @@ import Loading from "@/components/Loading";
 
 const App = () => {
   const { changeLanguage } = useLanguage();
-  const menus = useMenuStore(state => state.menus);
   const fetchUser = useAuthStore(state => state.info);
   const fetchMenu = useMenuStore(state => state.menu);
   const initWebInfo = useGlobalStore(state => state.initWebInfo);
@@ -25,8 +24,9 @@ const App = () => {
     // 初始化用户数据
     const isLoggedIn = !!localStorage.getItem('token');
     if (isLoggedIn) {
-      await Promise.all([fetchUser(), fetchMenu()]);
-      setRoutes(createRouter(menus))
+      await fetchUser()
+      const menus = await fetchMenu();
+      setRoutes(createRouter(menus));
     } else {
       setRoutes(createRouter([]))
       if (window.location.pathname !== '/login') {

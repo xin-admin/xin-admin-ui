@@ -17,7 +17,7 @@ export interface MenuStoreState {
 }
 
 export interface MenuStoreActions {
-  menu: () => Promise<void>;
+  menu: () => Promise<IMenus[]>;
   setMenus: (menus: IMenus[]) => void;
   setSelectKey: (selectKey: string[]) => void;
 }
